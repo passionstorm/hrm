@@ -19,8 +19,23 @@ Route::get('test', function(){
 	return view('admin.pages.index');
 });
 
+Route::get('login', 'UserController@GetLogin');
+Route::post('login', 'UserController@PostLogin');
+Route::get('logout', 'UserController@GetLogout');
+
+
 Route::group(['prefix'=>'admin'],function(){
-	Route::get('login', function(){
-		return view('admin.login');
-	});
+
+	Route::get('index', function(){
+		return view('admin.pages.index');
+	})->middleware('AdminLogin');
+
+
+
+	Route::get('register', 'UserController@GetRegister');
+	Route::post('register', 'UserController@PostRegister');
 });
+
+Route::get('mempage', function(){
+	return view('mempage');
+})->middleware('login');
