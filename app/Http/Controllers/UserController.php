@@ -19,6 +19,9 @@ class UserController extends Controller
         if($request->hasFile('avatar')){
             $file = $request->file('avatar');
             $hinh = Str::random(4).'_'.$file->getClientOriginalName();
+            while(file_exists('upload/avatar/'.$hinh)){
+                $hinh = Str::random(4).'_'.$file->getClientOriginalName();
+            }
             $file->move('upload/avatar', $hinh);
         }else{
             $hinh='user_avatar.jpg';
@@ -34,7 +37,7 @@ class UserController extends Controller
                 'salary'=>$request->salary,
                 'avatar'=>$hinh,
                 'created_at'=>Carbon::now(),
-                'created_by'=>Auth::user()->id
+                'created_by'=>Auth::user()->username
             ]
         );
         return redirect('admin/index');
