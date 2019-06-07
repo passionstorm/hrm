@@ -24,13 +24,14 @@ class register extends FormRequest
     public function rules()
     {
         return [
-            'email' => 'required',
+            'email' => 'required|unique:users,email',
             'password' => 'required',
             'rpassword' => 'required|same:password',
             'role' => 'required',
             'name' => 'required',
-            'username' => 'required',
-            'salary' => 'required'
+            'username' => 'required|unique:users,username',
+            'salary' => 'required',
+            'avatar' => 'image'
         ];
     }
 }

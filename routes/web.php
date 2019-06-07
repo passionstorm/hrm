@@ -16,7 +16,7 @@ Route::get('/', function () {
 });
 
 Route::get('test', function(){
-	return view('admin.pages.index');
+	echo var_dump(Auth::user()->created_at->toFormattedDateString());
 });
 
 Route::get('login', 'UserController@GetLogin');
@@ -25,15 +25,16 @@ Route::get('logout', 'UserController@GetLogout');
 
 
 Route::group(['prefix'=>'admin', 'middleware'=>'AdminLogin'],function(){
-
 	Route::get('index', function(){
 		return view('admin.pages.index');
 	});
 
-
-
 	Route::get('register', 'UserController@GetRegister');
 	Route::post('register', 'UserController@PostRegister');
+
+	Route::group(['prefix'=>'users'], function(){
+		Route::get('list', 'UserController@GetList');
+	});
 });
 
 Route::get('mempage', function(){
