@@ -37,7 +37,7 @@
   <div class="register-box-body">
     <p class="login-box-msg">Register a new membership</p>
     @include('messages.errors')
-    <form action="admin/register" method="post">
+    <form action="admin/register" method="post" enctype="multipart/form-data">
       @csrf
       <div class="form-group has-feedback">
         <label>Role</label>
@@ -73,6 +73,10 @@
       <div class="form-group has-feedback">
         <label>Salary</label>
         <input type="number" class="form-control" placeholder="Salary" name="salary" min="0">
+      </div>
+      <div class="form-group has-feedback">
+        <label>Avatar</label>
+        <input type="file" class="form-control" placeholder="Salary" name="avatar">
       </div>
 
       <div class="text-center">

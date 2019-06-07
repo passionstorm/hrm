@@ -6,7 +6,7 @@
   <!-- Content Header (Page header) -->
   <section class="content-header">
     <h1>
-      Dashboard
+      List of users
     </h1>
   </section>
   <!-- Main content -->
