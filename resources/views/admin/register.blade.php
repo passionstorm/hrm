@@ -42,7 +42,8 @@
       <div class="form-group has-feedback">
         <label>Role</label>
         <select class="form-control" name="role">
-          <option value="0">Normal</option>
+          <option value="0">Member</option>
+          <option value="2">Staff</option>
           <option value="1">Admin</option>
         </select>
       </div>
