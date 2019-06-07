@@ -24,7 +24,7 @@ class UserController extends Controller
                 'organization'=>$request->organization,
                 'salary'=>$request->salary,
                 'created_at'=>Carbon::now(),
-                'created_by'=>1
+                'created_by'=>Auth::user()->id
             ]
         );
         echo "done";

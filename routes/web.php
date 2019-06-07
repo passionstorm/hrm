@@ -24,11 +24,11 @@ Route::post('login', 'UserController@PostLogin');
 Route::get('logout', 'UserController@GetLogout');
 
 
-Route::group(['prefix'=>'admin'],function(){
+Route::group(['prefix'=>'admin', 'middleware'=>'AdminLogin'],function(){
 
 	Route::get('index', function(){
 		return view('admin.pages.index');
-	})->middleware('AdminLogin');
+	});
 
 
 
