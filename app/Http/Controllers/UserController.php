@@ -119,7 +119,9 @@ class UserController extends Controller
             while(file_exists(public_path().'/upload/avatar/'.$name)){
                 $name = Str::random(4).'_'.$file->getClientOriginalName();
             }
-            $file->move(public_path().'/upload/avatar', $name);
+            $path = public_path().'/upload/avatar/'.$name; 
+            // $file->move(public_path().'/upload/avatar', $name);
+            File::makeDirectory($path, $mode = 0775, true, true);
             $user->avatar = $name;
         }
 
