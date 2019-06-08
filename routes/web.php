@@ -36,6 +36,12 @@ Route::group(['prefix'=>'admin' , 'middleware'=>'AdminLogin'],function(){
 	});
 });
 
+Route::group(['prefix'=>'user'], function(){
+	Route::get('edit/{id}', 'UserController@GetEdit')->middleware('login');
+	Route::post('edit/{id}', 'UserController@PostEdit');
+});
+
+
 Route::get('mempage', function(){
 	return view('mempage');
 })->middleware('login');
