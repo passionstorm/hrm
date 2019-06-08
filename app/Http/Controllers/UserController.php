@@ -21,8 +21,6 @@ class UserController extends Controller
         if($request->hasFile('avatar')){
             $file = $request->file('avatar');
             $hinh = Str::random(4).'_'.$file->getClientOriginalName();
-            // $path = public_path().'/upload/avatar'.$hinh;
-            // File::makeDirectory($path, $mode = 0777, true, true);
             while(file_exists('upload/avatar/'.$hinh)){
                 $hinh = Str::random(4).'_'.$file->getClientOriginalName();
             }
@@ -119,8 +117,6 @@ class UserController extends Controller
         if($request->hasFile('avatar')){
             $file = $request->avatar;
             $name = Str::random(4).'_'.$file->getClientOriginalName();
-            // $path = public_path().'/upload/avatar'.$name;
-            // File::makeDirectory($path, $mode = 0777, true, true);
             while(file_exists('upload/avatar/'.$name)){
                 $name = Str::random(4).'_'.$file->getClientOriginalName();
             }
