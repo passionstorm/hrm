@@ -31,7 +31,7 @@ class register extends FormRequest
             'name' => 'required',
             'username' => 'required|unique:users,username',
             'salary' => 'required',
-            'avatar' => 'image'
+            'avatar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ];
     }
 }

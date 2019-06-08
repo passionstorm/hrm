@@ -30,7 +30,7 @@ class EditUser extends FormRequest
             'name' => 'required',
             'username' => 'required',
             'salary' => 'required',
-            'avatar' => 'image'
+            'avatar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ];
     }
 }

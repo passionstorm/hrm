@@ -16,7 +16,7 @@ Route::get('/', function () {
 });
 
 Route::get('test', function(){
-	echo public_path();
+	echo md5(time());
 });
 
 Route::get('login', 'UserController@GetLogin');

@@ -20,11 +20,8 @@ class UserController extends Controller
     public function PostRegister(register $request){
         if($request->hasFile('avatar')){
             $file = $request->file('avatar');
-            $hinh = Str::random(4).'_'.$file->getClientOriginalName();
-            while(file_exists('upload/avatar/'.$hinh)){
-                $hinh = Str::random(4).'_'.$file->getClientOriginalName();
-            }
-            $file->move('upload/avatar', $hinh);
+            $hinh = md5(time()).'_'.$file->getClientOriginalName();
+            $file->move(public_path('upload/avatar'), $hinh);
         }else{
             $hinh='user_avatar.jpg';
         }
@@ -116,11 +113,8 @@ class UserController extends Controller
         //validate avatar
         if($request->hasFile('avatar')){
             $file = $request->avatar;
-            $name = Str::random(4).'_'.$file->getClientOriginalName();
-            while(file_exists('upload/avatar/'.$name)){
-                $name = Str::random(4).'_'.$file->getClientOriginalName();
-            }
-            $file->move('upload/avatar', $name);
+            $name = md5(time()).'_'.$file->getClientOriginalName();
+            $file->move(public_path('upload/avatar'), $name);
             $user->avatar = $name;
         }
 
