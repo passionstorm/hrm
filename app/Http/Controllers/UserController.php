@@ -51,8 +51,10 @@ class UserController extends Controller
     	if(Auth::attempt(['username'=>$request->username, 'password'=>$request->password])){
             if(Auth::user()->role == 1){
                 return redirect('admin/index');
+            }elseif(Auth::user()->role == 2){
+                return redirect('staff/index');
             }else{
-                return redirect('mempage');
+                return redirect('member/index');
             }
     	}else{
     		return redirect('login')->with('fail', 'Login failed');
