@@ -16,7 +16,7 @@ Route::get('/', function () {
 });
 
 Route::get('test', function(){
-	echo var_dump(Auth::user()->created_at->toFormattedDateString());
+	echo public_path();
 });
 
 Route::get('login', 'UserController@GetLogin');
