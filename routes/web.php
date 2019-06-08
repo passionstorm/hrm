@@ -16,7 +16,7 @@ Route::get('/', function () {
 });
 
 Route::get('test', function(){
-	echo base_path();
+	echo public_path();
 });
 
 Route::get('login', 'UserController@GetLogin');
