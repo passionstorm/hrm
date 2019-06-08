@@ -21,14 +21,13 @@ class UserController extends Controller
     public function PostRegister(register $request)
     {
         if ($request->hasFile('avatar')) {
-            $file = $request->file('avatar');
-            $hinh = Str::random(4) . '_' . $file->getClientOriginalName();
-            while (file_exists('upload/avatar/' . $hinh)) {
-                $hinh = Str::random(4) . '_' . $file->getClientOriginalName();
-            }
-            $file->move('upload/avatar', $hinh);
+            $request->validate([
+                'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            ]);
+            $imageName =  md5(time()).'.'. $request->avatar->getClientOriginalExtension();
+            $request->avatar->move(public_path('upload/avatar'), $imageName);
         } else {
-            $hinh = 'user_avatar.jpg';
+            $imageName = 'user_avatar.jpg';
         }
         DB::table('users')->insert(
             [
@@ -39,7 +38,7 @@ class UserController extends Controller
                 'password' => bcrypt($request->password),
                 'organization' => $request->organization,
                 'salary' => $request->salary,
-                'avatar' => $hinh,
+                'avatar' => $imageName,
                 'created_at' => Carbon::now(),
                 'created_by' => Auth::user()->username
             ]
