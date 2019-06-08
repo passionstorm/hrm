@@ -21,10 +21,10 @@ class UserController extends Controller
         if($request->hasFile('avatar')){
             $file = $request->file('avatar');
             $hinh = Str::random(4).'_'.$file->getClientOriginalName();
-            while(file_exists(public_path().'/upload/avatar/'.$hinh)){
+            while(file_exists('upload/avatar/'.$hinh)){
                 $hinh = Str::random(4).'_'.$file->getClientOriginalName();
             }
-            $file->move(public_path().'/upload/avatar', $hinh);
+            $file->move('upload/avatar', $hinh);
         }else{
             $hinh='user_avatar.jpg';
         }
