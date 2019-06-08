@@ -2,85 +2,99 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EditUser;
 use Illuminate\Http\Request;
 use App\Http\Requests\login;
 use App\Http\Requests\register;
-use App\Http\Requests\EditUser;
-use Illuminate\Support\Facades\Auth;
-use DB;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
-    public function GetRegister(){
+    public function GetRegister()
+    {
         return view('admin.register');
     }
-    public function PostRegister(register $request){
-        if($request->hasFile('avatar')){
+
+    public function PostRegister(register $request)
+    {
+        if ($request->hasFile('avatar')) {
             $file = $request->file('avatar');
-            $hinh = Str::random(4).'_'.$file->getClientOriginalName();
-            while(file_exists('upload/avatar/'.$hinh)){
-                $hinh = Str::random(4).'_'.$file->getClientOriginalName();
+            $hinh = Str::random(4) . '_' . $file->getClientOriginalName();
+            while (file_exists('upload/avatar/' . $hinh)) {
+                $hinh = Str::random(4) . '_' . $file->getClientOriginalName();
             }
             $file->move('upload/avatar', $hinh);
-        }else{
-            $hinh='user_avatar.jpg';
+        } else {
+            $hinh = 'user_avatar.jpg';
         }
         DB::table('users')->insert(
             [
-                'role'=>$request->role,
-                'name'=>$request->name,
-                'username'=>$request->username,
-                'email'=>$request->email,
-                'password'=>bcrypt($request->password),
-                'organization'=>$request->organization,
-                'salary'=>$request->salary,
-                'avatar'=>$hinh,
-                'created_at'=>Carbon::now(),
-                'created_by'=>Auth::user()->username
+                'role' => $request->role,
+                'name' => $request->name,
+                'username' => $request->username,
+                'email' => $request->email,
+                'password' => bcrypt($request->password),
+                'organization' => $request->organization,
+                'salary' => $request->salary,
+                'avatar' => $hinh,
+                'created_at' => Carbon::now(),
+                'created_by' => Auth::user()->username
             ]
         );
         return redirect('admin/index');
     }
 
-    public function GetLogin(){
-    	return view('login');
+    public function GetLogin()
+    {
+        return view('login');
     }
-    public function PostLogin(login $request){
-    	if(Auth::attempt(['username'=>$request->username, 'password'=>$request->password])){
-            if(Auth::user()->role == 1){
+
+    public function PostLogin(login $request)
+    {
+        if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
+            if (Auth::user()->role == 1) {
                 return redirect('admin/index');
-            }elseif(Auth::user()->role == 2){
+            } elseif (Auth::user()->role == 2) {
                 return redirect('staff/index');
-            }else{
+            } else {
                 return redirect('member/index');
             }
-    	}else{
-    		return redirect('login')->with('fail', 'Login failed');
-    	}
+        } else {
+            return redirect('login')->with('fail', 'Login failed');
+        }
     }
-    public function GetLogout(){
+
+    public function GetLogout()
+    {
         Auth::Logout();
         return redirect('login');
     }
-    public function GetList(){
-        $users = DB::table('users')->get();
-        return view('admin.users.list', ['users'=>$users]);
+
+    public function GetList()
+    {
+        $users = DB::table('users')->where('id', '!=', Auth::id())->get();
+        return view('admin.users.list', ['users' => $users]);
     }
-    public function GetEdit($id){
-        if(Auth::user()->id == $id || Auth::user()->role == 1){
+
+    public function GetEdit($id)
+    {
+        if (Auth::user()->id == $id || Auth::user()->role == 1) {
             $user = DB::table('users')->find($id);
-            return view('user.edit', ['user'=>$user]);
-        }else{
+            return view('user.edit', ['user' => $user]);
+        } else {
             echo "You can not access this page";
         }
     }
-    public function PostEdit(EditUser $request, $id){
+
+    public function PostEdit(EditUser $request, $id)
+    {
         $user = DB::table('users')->find($id);
-        
+
         //validate password and rpassword
-        if($request->ChangePassword == 'on'){           
+        if ($request->ChangePassword == 'on') {
             $request->validate(
                 [
                     'password' => 'required',
@@ -89,13 +103,13 @@ class UserController extends Controller
             );
             DB::table('users')->where('id', $id)->update(
                 [
-                    'password'=>bcrypt($request->password),
+                    'password' => bcrypt($request->password),
                 ]
             );
         }
 
         //validate username
-        if($request->username != $user->username){
+        if ($request->username != $user->username) {
             $request->validate(
                 [
                     'username' => 'unique:users,username'
@@ -104,7 +118,7 @@ class UserController extends Controller
         }
 
         //validate email
-        if($request->email != $user->email){
+        if ($request->email != $user->email) {
             $request->validate(
                 [
                     'email' => 'unique:users,email'
@@ -113,32 +127,27 @@ class UserController extends Controller
         }
 
         //validate avatar
-        if($request->hasFile('avatar')){
-            $file = $request->avatar;
-            $name = Str::random(4).'_'.$file->getClientOriginalName();
-            while(file_exists(public_path().'/upload/avatar/'.$name)){
-                $name = Str::random(4).'_'.$file->getClientOriginalName();
-            }
-            $path = public_path().'/upload/avatar/'.$name; 
-            // $file->move(public_path().'/upload/avatar', $name);
-            File::makeDirectory($path, $mode = 0775, true, true);
-            $user->avatar = $name;
+        if ($request->hasFile('avatar')) {
+            $request->validate([
+                'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            ]);
+            $imageName =  md5(time()).'.'. $request->avatar->getClientOriginalExtension();
+            $request->avatar->move(public_path('upload/avatar'), $imageName);
         }
 
-    
         DB::table('users')->where('id', $id)->update(
             [
-                'role'=>$request->role,
-                'name'=>$request->name,
-                'username'=>$request->username,
-                'email'=>$request->email,
-                'organization'=>$request->organization,
-                'salary'=>$request->salary,
-                'avatar'=>$user->avatar,
-                'updated_at'=>Carbon::now(),
-                'updated_by'=>Auth::user()->username
+                'role' => $request->role,
+                'name' => $request->name,
+                'username' => $request->username,
+                'email' => $request->email,
+                'organization' => $request->organization,
+                'salary' => $request->salary,
+                'avatar' => $imageName,
+                'updated_at' => Carbon::now(),
+                'updated_by' => Auth::user()->username
             ]
         );
-        return redirect('user/edit/'.$id)->with('success', 'successful editing!');
+        return redirect('user/edit/' . $id)->with('success', 'successful editing!');
     }
 }
