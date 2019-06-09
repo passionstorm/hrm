@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Support\Facades\Auth;
 
 
-class login
+class PreventMem
 {
     /**
      * Handle an incoming request.
@@ -18,7 +18,11 @@ class login
     public function handle($request, Closure $next)
     {
         if(Auth::check()){
-            return $next($request);
+            if(Auth::user()->role != 0){
+                return $next($request);
+            }else{
+                return abort(401);
+            }
         }else{
             return abort(401);
         }

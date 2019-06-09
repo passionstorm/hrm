@@ -1,4 +1,4 @@
-@extends('admin.layout.index')
+@extends('layout.index')
 
 @section('content')
 <!-- Content Wrapper. Contains page content -->

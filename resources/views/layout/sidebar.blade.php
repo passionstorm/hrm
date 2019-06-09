@@ -27,11 +27,24 @@
   <ul class="sidebar-menu" data-widget="tree">
     <li class="header">MAIN NAVIGATION</li>
     <li>
-      <a href="admin/index">
+      <?php
+
+        $OnlyAdmin='list-item';
+        if(Auth::user()->role != Constants::ROLE_ADMIN){
+          $OnlyAdmin = 'none';
+        }
+
+        $PreventMember='list-item';
+        if(Auth::user()->role == Constants::ROLE_MEMBER){
+          $PreventMember = 'none';
+        }
+
+      ?>
+      <a href="index">
         <i class="fa fa-dashboard"></i> <span>Dashboard</span>
       </a>
     </li>
-    <li class="treeview">
+    <li class="treeview" style="display: {{$PreventMember}}">
       <a href="#">
         <i class="fa fa-users"></i>
         <span>Users</span>
@@ -40,8 +53,21 @@
         </span>
       </a>
       <ul class="treeview-menu">
-        <li><a href="admin/users/list"><i class="fa fa-circle-o"></i> List</a></li>
-        <li><a href="admin/register"><i class="fa fa-circle-o"></i> Add</a></li>
+        <li><a href="users/list"><i class="fa fa-circle-o"></i> List</a></li>
+        <li style="display: {{$OnlyAdmin}}"><a href="register"><i class="fa fa-circle-o"></i> Add</a></li>
+      </ul>
+    </li> 
+    <li class="treeview" style="display: {{$PreventMember}}">
+      <a href="#">
+        <i class="fa fa-users"></i>
+        <span>Projects</span>
+        <span class="pull-right-container">
+          <i class="fa fa-angle-left pull-right"></i>
+        </span>
+      </a>
+      <ul class="treeview-menu">
+        <li><a href="projects/list"><i class="fa fa-circle-o"></i> List</a></li>
+        <li style="display: {{$OnlyAdmin}}"><a href="projects/add"><i class="fa fa-circle-o"></i> Add</a></li>
       </ul>
     </li> 
   </ul>

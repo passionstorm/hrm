@@ -1,4 +1,4 @@
-@extends('admin.layout.index')
+@extends('layout.index')
 
 @section('css')
 <!-- DataTables -->
@@ -7,12 +7,36 @@
     #spc:after{
         content: none;
     }
+    .d-n{
+      display: none !important;
+    }
+    .iga-1{
+        border-right: 1px solid #d2d6de !important;
+        padding-left: 6px !important;
+        padding-right: 6px !important;
+    }
+    .input-group-addon{
+        width: 0% !important;
+    }
+    .is_deleted{
+      display: none
+    }
 </style>
+
 @endsection
 
 @section('content')
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
+  @include('messages.success')
+
+  <?php 
+    $OnlyAdmin = '';
+    if(Auth::user()->role != Constants::ROLE_ADMIN){
+      $OnlyAdmin = 'd-n';
+    }
+  ?>
+
   <!-- Content Header (Page header) -->
   <section class="content-header">
     <h1>
@@ -25,6 +49,16 @@
       <div class="col-xs-12">
         <div class="box">
           <div class="box-body">
+
+            <div class="row" style="margin-bottom: 20px">
+              <div class="col-lg-3">
+                <div class="input-group">
+                  <span class="input-group-addon iga-1"><input type="checkbox" id="osau" checked></span>
+                  <span class="input-group-addon"><b>Show only available users</b></span>
+                </div>
+              </div>
+            </div>
+
             <table id="example1" class="table table-bordered table-striped">
               <thead>
               <tr>
@@ -33,18 +67,26 @@
                 <th>Organization</th>
                 <th>Salary</th>
                 <th>Created_at</th>
-                <th id='spc'></th>
+                <th>is_deleted</th>
+                <th id='spc' class='{{$OnlyAdmin}}'></th>
+                <th id='spc' class='{{$OnlyAdmin}}'></th>
               </tr>
               </thead>
               <tbody>
                 @foreach($users as $u)
-                <tr>
+                <tr class="@if($u->is_deleted){{"is_deleted"}}@endif">
                     <td>{{$u->id}}</td>
                     <td>{{$u->name}}</td>
                     <td>{{$u->organization}}</td>
                     <td>{{$u->salary}}</td>
                     <td>{{$u->created_at}}</td>
-                    <td style="text-align: center"><a href="user/edit/{{$u->id}}">Edit</a></td>
+                    <td>
+                      @if($u->is_deleted)
+                        {!!'<span class="fa fa-check"></span>'!!}
+                      @endif
+                    </td>
+                    <td style="text-align: center" class='{{$OnlyAdmin}}'><a href="users/edit/{{$u->id}}">Edit</a></td>
+                    <td style="text-align: center" class='{{$OnlyAdmin}}'><a href="users/delete/{{$u->id}}">Delete</a></td>
                 </tr>
                 @endforeach
               </tbody>
@@ -80,6 +122,18 @@
       'autoWidth'   : false
     })
   })
+
+  //chuyen doi hien thi va ko hien thi is_deleted user
+  $(document).ready(function(){
+    $('#osau').change(function(){
+      if(!$(this).is(':checked')){
+        $('.is_deleted').css('display', 'table-row');
+      }else{
+        $('.is_deleted').css('display', 'none');
+      }
+    });
+  });
+
 </script>
 
 @endsection

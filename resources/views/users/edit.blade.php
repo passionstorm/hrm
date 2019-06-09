@@ -1,4 +1,4 @@
-@extends('admin.layout.index')
+@extends('layout.index')
 
 @section('css')
 <style>
@@ -6,7 +6,6 @@
         border-right: 1px solid #d2d6de !important;
         padding-left: 6px !important;
         padding-right: 6px !important;
-
     }
     .input-group-addon{
         width: 0% !important;
@@ -41,7 +40,9 @@
 @endsection
 
 @section('script')
-    <script>
+
+    {{-- checkbox để chuyển đổi giữa có và không hiển thị change password --}}
+{{--     <script>
         $(document).ready(function(){
             $('#ChangePassword').change(function(){
                 if( $(this).is(':checked') ){
@@ -51,5 +52,6 @@
                 }
             });
         });
-    </script>
+    </script> --}}
+
 @endsection

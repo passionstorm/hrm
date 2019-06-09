@@ -1,10 +1,16 @@
 <!-- form start -->
-<form role="form" action="user/edit/{{$user->id}}" method="post" enctype="multipart/form-data">
+<form role="form" action="users/edit/{{$user->id}}" method="post" enctype="multipart/form-data">
   @csrf
+  <?php 
+    $OnlyAdmin = '';
+    if(Auth::user()->role != Constants::ROLE_ADMIN){
+      $OnlyAdmin = 'disabled';
+    }
+  ?>
   <div class="box-body" style="padding-bottom: 20px">
     <div class="form-group">
       <label>Role</label>
-      <select class="form-control" name="role">
+      <select class="form-control" name="role" {{$OnlyAdmin}}>
         <option value="0"
           @if($user->role == 0)
             {{'selected'}} 
@@ -28,7 +34,7 @@
     </div>
     <div class="form-group">
       <label>Username</label>
-      <input type="text" class="form-control" name="username" value="{{$user->username}}">
+      <input type="text" class="form-control" name="username" value="{{$user->username}}" readonly>
     </div>
     <div class="form-group">
       <label>Email</label>
@@ -36,18 +42,18 @@
     </div>
     <div class="form-group">
       <label>Organization</label>
-      <input type="text" class="form-control" name="organization" value="{{$user->organization}}">
+      <input type="text" class="form-control" name="organization" value="{{$user->organization}}" {{$OnlyAdmin}}>
     </div>
     <div class="form-group">
       <label>Salary</label>
-      <input type="number" class="form-control" placeholder="Salary" name="salary" min="0"  value="{{$user->salary}}">
+      <input type="number" class="form-control" placeholder="Salary" name="salary" min="0"  value="{{$user->salary}}" {{$OnlyAdmin}}>
     </div>
     <div class="form-group">
       <label>Avatar</label>
       <p><img width="100" src="upload/avatar/{{$user->avatar}}" alt=""></p>
       <input type="file" class="form-control" name="avatar">
     </div>
-    <div class="row">
+{{--     <div class="row">
       <div class="col-lg-3">
         <div class="input-group">
           <span class="input-group-addon iga-1"><input type="checkbox" name="ChangePassword" id="ChangePassword"></span>
@@ -63,7 +69,7 @@
     <div class="form-group cont" hidden>
       <label>Retype password</label>
       <input type="password" class="form-control" placeholder="Retype password" name="rpassword">
-    </div>
+    </div> --}}
 
     <div class="text-center">
       <button type="submit" class="btn btn-primary" style="width: 10em">Edit</button>

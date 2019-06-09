@@ -1,21 +1,20 @@
-<form action="register" method="post" enctype="multipart/form-data">
+<form action="register" method="post">
   @csrf
   <div class="box-body" style="padding-bottom: 20px">
     <div class="form-group">
-      <label>Role</label>
+      <label>Country of customers</label>
       <select class="form-control" name="role">
-        <option value="0">Member</option>
-        <option value="2">Staff</option>
+        <option value="0">VietNam</option>
         <option value="1">Admin</option>
       </select>
     </div>
     <div class="form-group">
-      <label>Full name</label>
-      <input type="text" class="form-control" placeholder="Full name" name="name">
+      <label>Name of project</label>
+      <input type="text" class="form-control" placeholder="User name" name="username">
     </div>
     <div class="form-group">
-      <label>User name</label>
-      <input type="text" class="form-control" placeholder="User name" name="username">
+      <label>Customer name</label>
+      <input type="text" class="form-control" placeholder="Full name" name="name">
     </div>
     <div class="form-group">
       <label>Email</label>
