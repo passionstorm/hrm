@@ -6,7 +6,6 @@
         border-right: 1px solid #d2d6de !important;
         padding-left: 6px !important;
         padding-right: 6px !important;
-
     }
     .input-group-addon{
         width: 0% !important;
