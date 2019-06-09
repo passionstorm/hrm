@@ -12,6 +12,7 @@ use Constants;
 
 class ProjectsController extends Controller
 {
+
    public function GetAdd(){
    	return view('projects.add');
    }
@@ -78,4 +79,5 @@ class ProjectsController extends Controller
    		);
    		return redirect('projects/edit/'.$id)->with('success', 'Successful project editing!');
    }
+
 }

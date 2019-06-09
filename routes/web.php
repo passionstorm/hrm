@@ -51,9 +51,12 @@ Route::group(['prefix'=>'users'], function(){
 
 Route::group(['prefix'=>'projects', 'middleware'=>'PreventMem'], function(){
 
+
 	Route::get('list', 'ProjectsController@GetList');
 	Route::get('add', 'ProjectsController@GetAdd');
 	Route::post('add', 'ProjectsController@PostAdd');
+
+
 
 	Route::group(['middleware'=>'AdminLogin'], function(){
 		Route::get('delete/{id}', 'ProjectsController@GetDelete');
