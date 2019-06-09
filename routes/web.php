@@ -10,13 +10,18 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+use Illuminate\Support\Carbon;
+
 
 Route::get('/', function () {
     return view('welcome');
 });
 
 Route::get('test', function(){
-	return view('pages.error_404');
+	// return var_dump(Carbon::create(2012, 9, 5, 23, 26, 11));
+	echo Carbon::now()->timestamp.'<br>';
+	echo time();
+
 });
 
 Route::get('login', 'UserController@GetLogin');
@@ -46,8 +51,14 @@ Route::group(['prefix'=>'users'], function(){
 
 Route::group(['prefix'=>'projects', 'middleware'=>'PreventMem'], function(){
 
-	// Route::get('list', 'ProjectsController@GetList');
+	Route::get('list', 'ProjectsController@GetList');
 	Route::get('add', 'ProjectsController@GetAdd');
+	Route::post('add', 'ProjectsController@PostAdd');
 
+	Route::group(['middleware'=>'AdminLogin'], function(){
+		Route::get('delete/{id}', 'ProjectsController@GetDelete');
+		Route::get('edit/{id}', 'ProjectsController@GetEdit');
+		Route::post('edit/{id}', 'ProjectsController@PostEdit');
+	});
 });
 

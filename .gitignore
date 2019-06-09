@@ -1,10 +1,10 @@
 /node_modules
 /public/hot
 /public/storage
-/storage/*.key
-/vendor/*
-/app/cache/*
-/app/logs/*
+/storage/.key
+/vendor/
+/app/cache/
+/app/logs/
 /app/bootstrap*
 .env
 .phpunit.result.cache
@@ -12,5 +12,10 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
-/bower/*
-/public/upload/*
+
+/bower/
+/public/upload/
+.gitignore
+composer.lock
+.idea/
+storage/

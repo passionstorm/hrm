@@ -11,7 +11,7 @@
   <!-- Content Header (Page header) -->
   <section class="content-header">
     <h1>
-      Add project
+      Edit project
     </h1>
   </section>
   <!-- Main content -->
@@ -21,7 +21,7 @@
       <div class="box box-primary">
         @include('messages.errors')
         @include('messages.success')
-        @include('forms.AddProject')
+        @include('forms.EditProject')
       </div>
       <!-- /.box -->
     </div>

@@ -1,4 +1,4 @@
-<form action="register" method="post">
+<form action="projects/add" method="post">
   @csrf
   <div class="box-body" style="padding-bottom: 20px">
     <div class="form-group">
@@ -10,34 +10,34 @@
     </div>
     <div class="form-group">
       <label>Name of project</label>
-      <input type="text" class="form-control" placeholder="User name" name="name">
+      <input type="text" class="form-control" name="name">
     </div>
     <div class="form-group">
       <label>Customer name</label>
-      <input type="text" class="form-control" placeholder="Full name" name="c_name">
+      <input type="text" class="form-control" name="c_name">
     </div>
     <div class="form-group">
       <label>Budget</label>
-      <input type="number" class="form-control" placeholder="budget" name="budget" min="0">
+      <input type="number" class="form-control" name="budget" min="0">
     </div>
     <!-- Date -->
     <div class="form-group">
-      <label>Date:</label>
+      <label>Deadline:</label>
       <div class="input-group date">
         <div class="input-group-addon">
           <i class="fa fa-calendar"></i>
         </div>
-        <input type="text" class="form-control pull-right" id="datepicker">
+        <input type="text" class="form-control pull-right" id="datepicker" name="deadline">
       </div>
     </div>
     
     <div class="form-group">
       <label>Describe</label>
-      <textarea class="form-control" name="" id="" cols="30" rows="3"></textarea>
+      <textarea name="describe" id="editor1" name="editor1" rows="10" cols="80"></textarea>
     </div>
 
     <div class="text-center">
-      <button type="submit" class="btn btn-primary" style="width: 10em">Add User</button>
+      <button type="submit" class="btn btn-primary" style="width: 10em">Add</button>
     </div>    
   </div>
 </form>
