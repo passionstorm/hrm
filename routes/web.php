@@ -32,13 +32,18 @@ Route::group(['prefix'=>'admin' , 'middleware'=>'AdminLogin'],function(){
 	Route::post('register', 'UserController@PostRegister');
 
 	Route::group(['prefix'=>'users'], function(){
-		Route::get('list', 'UserController@GetList');
+		Route::get('list', 'UserController@GetListUsersForAdmin');
+		Route::get('delete/{id}', 'UserController@GetDeleteUser');
 	});
 });
 
-Route::group(['prefix'=>'staff'], function(){
+Route::group(['prefix'=>'staff', 'middleware'=>'PreventMem'], function(){
 	Route::get('index', function(){
 		return view('staff.pages.index');
+	});
+
+	Route::group(['prefix'=>'users'], function(){
+		Route::get('list', 'UserController@GetListUsersForStaff');
 	});
 });
 

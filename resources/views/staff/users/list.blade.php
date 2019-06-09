@@ -57,8 +57,6 @@
                 <th>Salary</th>
                 <th>Created_at</th>
                 <th>is_deleted</th>
-                <th id='spc'></th>
-                <th id='spc'></th>
               </tr>
               </thead>
               <tbody>
@@ -74,8 +72,6 @@
                         {!!'<span class="fa fa-check"></span>'!!}
                       @endif
                     </td>
-                    <td style="text-align: center"><a href="user/edit/{{$u->id}}">Edit</a></td>
-                    <td style="text-align: center"><a href="admin/users/delete/{{$u->id}}">Delete</a></td>
                 </tr>
                 @endforeach
               </tbody>

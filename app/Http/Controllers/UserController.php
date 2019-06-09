@@ -62,10 +62,17 @@ class UserController extends Controller
         Auth::Logout();
         return redirect('login');
     }
-    public function GetList(){
-        $users = DB::table('users')->get();
+
+    public function GetListUsersForAdmin(){
+        $users = DB::table('users')->where('id','!=', Auth::user()->id)->get();
         return view('admin.users.list', ['users'=>$users]);
     }
+
+    public function GetListUsersForStaff(){
+        $users = DB::table('users')->where('id','!=', Auth::user()->id)->get();
+        return view('staff.users.list', ['users'=>$users]);
+    }
+
     public function GetEdit($id){
         if(Auth::user()->id == $id || Auth::user()->role == 1){
             $user = DB::table('users')->find($id);
@@ -133,5 +140,14 @@ class UserController extends Controller
             ]
         );
         return redirect('user/edit/'.$id)->with('success', 'successful editing!');
+    }
+
+    public function GetDeleteUser($id){
+        DB::table('users')->where('id', $id)->update(
+            [
+                'is_deleted'=>1
+            ]
+        );
+        return redirect('admin/users/list')->with('success', 'Delete user successfully!');
     }
 }

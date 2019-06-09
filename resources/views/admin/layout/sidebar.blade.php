@@ -27,7 +27,15 @@
   <ul class="sidebar-menu" data-widget="tree">
     <li class="header">MAIN NAVIGATION</li>
     <li>
-      <a href="admin/index">
+      <?php
+        $role = 'member'; 
+        if(Auth::user()->role == 1){
+          $role = 'admin';
+        }elseif(Auth::user()->role == 2){
+          $role = 'staff';
+        }
+      ?>
+      <a href="{{$role}}/index">
         <i class="fa fa-dashboard"></i> <span>Dashboard</span>
       </a>
     </li>
@@ -40,8 +48,13 @@
         </span>
       </a>
       <ul class="treeview-menu">
-        <li><a href="admin/users/list"><i class="fa fa-circle-o"></i> List</a></li>
-        <li><a href="admin/register"><i class="fa fa-circle-o"></i> Add</a></li>
+        <li><a href="{{$role}}/users/list"><i class="fa fa-circle-o"></i> List</a></li>
+        <?php 
+          if($role != 1){
+            $OnlyAdmin = 'none';
+          }
+        ?>
+        <li style="display: {{$OnlyAdmin}}"><a href="admin/register"><i class="fa fa-circle-o"></i> Add</a></li>
       </ul>
     </li> 
   </ul>
