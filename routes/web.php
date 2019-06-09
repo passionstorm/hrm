@@ -46,7 +46,9 @@ Route::group(['prefix'=>'users'], function(){
 
 Route::group(['prefix'=>'projects', 'middleware'=>'PreventMem'], function(){
 
-	Route::get('list', 'ProjectsController@GetList');
+	Route::get('add', 'ProjectsController@GetAdd');
+
+	// Route::get('list', 'ProjectsController@GetList');
 
 });
 
