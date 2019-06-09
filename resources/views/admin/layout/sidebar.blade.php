@@ -29,10 +29,16 @@
     <li>
       <?php
         $role = 'member'; 
+
         if(Auth::user()->role == 1){
           $role = 'admin';
         }elseif(Auth::user()->role == 2){
           $role = 'staff';
+        }
+
+        $OnlyAdmin='list-item';
+        if(Auth::user()->role != 1){
+          $OnlyAdmin = 'none';
         }
       ?>
       <a href="{{$role}}/index">
@@ -49,11 +55,6 @@
       </a>
       <ul class="treeview-menu">
         <li><a href="{{$role}}/users/list"><i class="fa fa-circle-o"></i> List</a></li>
-        <?php 
-          if($role != 1){
-            $OnlyAdmin = 'none';
-          }
-        ?>
         <li style="display: {{$OnlyAdmin}}"><a href="admin/register"><i class="fa fa-circle-o"></i> Add</a></li>
       </ul>
     </li> 
