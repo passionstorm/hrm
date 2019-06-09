@@ -51,9 +51,8 @@
         <!-- small box -->
         <div class="small-box bg-aqua">
           <div class="inner">
-            <h3>.</h3>
-
-            <p>.</p>
+            <h3>{{DB::table('projects')->count()}}</h3>
+            <p>Projects</p>
           </div>
           <div class="icon">
             <i class="fa fa-shopping-cart"></i>

@@ -40,15 +40,34 @@
         if(Auth::user()->role != 1){
           $OnlyAdmin = 'none';
         }
+
+        $PreventMember='list-item';
+        if(Auth::user()->role != 1){
+          $PreventMember = 'none';
+        }
+
       ?>
       <a href="{{$role}}/index">
         <i class="fa fa-dashboard"></i> <span>Dashboard</span>
       </a>
     </li>
-    <li class="treeview">
+    <li class="treeview" style="display: {{$PreventMember}}">
       <a href="#">
         <i class="fa fa-users"></i>
         <span>Users</span>
+        <span class="pull-right-container">
+          <i class="fa fa-angle-left pull-right"></i>
+        </span>
+      </a>
+      <ul class="treeview-menu">
+        <li><a href="{{$role}}/users/list"><i class="fa fa-circle-o"></i> List</a></li>
+        <li style="display: {{$OnlyAdmin}}"><a href="admin/register"><i class="fa fa-circle-o"></i> Add</a></li>
+      </ul>
+    </li> 
+    <li class="treeview" style="display: {{$PreventMember}}">
+      <a href="#">
+        <i class="fa fa-users"></i>
+        <span>Projects</span>
         <span class="pull-right-container">
           <i class="fa fa-angle-left pull-right"></i>
         </span>
