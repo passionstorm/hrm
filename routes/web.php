@@ -62,3 +62,16 @@ Route::group(['prefix'=>'projects', 'middleware'=>'PreventMem'], function(){
 	});
 });
 
+Route::group(['prefix'=>'ots'], function(){
+
+	Route::get('add', 'ProjectsController@GetAdd');
+	Route::post('add', 'ProjectsController@PostAdd');
+	
+	// Route::get('list', 'ProjectsController@GetList');
+
+	// Route::group(['middleware'=>'AdminLogin'], function(){
+	// 	Route::get('delete/{id}', 'ProjectsController@GetDelete');
+	// 	Route::get('edit/{id}', 'ProjectsController@GetEdit');
+	// 	Route::post('edit/{id}', 'ProjectsController@PostEdit');
+	// });
+});
