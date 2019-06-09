@@ -6,7 +6,7 @@
   <!-- Content Header (Page header) -->
   <section class="content-header">
     <h1>
-      Add user
+      Add project
     </h1>
   </section>
   <!-- Main content -->
@@ -15,7 +15,7 @@
       <!-- general form elements -->
       <div class="box box-primary">
         @include('messages.errors')
-        @include('forms.register')
+        @include('forms.AddProject')
       </div>
       <!-- /.box -->
     </div>
