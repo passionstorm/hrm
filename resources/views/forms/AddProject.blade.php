@@ -5,7 +5,7 @@
       <label>Country of customers</label>
       <select class="form-control" name="role">
         <option value="0">VietNam</option>
-        <option value="1">Admin</option>
+        <option value="1">Jappan</option>
       </select>
     </div>
     <div class="form-group">
@@ -17,28 +17,16 @@
       <input type="text" class="form-control" placeholder="Full name" name="name">
     </div>
     <div class="form-group">
-      <label>Email</label>
+      <label>Budget</label>
       <input type="email" class="form-control" placeholder="Email" name="email">
     </div>
     <div class="form-group">
-      <label>Password</label>
+      <label>Deadline</label>
       <input type="password" class="form-control" placeholder="Password" name="password">
     </div>
     <div class="form-group">
-      <label>Retype password</label>
+      <label>Describe</label>
       <input type="password" class="form-control" placeholder="Retype password" name="rpassword">
-    </div>
-    <div class="form-group">
-      <label>Organization</label>
-      <input type="text" class="form-control" placeholder="Organization" name="organization">
-    </div>
-    <div class="form-group">
-      <label>Salary</label>
-      <input type="number" class="form-control" placeholder="Salary" name="salary" min="0">
-    </div>
-    <div class="form-group">
-      <label>Avatar</label>
-      <input type="file" class="form-control" name="avatar">
     </div>
 
     <div class="text-center">
