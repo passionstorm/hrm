@@ -8,5 +8,7 @@ use DB;
 
 class ProjectsController extends Controller
 {
-    
+   public function GetAdd(){
+   	return view('projects.add');
+   }
 }

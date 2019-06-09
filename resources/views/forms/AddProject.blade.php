@@ -3,30 +3,37 @@
   <div class="box-body" style="padding-bottom: 20px">
     <div class="form-group">
       <label>Country of customers</label>
-      <select class="form-control" name="role">
+      <select class="form-control" name="c_country">
         <option value="0">VietNam</option>
         <option value="1">Jappan</option>
       </select>
     </div>
     <div class="form-group">
       <label>Name of project</label>
-      <input type="text" class="form-control" placeholder="User name" name="username">
+      <input type="text" class="form-control" placeholder="User name" name="name">
     </div>
     <div class="form-group">
       <label>Customer name</label>
-      <input type="text" class="form-control" placeholder="Full name" name="name">
+      <input type="text" class="form-control" placeholder="Full name" name="c_name">
     </div>
     <div class="form-group">
       <label>Budget</label>
-      <input type="email" class="form-control" placeholder="Email" name="email">
+      <input type="number" class="form-control" placeholder="budget" name="budget" min="0">
     </div>
+    <!-- Date -->
     <div class="form-group">
-      <label>Deadline</label>
-      <input type="password" class="form-control" placeholder="Password" name="password">
+      <label>Date:</label>
+      <div class="input-group date">
+        <div class="input-group-addon">
+          <i class="fa fa-calendar"></i>
+        </div>
+        <input type="text" class="form-control pull-right" id="datepicker">
+      </div>
     </div>
+    
     <div class="form-group">
       <label>Describe</label>
-      <input type="password" class="form-control" placeholder="Retype password" name="rpassword">
+      <textarea class="form-control" name="" id="" cols="30" rows="3"></textarea>
     </div>
 
     <div class="text-center">
