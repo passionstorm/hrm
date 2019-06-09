@@ -36,11 +36,11 @@
 <!-- Site wrapper -->
 <div class="wrapper">
     
-    @include('admin.layout.header')
+    @include('layout.header')
 
   <!-- =============================================== -->
 
-    @include('admin.layout.sidebar')
+    @include('layout.sidebar')
 
   <!-- =============================================== -->
 
@@ -48,10 +48,10 @@
     @yield('content')
   <!-- /.content-wrapper -->
 
-  @include('admin.layout.footer')
+  @include('layout.footer')
     
   <!-- Control Sidebar -->
-  @include('admin.layout.ControlSidebar')
+  @include('layout.ControlSidebar')
   <!-- /.control-sidebar -->
   <!-- Add the sidebar's background. This div must be placed
        immediately after the control sidebar -->

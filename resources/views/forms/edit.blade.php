@@ -1,10 +1,16 @@
 <!-- form start -->
-<form role="form" action="user/edit/{{$user->id}}" method="post" enctype="multipart/form-data">
+<form role="form" action="users/edit/{{$user->id}}" method="post" enctype="multipart/form-data">
   @csrf
+  <?php 
+    $OnlyAdmin = '';
+    if(Auth::user()->role != Constants::ROLE_ADMIN){
+      $OnlyAdmin = 'disabled';
+    }
+  ?>
   <div class="box-body" style="padding-bottom: 20px">
     <div class="form-group">
       <label>Role</label>
-      <select class="form-control" name="role">
+      <select class="form-control" name="role" {{$OnlyAdmin}}>
         <option value="0"
           @if($user->role == 0)
             {{'selected'}} 
@@ -36,11 +42,11 @@
     </div>
     <div class="form-group">
       <label>Organization</label>
-      <input type="text" class="form-control" name="organization" value="{{$user->organization}}">
+      <input type="text" class="form-control" name="organization" value="{{$user->organization}}" {{$OnlyAdmin}}>
     </div>
     <div class="form-group">
       <label>Salary</label>
-      <input type="number" class="form-control" placeholder="Salary" name="salary" min="0"  value="{{$user->salary}}">
+      <input type="number" class="form-control" placeholder="Salary" name="salary" min="0"  value="{{$user->salary}}" {{$OnlyAdmin}}>
     </div>
     <div class="form-group">
       <label>Avatar</label>

@@ -21,10 +21,10 @@ class PreventMem
             if(Auth::user()->role != 0){
                 return $next($request);
             }else{
-                return redirect('mempage')->with('fail', 'You can not access this page');
+                return abort(401);
             }
         }else{
-            return redirect('login')->with('fail', 'You must login first to access that page');
+            return abort(401);
         }
     }
 }

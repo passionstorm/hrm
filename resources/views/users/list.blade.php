@@ -1,4 +1,4 @@
-@extends('admin.layout.index')
+@extends('layout.index')
 
 @section('css')
 <!-- DataTables -->
@@ -6,6 +6,9 @@
 <style>
     #spc:after{
         content: none;
+    }
+    .d-n{
+      display: none !important;
     }
     .iga-1{
         border-right: 1px solid #d2d6de !important;
@@ -26,6 +29,14 @@
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
   @include('messages.success')
+
+  <?php 
+    $OnlyAdmin = '';
+    if(Auth::user()->role != Constants::ROLE_ADMIN){
+      $OnlyAdmin = 'd-n';
+    }
+  ?>
+
   <!-- Content Header (Page header) -->
   <section class="content-header">
     <h1>
@@ -57,6 +68,8 @@
                 <th>Salary</th>
                 <th>Created_at</th>
                 <th>is_deleted</th>
+                <th id='spc' class='{{$OnlyAdmin}}'></th>
+                <th id='spc' class='{{$OnlyAdmin}}'></th>
               </tr>
               </thead>
               <tbody>
@@ -72,6 +85,8 @@
                         {!!'<span class="fa fa-check"></span>'!!}
                       @endif
                     </td>
+                    <td style="text-align: center" class='{{$OnlyAdmin}}'><a href="users/edit/{{$u->id}}">Edit</a></td>
+                    <td style="text-align: center" class='{{$OnlyAdmin}}'><a href="users/delete/{{$u->id}}">Delete</a></td>
                 </tr>
                 @endforeach
               </tbody>

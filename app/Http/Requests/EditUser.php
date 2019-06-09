@@ -26,10 +26,8 @@ class EditUser extends FormRequest
         return [
             'email' => 'required',
             'rpassword' => 'same:password',
-            'role' => 'required',
             'name' => 'required',
             'username' => 'required',
-            'salary' => 'required',
             'avatar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ];
     }

@@ -1,4 +1,4 @@
-<form action="admin/register" method="post" enctype="multipart/form-data">
+<form action="register" method="post" enctype="multipart/form-data">
   @csrf
   <div class="box-body" style="padding-bottom: 20px">
     <div class="form-group">

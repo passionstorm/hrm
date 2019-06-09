@@ -1,4 +1,4 @@
-@extends('admin.layout.index')
+@extends('layout.index')
 
 @section('content')
 <!-- Content Wrapper. Contains page content -->
@@ -26,7 +26,7 @@
           <div class="icon">
             <i class="ion ion-person-add"></i>
           </div>
-          <a href="staff/users/list" class="small-box-footer">
+          <a href="users/list" class="small-box-footer">
             More info <i class="fa fa-arrow-circle-right"></i>
           </a>
         </div>

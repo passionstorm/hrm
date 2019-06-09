@@ -11,11 +11,12 @@ use DB;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use File;
+use Constants;
 
 class UserController extends Controller
 {
     public function GetRegister(){
-        return view('admin.register');
+        return view('register');
     }
     public function PostRegister(register $request){
         if($request->hasFile('avatar')){
@@ -39,46 +40,41 @@ class UserController extends Controller
                 'created_by'=>Auth::user()->username
             ]
         );
-        return redirect('admin/index');
+        return redirect('index');
     }
 
     public function GetLogin(){
     	return view('login');
     }
+
     public function PostLogin(login $request){
     	if(Auth::attempt(['username'=>$request->username, 'password'=>$request->password])){
-            if(Auth::user()->role == 1){
-                return redirect('admin/index');
-            }elseif(Auth::user()->role == 2){
-                return redirect('staff/index');
-            }else{
-                return redirect('member/index');
-            }
+                return redirect('index');
     	}else{
     		return redirect('login')->with('fail', 'Login failed');
     	}
     }
+
+    public function GetIndexPage(){
+        return view('pages.index');
+    }
+
     public function GetLogout(){
         Auth::Logout();
         return redirect('login');
     }
 
-    public function GetListUsersForAdmin(){
+    public function GetList(){
         $users = DB::table('users')->where('id','!=', Auth::user()->id)->get();
-        return view('admin.users.list', ['users'=>$users]);
-    }
-
-    public function GetListUsersForStaff(){
-        $users = DB::table('users')->where('id','!=', Auth::user()->id)->get();
-        return view('staff.users.list', ['users'=>$users]);
+        return view('users.list', ['users'=>$users]);
     }
 
     public function GetEdit($id){
         if(Auth::user()->id == $id || Auth::user()->role == 1){
             $user = DB::table('users')->find($id);
-            return view('user.edit', ['user'=>$user]);
+            return view('users.edit', ['user'=>$user]);
         }else{
-            echo "You can not access this page";
+            abort(401);
         }
     }
     public function PostEdit(EditUser $request, $id){
@@ -125,21 +121,27 @@ class UserController extends Controller
             $user->avatar = $name;
         }
 
-    
+        //validate role
+        if(Auth::user()->role == Constants::ROLE_ADMIN){
+            $user->role = $request->role;
+            $user->organization = $request->organization;
+            $user->salary = $request->salary;
+        }
+
         DB::table('users')->where('id', $id)->update(
             [
-                'role'=>$request->role,
+                'role'=>$user->role,
                 'name'=>$request->name,
                 // 'username'=>$request->username,
                 'email'=>$request->email,
-                'organization'=>$request->organization,
-                'salary'=>$request->salary,
+                'organization'=>$user->organization,
+                'salary'=>$user->salary,
                 'avatar'=>$user->avatar,
                 'updated_at'=>Carbon::now(),
                 'updated_by'=>Auth::user()->username
             ]
         );
-        return redirect('user/edit/'.$id)->with('success', 'successful editing!');
+        return redirect('users/edit/'.$id)->with('success', 'successful editing!');
     }
 
     public function GetDeleteUser($id){
@@ -148,6 +150,6 @@ class UserController extends Controller
                 'is_deleted'=>1
             ]
         );
-        return redirect('admin/users/list')->with('success', 'Delete user successfully!');
+        return redirect('users/list')->with('success', 'Delete user successfully!');
     }
 }

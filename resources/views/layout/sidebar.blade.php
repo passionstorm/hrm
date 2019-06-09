@@ -28,26 +28,19 @@
     <li class="header">MAIN NAVIGATION</li>
     <li>
       <?php
-        $role = 'member'; 
-
-        if(Auth::user()->role == 1){
-          $role = 'admin';
-        }elseif(Auth::user()->role == 2){
-          $role = 'staff';
-        }
 
         $OnlyAdmin='list-item';
-        if(Auth::user()->role != 1){
+        if(Auth::user()->role != Constants::ROLE_ADMIN){
           $OnlyAdmin = 'none';
         }
 
         $PreventMember='list-item';
-        if(Auth::user()->role == 0){
+        if(Auth::user()->role == Constants::ROLE_MEMBER){
           $PreventMember = 'none';
         }
 
       ?>
-      <a href="{{$role}}/index">
+      <a href="index">
         <i class="fa fa-dashboard"></i> <span>Dashboard</span>
       </a>
     </li>
@@ -60,8 +53,8 @@
         </span>
       </a>
       <ul class="treeview-menu">
-        <li><a href="{{$role}}/users/list"><i class="fa fa-circle-o"></i> List</a></li>
-        <li style="display: {{$OnlyAdmin}}"><a href="admin/register"><i class="fa fa-circle-o"></i> Add</a></li>
+        <li><a href="users/list"><i class="fa fa-circle-o"></i> List</a></li>
+        <li style="display: {{$OnlyAdmin}}"><a href="register"><i class="fa fa-circle-o"></i> Add</a></li>
       </ul>
     </li> 
     <li class="treeview" style="display: {{$PreventMember}}">
@@ -73,8 +66,8 @@
         </span>
       </a>
       <ul class="treeview-menu">
-        <li><a href="{{$role}}/users/list"><i class="fa fa-circle-o"></i> List</a></li>
-        <li style="display: {{$OnlyAdmin}}"><a href="admin/register"><i class="fa fa-circle-o"></i> Add</a></li>
+        <li><a href="projects/list"><i class="fa fa-circle-o"></i> List</a></li>
+        <li style="display: {{$OnlyAdmin}}"><a href="projects/add"><i class="fa fa-circle-o"></i> Add</a></li>
       </ul>
     </li> 
   </ul>

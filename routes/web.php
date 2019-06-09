@@ -16,48 +16,33 @@ Route::get('/', function () {
 });
 
 Route::get('test', function(){
-	echo md5(time());
+	return view('pages.error_404');
 });
 
 Route::get('login', 'UserController@GetLogin');
 Route::post('login', 'UserController@PostLogin');
 Route::get('logout', 'UserController@GetLogout');
+Route::get('index', 'UserController@GetIndexPage');
 
-Route::group(['prefix'=>'admin' , 'middleware'=>'AdminLogin'],function(){
-	Route::get('index', function(){
-		return view('admin.pages.index');
-	});
+Route::group(['middleware'=>'AdminLogin'],function(){
 
 	Route::get('register', 'UserController@GetRegister');
 	Route::post('register', 'UserController@PostRegister');
 
-	Route::group(['prefix'=>'users'], function(){
-		Route::get('list', 'UserController@GetListUsersForAdmin');
-		Route::get('delete/{id}', 'UserController@GetDeleteUser');
-	});
 });
 
-Route::group(['prefix'=>'staff', 'middleware'=>'PreventMem'], function(){
-	Route::get('index', function(){
-		return view('staff.pages.index');
-	});
+Route::group(['prefix'=>'users'], function(){
 
-	Route::group(['prefix'=>'users'], function(){
-		Route::get('list', 'UserController@GetListUsersForStaff');
-	});
-});
+	Route::get('list', 'UserController@GetList')->middleware('PreventMem');
 
-Route::group(['prefix'=>'member'], function(){
-	Route::get('index', function(){
-		return view('member.pages.index');
-	});
-});
-
-Route::group(['prefix'=>'user'], function(){
 	Route::get('edit/{id}', 'UserController@GetEdit')->middleware('login');
 	Route::post('edit/{id}', 'UserController@PostEdit');
-});
 
+	Route::group(['middleware'=>'AdminLogin'], function(){
+		Route::get('delete/{id}', 'UserController@GetDeleteUser');
+	});
+
+});
 
 Route::group(['prefix'=>'projects', 'middleware'=>'PreventMem'], function(){
 
@@ -65,6 +50,3 @@ Route::group(['prefix'=>'projects', 'middleware'=>'PreventMem'], function(){
 
 });
 
-Route::get('mempage', function(){
-	return view('mempage');
-})->middleware('login');
