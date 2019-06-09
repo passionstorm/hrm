@@ -59,6 +59,12 @@ Route::group(['prefix'=>'user'], function(){
 });
 
 
+Route::group(['prefix'=>'projects', 'middleware'=>'PreventMem'], function(){
+
+	Route::get('list', 'ProjectsController@GetList');
+
+});
+
 Route::get('mempage', function(){
 	return view('mempage');
 })->middleware('login');

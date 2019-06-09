@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use DB;
 
 
-class UserController extends Controller
+class ProjectsController extends Controller
 {
     
 }

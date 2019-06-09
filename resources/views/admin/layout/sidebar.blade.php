@@ -42,7 +42,7 @@
         }
 
         $PreventMember='list-item';
-        if(Auth::user()->role != 1){
+        if(Auth::user()->role == 0){
           $PreventMember = 'none';
         }
 
