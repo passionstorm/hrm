@@ -41,7 +41,9 @@
 @endsection
 
 @section('script')
-    <script>
+
+    {{-- checkbox để chuyển đổi giữa có và không hiển thị change password --}}
+{{--     <script>
         $(document).ready(function(){
             $('#ChangePassword').change(function(){
                 if( $(this).is(':checked') ){
@@ -51,5 +53,6 @@
                 }
             });
         });
-    </script>
+    </script> --}}
+
 @endsection

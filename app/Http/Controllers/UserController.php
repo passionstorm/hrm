@@ -84,29 +84,29 @@ class UserController extends Controller
     public function PostEdit(EditUser $request, $id){
         $user = DB::table('users')->find($id);
         
-        //validate password and rpassword
-        if($request->ChangePassword == 'on'){           
-            $request->validate(
-                [
-                    'password' => 'required',
-                    'rpassword' => 'required'
-                ]
-            );
-            DB::table('users')->where('id', $id)->update(
-                [
-                    'password'=>bcrypt($request->password),
-                ]
-            );
-        }
+        //validate password and rpassword. Then save it
+        // if($request->ChangePassword == 'on'){           
+        //     $request->validate(
+        //         [
+        //             'password' => 'required',
+        //             'rpassword' => 'required'
+        //         ]
+        //     );
+        //     DB::table('users')->where('id', $id)->update(
+        //         [
+        //             'password'=>bcrypt($request->password),
+        //         ]
+        //     );
+        // }
 
         //validate username
-        if($request->username != $user->username){
-            $request->validate(
-                [
-                    'username' => 'unique:users,username'
-                ]
-            );
-        }
+        // if($request->username != $user->username){
+        //     $request->validate(
+        //         [
+        //             'username' => 'unique:users,username'
+        //         ]
+        //     );
+        // }
 
         //validate email
         if($request->email != $user->email){
@@ -130,7 +130,7 @@ class UserController extends Controller
             [
                 'role'=>$request->role,
                 'name'=>$request->name,
-                'username'=>$request->username,
+                // 'username'=>$request->username,
                 'email'=>$request->email,
                 'organization'=>$request->organization,
                 'salary'=>$request->salary,

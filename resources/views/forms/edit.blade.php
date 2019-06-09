@@ -28,7 +28,7 @@
     </div>
     <div class="form-group">
       <label>Username</label>
-      <input type="text" class="form-control" name="username" value="{{$user->username}}">
+      <input type="text" class="form-control" name="username" value="{{$user->username}}" readonly>
     </div>
     <div class="form-group">
       <label>Email</label>
@@ -47,7 +47,7 @@
       <p><img width="100" src="upload/avatar/{{$user->avatar}}" alt=""></p>
       <input type="file" class="form-control" name="avatar">
     </div>
-    <div class="row">
+{{--     <div class="row">
       <div class="col-lg-3">
         <div class="input-group">
           <span class="input-group-addon iga-1"><input type="checkbox" name="ChangePassword" id="ChangePassword"></span>
@@ -63,7 +63,7 @@
     <div class="form-group cont" hidden>
       <label>Retype password</label>
       <input type="password" class="form-control" placeholder="Retype password" name="rpassword">
-    </div>
+    </div> --}}
 
     <div class="text-center">
       <button type="submit" class="btn btn-primary" style="width: 10em">Edit</button>
