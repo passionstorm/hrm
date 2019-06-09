@@ -26,7 +26,7 @@
   <!-- sidebar menu: : style can be found in sidebar.less -->
   <ul class="sidebar-menu" data-widget="tree">
     <li class="header">MAIN NAVIGATION</li>
-    <li class="treeview">
+    <li>
       <a href="admin/index">
         <i class="fa fa-dashboard"></i> <span>Dashboard</span>
       </a>
@@ -41,7 +41,7 @@
       </a>
       <ul class="treeview-menu">
         <li><a href="admin/users/list"><i class="fa fa-circle-o"></i> List</a></li>
-        <li><a href="../charts/morris.html"><i class="fa fa-circle-o"></i> Add</a></li>
+        <li><a href="admin/register"><i class="fa fa-circle-o"></i> Add</a></li>
       </ul>
     </li> 
   </ul>

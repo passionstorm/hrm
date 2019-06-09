@@ -16,7 +16,7 @@ Route::get('/', function () {
 });
 
 Route::get('test', function(){
-	echo var_dump(Auth::user()->created_at->toFormattedDateString());
+	echo md5(time());
 });
 
 Route::get('login', 'UserController@GetLogin');
@@ -35,6 +35,24 @@ Route::group(['prefix'=>'admin' , 'middleware'=>'AdminLogin'],function(){
 		Route::get('list', 'UserController@GetList');
 	});
 });
+
+Route::group(['prefix'=>'staff'], function(){
+	Route::get('index', function(){
+		return view('staff.pages.index');
+	});
+});
+
+Route::group(['prefix'=>'member'], function(){
+	Route::get('index', function(){
+		return view('member.pages.index');
+	});
+});
+
+Route::group(['prefix'=>'user'], function(){
+	Route::get('edit/{id}', 'UserController@GetEdit')->middleware('login');
+	Route::post('edit/{id}', 'UserController@PostEdit');
+});
+
 
 Route::get('mempage', function(){
 	return view('mempage');
