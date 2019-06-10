@@ -6,10 +6,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use DB;
+use Constants;
 
 
 class OtsController extends Controller
 {
+
    public function GetAdd(){
       $projects = DB::table('projects')->get();
    	return view('ots.add', ['projects'=>$projects]);
@@ -77,4 +79,5 @@ class OtsController extends Controller
    // 		);
    // 		return redirect('projects/edit/'.$id)->with('success', 'Successful project editing!');
    // }
+
 }
