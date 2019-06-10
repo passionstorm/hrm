@@ -32,7 +32,7 @@
 
   <?php 
     $OnlyAdmin = '';
-    if(Auth::user()->role != Constants::ROLE_ADMIN){
+    if(Auth::user()->role != Constants::ROLES['admin']){
       $OnlyAdmin = 'd-n';
     }
   ?>
@@ -85,7 +85,7 @@
                         {!!'<span class="fa fa-check"></span>'!!}
                       @endif
                     </td>
-                    <td style="text-align: center" class='{{$OnlyAdmin}}'><a href="projects/edit/{{$p->id}}">Edit</a></td>
+                    <td style="text-align: center" class='{{$OnlyAdmin}}'><a href="projects/post/{{$p->id}}">Edit</a></td>
                     <td style="text-align: center" class='{{$OnlyAdmin}}'><a href="projects/delete/{{$p->id}}">Delete</a></td>
                 </tr>
                 @endforeach

@@ -30,12 +30,12 @@
       <?php
 
         $OnlyAdmin='list-item';
-        if(Auth::user()->role != Constants::ROLE_ADMIN){
+        if(Auth::user()->role != Constants::ROLES['admin']){
           $OnlyAdmin = 'none';
         }
 
         $PreventMember='list-item';
-        if(Auth::user()->role == Constants::ROLE_MEMBER){
+        if(Auth::user()->role == Constants::ROLES['member']){
           $PreventMember = 'none';
         }
 
@@ -54,7 +54,7 @@
       </a>
       <ul class="treeview-menu">
         <li><a href="users/list"><i class="fa fa-circle-o"></i> List</a></li>
-        <li style="display: {{$OnlyAdmin}}"><a href="register"><i class="fa fa-circle-o"></i> Add</a></li>
+        <li style="display: {{$OnlyAdmin}}"><a href="users/post"><i class="fa fa-circle-o"></i> Add</a></li>
       </ul>
     </li> 
     <li class="treeview" style="display: {{$PreventMember}}">
@@ -67,7 +67,7 @@
       </a>
       <ul class="treeview-menu">
         <li><a href="projects/list"><i class="fa fa-circle-o"></i> List</a></li>
-        <li style="display: {{$OnlyAdmin}}"><a href="projects/add"><i class="fa fa-circle-o"></i> Add</a></li>
+        <li style="display: {{$OnlyAdmin}}"><a href="projects/post"><i class="fa fa-circle-o"></i> Add</a></li>
       </ul>
     </li>  
     <li class="treeview">
