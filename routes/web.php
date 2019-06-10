@@ -59,8 +59,8 @@ Route::group(['prefix'=>'projects', 'middleware'=>'PreventMem'], function(){
 
 Route::group(['prefix'=>'ots'], function(){
 
-	Route::get('add', 'ProjectsController@GetAdd');
-	Route::post('add', 'ProjectsController@PostAdd');
+	Route::get('add', 'OtsController@GetAdd');
+	Route::post('add', 'OtsController@PostAdd');
 	
 	// Route::get('list', 'ProjectsController@GetList');
 
