@@ -71,11 +71,7 @@ class UserController extends Controller
      */
     public function DeleteUser($id)
     {
-        DB::table('users')->where('id', $id)->update(
-            [
-                'is_deleted' => Constants
-            ]
-        );
+        DB::table('users')->where('id', $id)->update(['is_deleted' => Constants::IS_DELETED]);
         return redirect('users/list')->with('success', 'Delete user successfully!');
     }
 
