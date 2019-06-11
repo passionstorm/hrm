@@ -25,7 +25,7 @@
       <div class="box box-primary">
         @include('messages.errors')
         @include('messages.success')
-        @include('forms.PostProject')
+        @include('forms.EditProject')
       </div>
       <!-- /.box -->
     </div>

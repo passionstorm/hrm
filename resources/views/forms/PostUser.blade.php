@@ -1,6 +1,6 @@
   <?php 
-    $OnlyAdmin = '';
-    if(Auth::user()->role != Constants::ROLES['admin']){
+    use App\Constants;$OnlyAdmin = '';
+    if(Auth::user()->role != Constants::ROLE_ADMIN){
       $OnlyAdmin = 'disabled';
     }
 
@@ -27,24 +27,24 @@
 
   ?>
 <!-- form start -->
-<form role="form" action="users/post{{$var}}" method="post" enctype="multipart/form-data">
+<form role="form" action="users/edit{{$var}}" method="post" enctype="multipart/form-data">
   @csrf
   <div class="box-body" style="padding-bottom: 20px">
     <div class="form-group">
       <label>Role</label>
       <select class="form-control" name="role" {{$OnlyAdmin}}>
-        <option value="0"
-          @if($m_user->role == Constants::ROLES['member'])
+        <option value="{{Constants::ROLE_MEMBER}}"
+          @if($m_user->role == Constants::ROLE_MEMBER)
             {{'selected'}} 
           @endif
         >Member</option>
-        <option value="2"
-          @if($m_user->role == Constants::ROLES['staff'])
+        <option value="{{Constants::ROLE_STAFF}}"
+          @if($m_user->role == Constants::ROLE_STAFF)
             {{'selected'}} 
           @endif
         >Staff</option>
-        <option value="1"
-          @if($m_user->role == Constants::ROLES['admin'])
+        <option value="{{Constants::ROLE_ADMIN}}"
+          @if($m_user->role == Constants::ROLE_ADMIN)
             {{'selected'}} 
           @endif
         >Admin</option>
@@ -88,14 +88,11 @@
       <input type="file" class="form-control" name="avatar">
     </div>
 
-    <div class="text-center">
-      <button type="submit" class="btn btn-primary" style="width: 10em">
+    <div class="pull-right">
         @if(isset($user))
-          {{'Edit'}}
-        @else
-          {{'Add'}}
+        <a href="users/delete/{{$user->id}}" class="btn btn-danger">Delete user</a>
         @endif
-      </button>
+      <button type="submit" class="btn btn-primary" style="width: 10em"> Submit</button>
     </div>
   </div>
 </form>
