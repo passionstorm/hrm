@@ -40,8 +40,8 @@
 
     <?php
 
-    use App\Constants;
     use Illuminate\Support\Facades\Auth;
+    use App\Constants;
 
     $OnlyAdmin = '';
     if (Auth::user()->role != Constants::ROLE_ADMIN) {
@@ -52,7 +52,7 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-            List of users
+            List of projects
         </h1>
     </section>
     <!-- Main content -->
@@ -65,15 +65,16 @@
                         <div class="row" style="margin-bottom: 20px">
                             <div class="col-lg-3">
                                 <div class="input-group">
-                                    <label for="osau">
-                                        <div class="icheckbox_flat-green"><input type="checkbox" id="osau"
-                                                                                 checked class="hiddent">Show only
-                                            available users
-                                        </div>
                                 </div>
+                                <label for="osau">
+                                    <div class="icheckbox_flat-green"><input type="checkbox" id="osau"
+                                                                             checked class="hiddent">Show only
+                                        available projects
+                                    </div>
+                                </label>
                             </div>
-                            <div class="pull-right">
-                                <a href="users/edit" class="btn btn-primary">New user</a>
+                            <div class="col pull-right">
+                                <a href="projects/edit" class="btn btn-primary">Add project</a>
                             </div>
                         </div>
 
@@ -82,24 +83,24 @@
                             <tr>
                                 <th>Id</th>
                                 <th>Name</th>
-                                @if (Auth::user()->role == Constants::ROLE_ADMIN)
-                                <th>Salary</th>
-                                @endif
+                                <th>Budget</th>
+                                <th>Deadline</th>
+                                <th>Participants</th>
                                 <th id='spc' class='{{$OnlyAdmin}}'></th>
                             </tr>
                             </thead>
                             <tbody>
-                            @foreach($users as $u)
-                            <tr class="@if($u->is_deleted){{" is_deleted is_deleted_bg
+                            @foreach($projects as $p)
+                            <tr class="@if($p->is_deleted){{" is_deleted is_deleted_bg
                             "}}@endif">
-                            <td>{{$u->id}}</td>
-                            <td>{{$u->name}}</td>
-                            @if (Auth::user()->role == Constants::ROLE_ADMIN)
-                            <td>{{$u->salary}}</td>
-                            @endif
-                            <td style="text-align: center" class='{{$OnlyAdmin}}'><a
-                                        href="users/edit/{{$u->id}}">Edit</a></td>
+                            <td>{{$p->id}}</td>
+                            <td>{{$p->name}}</td>
+                            <td>{{$p->budget}}</td>
+                            <td>{{$p->deadline}}</td>
+                            <td>0</td>
+                            <td style="text-align: center" class='{{$OnlyAdmin}}'><a href="projects/edit/{{$p->id}}">Edit</a>
                             </td>
+
                             </tr>
                             @endforeach
                             </tbody>
@@ -125,7 +126,7 @@
 <!-- page script -->
 <script>
     $(function () {
-        $('#example1').DataTable();
+        $('#example1').DataTable()
         $('#example2').DataTable({
             'paging': true,
             'lengthChange': false,
@@ -134,7 +135,7 @@
             'info': true,
             'autoWidth': false
         })
-    });
+    })
 
     //chuyen doi hien thi va ko hien thi is_deleted user
     $(document).ready(function () {

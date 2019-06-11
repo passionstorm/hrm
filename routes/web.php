@@ -1,22 +1,19 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+use App\Constants;
+use Illuminate\Support\Facades\Route;
+
+$roleAdmin = 'role:' . Constants::ROLE_ADMIN;
+$roleMember = 'role:' . Constants::ROLE_MEMBER;
+$roleManager = 'role:' . Constants::ROLE_ADMIN . ',' . Constants::ROLE_STAFF;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('test', function(){
-	return view('pages.error_404');
+Route::get('test', function () {
+    echo Constants::COUNTRIES['vn'];
+
 });
 
 Route::get('login', 'UserController@GetLogin');
@@ -24,31 +21,15 @@ Route::post('login', 'UserController@PostLogin');
 Route::get('logout', 'UserController@GetLogout');
 Route::get('index', 'UserController@GetIndexPage');
 
-Route::group(['middleware'=>'AdminLogin'],function(){
 
-	Route::get('register', 'UserController@GetRegister');
-	Route::post('register', 'UserController@PostRegister');
+//users
+Route::get('users/list', 'UserController@GetList')->middleware($roleManager);
+Route::get('users/delete/{id}', 'UserController@DeleteUser')->middleware($roleAdmin);
+Route::get('users/edit/{id?}', 'UserController@EditUser')->middleware($roleAdmin);
+Route::post('users/edit/{id?}', 'UserController@PostUser')->middleware($roleAdmin);
 
-});
-
-Route::group(['prefix'=>'users'], function(){
-
-	Route::get('list', 'UserController@GetList')->middleware('PreventMem');
-
-	Route::get('edit/{id}', 'UserController@GetEdit')->middleware('login');
-	Route::post('edit/{id}', 'UserController@PostEdit');
-
-	Route::group(['middleware'=>'AdminLogin'], function(){
-		Route::get('delete/{id}', 'UserController@GetDeleteUser');
-	});
-
-});
-
-Route::group(['prefix'=>'projects', 'middleware'=>'PreventMem'], function(){
-
-	Route::get('add', 'ProjectsController@GetAdd');
-
-	// Route::get('list', 'ProjectsController@GetList');
-
-});
-
+//project
+Route::get('projects/list', 'ProjectsController@GetList')->middleware($roleManager);
+Route::get('projects/edit/{id?}', 'ProjectsController@EditProject')->middleware($roleAdmin);
+Route::post('projects/edit/{id?}', 'ProjectsController@PostProject')->middleware($roleAdmin);
+Route::get('projects/delete/{id}', 'ProjectsController@DeleteProject')->middleware($roleAdmin);

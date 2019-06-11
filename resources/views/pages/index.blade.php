@@ -57,12 +57,11 @@
           <div class="icon">
             <i class="fa fa-shopping-cart"></i>
           </div>
-          <a href="#" class="small-box-footer">
+          <a href="projects/list" class="small-box-footer">
             More info <i class="fa fa-arrow-circle-right"></i>
           </a>
         </div>
       </div>
-      <!-- ./col -->
       <div class="col-lg-3 col-xs-6">
         <!-- small box -->
         <div class="small-box bg-green">
@@ -79,9 +78,6 @@
           </a>
         </div>
       </div>
-      <!-- ./col -->
-
-      <!-- ./col -->
     </div>
     <!-- /.row -->
     

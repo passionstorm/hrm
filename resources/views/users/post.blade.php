@@ -10,6 +10,9 @@
     .input-group-addon{
         width: 0% !important;
     }
+    .d-n{
+      display: none !important;
+    }
 </style>
 @endsection
 
@@ -19,7 +22,11 @@
   <!-- Content Header (Page header) -->
   <section class="content-header">
     <h1>
-      Edit
+      @if( isset($user) )
+        {{'Edit user'}}
+      @else
+        {{'Add user'}}
+      @endif
     </h1>
   </section>
   <!-- Main content -->
@@ -29,7 +36,7 @@
       <div class="box box-primary">
         @include('messages.errors')
         @include('messages.success')
-        @include('forms.edit')
+        @include('forms.PostUser')
       </div>
       <!-- /.box -->
     </div>
