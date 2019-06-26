@@ -30,12 +30,12 @@
       <?php
 
         $OnlyAdmin='list-item';
-        if(Auth::user()->role != Constants::ROLES['admin']){
+        if(Auth::user()->role != Constants::ROLE_ADMIN){
           $OnlyAdmin = 'none';
         }
 
         $PreventMember='list-item';
-        if(Auth::user()->role == Constants::ROLES['member']){
+        if(Auth::user()->role == Constants::ROLE_MEMBER){
           $PreventMember = 'none';
         }
 
