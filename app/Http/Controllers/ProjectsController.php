@@ -19,7 +19,7 @@ class ProjectsController extends Controller
    }
 
    public function GetDelete($id){
-   	$projects = DB::table('projects')->where('id',$id)->update(
+   	DB::table('projects')->where('id',$id)->update(
    		[
    			'is_deleted'=>1
    		]
