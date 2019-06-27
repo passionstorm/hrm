@@ -12,8 +12,10 @@ Route::get('/', function () {
 });
 
 Route::get('test', function () {
-    echo Constants::COUNTRIES['vn'];
-
+    foreach( array_keys(Constants::COUNTRIES) as $country ){
+        echo $country;
+    }
+    // return var_dump( Constants::COUNTRIES );
 });
 
 Route::get('login', 'UserController@GetLogin');

@@ -1,5 +1,5 @@
 <?php
-
+$countries = Constants::COUNTRIES;
 if (isset($project)) {
     $projectId = $project->id;
     $actionSubmit = 'projects/edit/' . $project->id;;
@@ -24,18 +24,14 @@ if (isset($project)) {
         <div class="form-group">
             <label>Country of customers</label>
             <select class="form-control" name="c_country">
-                <option value="0"
-                        @if($form->c_country == Constants::COUNTRIES['vn'])
-                    {{'selected'}}
-                    @endif
-                    >VietNam
-                </option>
-                <option value="1"
-                        @if($form->c_country == Constants::COUNTRIES['jp'])
-                    {{'selected'}}
-                    @endif
-                    >Jappan
-                </option>
+                @foreach( $countries as $country )
+                    <option value="{{ array_search( $country, $countries ) }}"
+                        @if($form->c_country == $country)
+                            {{'selected'}}
+                        @endif
+                        >{{$country}}
+                    </option>
+                @endforeach
             </select>
         </div>
         <div class="form-group">

@@ -30,7 +30,6 @@
                 <?php
                 use App\Constants;
                 use Illuminate\Support\Facades\Auth;
-
                 $OnlyAdmin = 'list-item';
                 if (Auth::user()->role != Constants::ROLE_ADMIN) {
                     $OnlyAdmin = 'none';
