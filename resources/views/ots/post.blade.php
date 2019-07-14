@@ -25,8 +25,6 @@
   <section class="content">
     <div style="padding: 0 40px">
       <div class="box box-primary">
-        @include('messages.errors')
-        @include('messages.success')
         @include('forms.PostOTs')
       </div>
     </div>
