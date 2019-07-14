@@ -5,7 +5,6 @@
 .d-n{
   display: none !important;
 }
-  
 </style>
 @endsection
 
