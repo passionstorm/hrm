@@ -56,7 +56,7 @@
                 </a>
             </li>
             <li>
-                <a href="#">
+                <a href="ot/list">
                     <i class="fa fa-calendar-plus-o"></i>
                     <span>OT</span>
                 </a>

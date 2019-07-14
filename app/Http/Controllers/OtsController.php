@@ -9,6 +9,7 @@ use DB;
 use Constants;
 use Validator;
 use SebastianBergmann\Environment\Console;
+use ___PHPSTORM_HELPERS\object;
 
 class OtsController extends Controller
 {
@@ -49,7 +50,6 @@ class OtsController extends Controller
          //validate
          $amount = count($request->project);
          $user_id = Auth::user()->id;
-         $errorDates = [];
          //check user enter same post value
          if ($amount >= 2) {
             for ($i = 0; $i < $amount - 1; $i++) {
@@ -66,10 +66,10 @@ class OtsController extends Controller
          }
          //end-check user enter same post value
          //check error date
-         for($i = 0; $i < $amount; $i++){
+         for ($i = 0; $i < $amount; $i++) {
             if (strtotime($request->date[$i]) < strtotime('today')) {
                return response()->json([
-                  'errorDates' => 'date'.$i,
+                  'errorDates' => 'date' . $i,
                ]);
             }
          }
@@ -93,11 +93,9 @@ class OtsController extends Controller
                foreach ($times as $time) {
                   $time2 = (object) ['start' => $request->start[$i], 'end' => $request->end[$i]];
                   if ($this->checkConflictTime($time, $time2)) {
-                     //response errors
                      return response()->json([
                         'existOT' => $i
                      ]);
-                     //end-response errors
                   }
                }
             }
@@ -158,6 +156,73 @@ class OtsController extends Controller
             'success' => 'success',
          ]);
          //
+      }
+   }
+
+   public function GetList()
+   {
+      $project_ids = [];
+      $project_names = [];
+      $ot_ids = DB::table('ot')->where('user_id', Auth::user()->id)->select('id')->get();
+      foreach ($ot_ids as $ot_id) {
+         $ids = DB::table('ot_detail')->where('ot_id', $ot_id->id)->select('project_id')->get();
+         foreach ($ids as $x) {
+            $id = $x->project_id;
+            $name = DB::table('projects')->find($id)->name;
+            array_push($project_ids, $id);
+            array_push($project_names, $name);
+         }
+      }
+      $project_ids = array_unique($project_ids);
+      $project_names = array_unique($project_names);
+      $projects = array_combine($project_ids, $project_names);
+      return view('ots.list', ['projects' => $projects]);
+   }
+
+   public function AjaxList(Request $request)
+   {
+      if ($request->ajax()) {
+         $project = $request->project;
+         $year = $request->year;
+         $month = $request->month;
+         // Create appropriate data as required of request
+         $items = [];
+         $amount = 0;
+         $ots = DB::table('ot')->where('user_id', Auth::user()->id)->whereYear('ot_date', $year)->whereMonth('ot_date', $month)->select('ot_date as date', 'id', 'approved')->get();
+         foreach($ots as $ot){
+            if($project == 0){
+               $ots_detail = DB::table('ot_detail')->where('ot_id', $ot->id)->select('id', 'time_start as start', 'time_end as end', 'project_id', 'is_deleted')->get();
+            }else{
+               $ots_detail = DB::table('ot_detail')->where([
+                  ['ot_id', $ot->id],
+                  ['project_id', $project],
+               ])->select('id', 'time_start as start', 'time_end as end', 'project_id', 'is_deleted')->get();
+            }
+            foreach($ots_detail as $ot_detail){
+               if($ot->approved == 0){
+                  $approved = 'No';
+               }else{
+                  $approved = 'Yes';
+                  $amount += ( strtotime($ot_detail->end) - strtotime($ot_detail->start) )/3600;
+               }
+               $item = (object) [
+                  'id' => $ot_detail->id,
+                  'date' => $ot->date,
+                  'start' => $ot_detail->start,
+                  'end' => $ot_detail->end,
+                  'project' => DB::table('projects')->find($ot_detail->project_id)->name,
+                  'approved' => $approved,
+                  'is_deleted' => $ot_detail->is_deleted,
+               ];
+               array_push($items, $item);
+            }
+         }
+         //end-Create appropriate data as required of request
+
+         return response()->json([
+            'items' => $items,
+            'amount' => $amount,
+         ]);
       }
    }
 }
