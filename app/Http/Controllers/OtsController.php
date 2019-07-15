@@ -44,6 +44,9 @@ class OtsController extends Controller
       //Edit view
       if ($id) {
          $ot_d = DB::table('ot_detail')->where('id', $id)->select('comment', 'ot_id', 'time_start as start', 'time_end as end', 'project_id', 'comment')->get();
+         if( DB::table('ot')->find($ot_d[0]->ot_id)->user_id != Auth::user()->id ){
+            abort(404);
+         }
          $date = DB::table('ot')->find($ot_d[0]->ot_id)->ot_date;
          $item = (object) [
             'date' => $date,
@@ -211,9 +214,12 @@ class OtsController extends Controller
          $ids = DB::table('ot_detail')->where('ot_id', $ot_id->id)->select('project_id')->get();
          foreach ($ids as $x) {
             $id = $x->project_id;
-            $name = DB::table('projects')->find($id)->name;
-            array_push($project_ids, $id);
-            array_push($project_names, $name);
+            $project = DB::table('projects')->find($id);
+            if($project){
+               $name = DB::table('projects')->find($id)->name;
+               array_push($project_ids, $id);
+               array_push($project_names, $name);
+            }
          }
       }
       $project_ids = array_unique($project_ids);
@@ -247,6 +253,9 @@ class OtsController extends Controller
                } else {
                   $approved = 'Yes';
                   $amount += (strtotime($ot_detail->end) - strtotime($ot_detail->start)) / 3600;
+               }
+               if(!DB::table('projects')->find($ot_detail->project_id)){
+                  continue;
                }
                $item = (object) [
                   'id' => $ot_detail->id,

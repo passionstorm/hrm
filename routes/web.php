@@ -12,8 +12,8 @@ $roleManager = 'role:' . Constants::ROLE_ADMIN . ',' . Constants::ROLE_STAFF;
 
 
 Route::get('test', function () {
-    $e = DB::table('ot')->find('2');
-    echo var_dump($e);
+    $e = DB::table('projects')->find('1');
+    echo var_dump($e).'<hr>';
 });
 
 
