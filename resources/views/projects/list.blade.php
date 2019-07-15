@@ -87,12 +87,18 @@
                             </thead>
                             <tbody>
                             @foreach($projects as $p)
+                            <?php
+                            $participants_c = 0;
+                            if( $p->participants ){
+                            $participants_c = count( explode(',',$p->participants) );
+                            }
+                            ?>
                             <tr class="@if($p->is_deleted){{" is_deleted is_deleted_bg "}}@endif">
                             <td>{{$p->id}}</td>
                             <td>{{$p->name}}</td>
                             <td>{{$p->budget}}</td>
                             <td>{{$p->deadline}}</td>
-                            <td>0</td>
+                            <td><span>{{$participants_c}}</span><a href="projects/{{$p->id}}/participants/add" style="float: right">Add</a></td>
                             <td style="text-align: center" class='{{$OnlyAdmin}}'><a href="projects/edit/{{$p->id}}">Edit</a>
                             </td>
 

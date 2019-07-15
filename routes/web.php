@@ -3,6 +3,8 @@
 use App\Constants;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Carbon;
+use function Opis\Closure\serialize;
+
 // use DB;
 
 $roleAdmin = 'role:' . Constants::ROLE_ADMIN;
@@ -12,8 +14,7 @@ $roleManager = 'role:' . Constants::ROLE_ADMIN . ',' . Constants::ROLE_STAFF;
 
 
 Route::get('test', function () {
-    $e = DB::table('projects')->find('1');
-    echo var_dump($e).'<hr>';
+
 });
 
 
@@ -34,6 +35,9 @@ Route::get('users/edit/{id?}', 'UserController@EditUser')->middleware($roleAdmin
 Route::post('users/edit/{id?}', 'UserController@PostUser')->middleware($roleAdmin);
 
 //project
+Route::get('projects/{id}/participants/add/', 'ProjectsController@AddParticipants')->middleware($roleManager);
+Route::get('projects/participants/add/ajax', 'ProjectsController@AddParticipantsAjax')->middleware($roleManager);
+Route::get('projects/participants/remove/ajax', 'ProjectsController@RemoveParticipantsAjax')->middleware($roleManager);
 Route::get('projects/list', 'ProjectsController@GetList')->middleware($roleManager);
 Route::get('projects/edit/{id?}', 'ProjectsController@EditProject')->middleware($roleAdmin);
 Route::post('projects/edit/{id?}', 'ProjectsController@PostProject')->middleware($roleAdmin);
