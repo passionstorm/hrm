@@ -11,6 +11,9 @@
 <div class="alert alert-danger displaySamePost">
     <h4>- You can't enter same posts</h4>
 </div>
+<div class="alert alert-danger displayEditNotChange">
+    <h4>- You must change the data before overwrite this ot</h4>
+</div>
 <form id="dynamic_form">
     <div class="box-body" style="padding-bottom: 20px">
 
@@ -19,7 +22,6 @@
         <input type="submit" name="save" id="save" class="btn btn-primary" value="Save" />
     </div>
     <br>
-    {{-- <button id ='test' type="button">test</button> --}}
 </form>
 
 

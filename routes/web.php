@@ -12,8 +12,8 @@ $roleManager = 'role:' . Constants::ROLE_ADMIN . ',' . Constants::ROLE_STAFF;
 
 
 Route::get('test', function () {
-    $e = (strtotime('05:04') - strtotime('04:04'))/3600;
-    echo ($e);
+    $e = DB::table('ot')->find('2');
+    echo var_dump($e);
 });
 
 
@@ -42,5 +42,5 @@ Route::get('projects/delete/{id}', 'ProjectsController@DeleteProject')->middlewa
 //ot
 Route::get('ot/list', 'OtsController@GetList')->middleware("login");
 Route::get('ot/list/ajax', 'OtsController@AjaxList')->middleware("login");
-Route::get('ot/post', 'OtsController@AddOTs')->middleware("login");
+Route::get('ot/post/{id?}', 'OtsController@GetOTs')->middleware("login");
 Route::post('ot/post', 'OtsController@PostOT')->middleware("login");

@@ -132,7 +132,7 @@
                             $amount = data.amount;
                             $items.forEach( (i) => {
                                 console.log(i.id);
-                                $('tbody').append('<tr> <td>'+i.id+'</td><td>'+i.date+'</td> <td>'+i.start+'</td> <td>'+i.end+'</td> <td>'+i.project+'</td> <td>'+i.approved+'</td> <td style="text-align: center"><a href="#">Edit</a></td> </tr>');
+                                $('tbody').append('<tr> <td>'+i.id+'</td><td>'+i.date+'</td> <td>'+i.start+'</td> <td>'+i.end+'</td> <td>'+i.project+'</td> <td>'+i.approved+'</td> <td style="text-align: center"><a href="ot/post/'+i.id+'">Edit</a></td> </tr>');
                             });
                             $('tbody').append('<tr><td><b>Amount of OT: </b></td></td> <td >'+$amount+' hours</td> </tr>');
                         }

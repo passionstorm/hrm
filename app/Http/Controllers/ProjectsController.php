@@ -46,7 +46,6 @@ class ProjectsController extends Controller
             $data = DB::table('projects')->find($id);
             return view('projects.edit', ['project' => $data]);
         }
-
         return view('projects.edit');
     }
 
