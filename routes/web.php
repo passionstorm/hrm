@@ -11,17 +11,34 @@ $roleManager = 'role:' . Constants::ROLE_ADMIN . ',' . Constants::ROLE_STAFF;
 
 
 Route::get('test', function () {
-    $year = '2019'; $month='07';$project = 0;
-    $ots = DB::table('ot')->where('user_id', Auth::user()->id)->whereYear('ot_date', $year)->whereMonth('ot_date', $month)->select('ot_date as date', 'id', 'approved');
-    if ($project == 0) {
-        $ot_details = DB::table('ot_detail')->joinSub($ots, 'ots', function ($join) {
-           $join->on('ot_detail.ot_id', '=', 'ots.id');
-        })->join('projects', 'ot_detail.project_id', '=', 'projects.id')->select('ot_detail.id', 'ot_detail.time_start as start', 'ot_detail.time_end as end', 'projects.name', 'ots.date', 'ots.approved')->get();
-     } else {
-        $ot_details = DB::table('ot_detail')->where('project_id', $project)->joinSub($ots, 'ots', function ($join) {
-           $join->on('ot_detail.ot_id', '=', 'ots.id');
-        })->join('projects', 'ot_detail.project_id', '=', 'projects.id')->select('ot_detail.id', 'ot_detail.time_start as start', 'ot_detail.time_end as end', 'projects.name', 'ots.date', 'ots.approved')->get();
-     }
+    $year = '2019';
+    $month = '07';
+    $project = 2;
+    // $ots = DB::table('ot')->where('user_id', Auth::user()->id)->whereYear('ot_date', $year)->whereMonth('ot_date', $month)->select('ot_date as date', 'id', 'approved');
+    // if ($project == 0) {
+    //     $ot_details = DB::table('ot_detail')->joinSub($ots, 'ots', function ($join) {
+    //         $join->on('ot_detail.ot_id', '=', 'ots.id');
+    //     })->join('projects', 'ot_detail.project_id', '=', 'projects.id')->select('ot_detail.id', 'ot_detail.time_start as start', 'ot_detail.time_end as end', 'projects.name', 'ots.date', 'ots.approved')->get();
+    // } else {
+    //     $ot_details = DB::table('ot_detail')->where('project_id', $project)->joinSub($ots, 'ots', function ($join) {
+    //         $join->on('ot_detail.ot_id', '=', 'ots.id');
+    //     })->join('projects', 'ot_detail.project_id', '=', 'projects.id')->select('ot_detail.id', 'ot_detail.time_start as start', 'ot_detail.time_end as end', 'projects.name', 'ots.date', 'ots.approved')->get();
+    // }
+
+    $ot_details = DB::table('ot')
+        ->where('user_id', Auth::user()->id)->whereYear('ot_date', $year)->whereMonth('ot_date', $month)
+        ->join('ot_detail', function ($join) use ($project) {
+            if ($project == 0) {
+                $join->on('ot.id', 'ot_detail.ot_id');
+            } else {
+                $join->on('ot.id', 'ot_detail.ot_id')->where('ot_detail.project_id', $project);
+            }
+        })
+        ->join('projects', function($join){
+            $join->on('projects.id', 'ot_detail.project_id');
+        })
+        ->select('ot_detail.id', 'ot_detail.time_start as start', 'ot_detail.time_end as end', 'projects.name as project_name', 'ot.ot_date as date', 'ot.approved')->get();
+
     echo ($ot_details);
 });
 

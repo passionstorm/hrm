@@ -83,7 +83,6 @@
 
                             </tbody>
                         </table>
-                        {{-- <button id="test">test</button> --}}
                     </div>
                     <!-- /.box-body -->
                 </div>
@@ -125,8 +124,6 @@
                         project: project
                     },
                     success: function(data){
-                        console.log(data.items);
-                        console.log(data.amount);
                         $('tbody').remove();
                         $('table').append('<tbody></tbody>')
                         $items = data.items;
@@ -144,18 +141,6 @@
             //end-AJAX
         })
     });
-
-    //test
-    // $('#test').click(function(){
-    //   var v = $('input[name="month_year"]').val();
-    //   var va = v.split('-');
-    //   var month = va[1];
-    //   var year = va[0];
-    //   var project = $('select[name="project"]').val(); 
-    //   console.log(typeof month);
-    //   console.log(typeof project);
-    //   console.log( project);
-    // });
 </script>
 
 @endsection
