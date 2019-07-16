@@ -6,10 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use DB;
-use Constants;
-use Validator;
-use SebastianBergmann\Environment\Console;
-use ___PHPSTORM_HELPERS\object;
 
 class OtsController extends Controller
 {
@@ -44,9 +40,11 @@ class OtsController extends Controller
       //Edit view
       if ($id) {
          $ot_d = DB::table('ot_detail')->where('id', $id)->select('comment', 'ot_id', 'time_start as start', 'time_end as end', 'project_id', 'comment')->get();
-         if( DB::table('ot')->find($ot_d[0]->ot_id)->user_id != Auth::user()->id ){
+         //Prevent edit ot other people
+         if (DB::table('ot')->find($ot_d[0]->ot_id)->user_id != Auth::user()->id) {
             abort(404);
          }
+         //end-Prevent edit ot other people
          $date = DB::table('ot')->find($ot_d[0]->ot_id)->ot_date;
          $item = (object) [
             'date' => $date,
@@ -103,18 +101,18 @@ class OtsController extends Controller
             }
          }
          //end-check error time
-         if( !$request->ignoreConflictTime ){
+         if (!$request->ignoreConflictTime) {
             //check conflict in 'ot_detail' table
             for ($i = 0; $i < $amount; $i++) {
                $ot_id = $this->findOtId($request->date[$i], $user_id);
                if (count($ot_id) > 0) {
                   $v = $ot_id[0]->id;
-                  if($request->id){
+                  if ($request->id) {
                      $times = DB::table('ot_detail')->where([
                         ['ot_id', $v],
                         ['id', '!=', $request->id],
                      ])->select('time_start as start', 'time_end as end')->get();
-                  }else{
+                  } else {
                      $times = DB::table('ot_detail')->where('ot_id', $v)->select('time_start as start', 'time_end as end')->get();
                   }
                   foreach ($times as $time) {
@@ -167,7 +165,7 @@ class OtsController extends Controller
          for ($i = 0; $i < count($projects); $i++) {
             $ot_id = $this->findOtId($request->date[$i], $user_id);
             //Edit ot detail
-            if($request->id){
+            if ($request->id) {
                DB::table('ot_detail')->where('id', $request->id)->update(
                   [
                      'ot_id' => $ot_id[0]->id,
@@ -182,7 +180,7 @@ class OtsController extends Controller
             }
             //end-Edit ot detail
             //Add ot detail
-            else{
+            else {
                DB::table('ot_detail')->insert(
                   [
                      'ot_id' => $ot_id[0]->id,
@@ -207,24 +205,15 @@ class OtsController extends Controller
 
    public function GetList()
    {
-      $project_ids = [];
-      $project_names = [];
-      $ot_ids = DB::table('ot')->where('user_id', Auth::user()->id)->select('id')->get();
-      foreach ($ot_ids as $ot_id) {
-         $ids = DB::table('ot_detail')->where('ot_id', $ot_id->id)->select('project_id')->get();
-         foreach ($ids as $x) {
-            $id = $x->project_id;
-            $project = DB::table('projects')->find($id);
-            if($project){
-               $name = DB::table('projects')->find($id)->name;
-               array_push($project_ids, $id);
-               array_push($project_names, $name);
-            }
-         }
-      }
-      $project_ids = array_unique($project_ids);
-      $project_names = array_unique($project_names);
-      $projects = array_combine($project_ids, $project_names);
+      //query jojn
+      $ot_ids = DB::table('ot')->where('user_id', Auth::user()->id)->select('id');
+      $project_ids = DB::table('ot_detail')->joinSub($ot_ids, 'ot_ids', function ($join) {
+         $join->on('ot_detail.ot_id', '=', 'ot_ids.id');
+      })->select('project_id')->groupBy('project_id');
+      $projects = DB::table('projects')->joinSub($project_ids, 'project_ids', function ($join) {
+         $join->on('project_ids.project_id', '=', 'projects.id');
+      })->select('name', 'id')->get();
+      //end-query jojn
       return view('ots.list', ['projects' => $projects]);
    }
 
@@ -235,44 +224,30 @@ class OtsController extends Controller
          $year = $request->year;
          $month = $request->month;
          // Create appropriate data as required of request
-         $items = [];
          $amount = 0;
-         $ots = DB::table('ot')->where('user_id', Auth::user()->id)->whereYear('ot_date', $year)->whereMonth('ot_date', $month)->select('ot_date as date', 'id', 'approved')->get();
-         foreach ($ots as $ot) {
-            if ($project == 0) {
-               $ots_detail = DB::table('ot_detail')->where('ot_id', $ot->id)->select('id', 'time_start as start', 'time_end as end', 'project_id', 'is_deleted')->get();
-            } else {
-               $ots_detail = DB::table('ot_detail')->where([
-                  ['ot_id', $ot->id],
-                  ['project_id', $project],
-               ])->select('id', 'time_start as start', 'time_end as end', 'project_id', 'is_deleted')->get();
-            }
-            foreach ($ots_detail as $ot_detail) {
-               if ($ot->approved == 0) {
-                  $approved = 'No';
-               } else {
-                  $approved = 'Yes';
-                  $amount += (strtotime($ot_detail->end) - strtotime($ot_detail->start)) / 3600;
-               }
-               if(!DB::table('projects')->find($ot_detail->project_id)){
-                  continue;
-               }
-               $item = (object) [
-                  'id' => $ot_detail->id,
-                  'date' => $ot->date,
-                  'start' => $ot_detail->start,
-                  'end' => $ot_detail->end,
-                  'project' => DB::table('projects')->find($ot_detail->project_id)->name,
-                  'approved' => $approved,
-                  'is_deleted' => $ot_detail->is_deleted,
-               ];
-               array_push($items, $item);
+         $ots = DB::table('ot')->where('user_id', Auth::user()->id)->whereYear('ot_date', $year)->whereMonth('ot_date', $month)->select('ot_date as date', 'id', 'approved');
+         if ($project == 0) {
+            //query jojn
+            $ot_details = DB::table('ot_detail')->joinSub($ots, 'ots', function ($join) {
+               $join->on('ot_detail.ot_id', '=', 'ots.id');
+            })->join('projects', 'ot_detail.project_id', '=', 'projects.id')->select('ot_detail.id', 'ot_detail.time_start as start', 'ot_detail.time_end as end', 'projects.name as project_name', 'ots.date', 'ots.approved')->get();
+            //end-query jojn
+         } else {
+            //query jojn
+            $ot_details = DB::table('ot_detail')->where('project_id', $project)->joinSub($ots, 'ots', function ($join) {
+               $join->on('ot_detail.ot_id', '=', 'ots.id');
+            })->join('projects', 'ot_detail.project_id', '=', 'projects.id')->select('ot_detail.id', 'ot_detail.time_start as start', 'ot_detail.time_end as end', 'projects.name as project_name', 'ots.date', 'ots.approved')->get();
+            //end-query jojn
+         }
+         foreach($ot_details as $ot_detail){
+            if ($ot_detail->approved != 0) {
+               $amount += (strtotime($ot_detail->get()->end) - strtotime($ot_detail->get()->start)) / 3600;
             }
          }
          //end-Create appropriate data as required of request
 
          return response()->json([
-            'items' => $items,
+            'items' => $ot_details,
             'amount' => $amount,
          ]);
       }

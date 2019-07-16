@@ -1,4 +1,4 @@
-<div class="alert alert-success displaySuccess">
+{{-- <div class="alert alert-success displaySuccess">
     <h4><i class="icon fa fa-check"></i>Save successfully</h4>
 </div>
 <div class="alert alert-danger displayWarning">
@@ -10,9 +10,12 @@
 </div>
 <div class="alert alert-danger displaySamePost">
     <h4>- You can't enter same posts</h4>
-</div>
-<div class="alert alert-danger displayEditNotChange">
+</div> --}}
+{{-- <div class="alert alert-danger displayEditNotChange">
     <h4>- You must change the data before overwrite this ot</h4>
+</div> --}}
+<div id="displayAlert">
+    
 </div>
 <form id="dynamic_form">
     <div class="box-body" style="padding-bottom: 20px">

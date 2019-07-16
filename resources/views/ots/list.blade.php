@@ -52,8 +52,8 @@
                                     <select name="project" id="" class="form-control" required>
                                         <option value="" selected disabled hidden>Choose Project...</option>
                                         <option value="0">All</option>
-                                        @foreach ($projects as $key => $project)
-                                        <option value="{{$key}}">{{$project}}</option>
+                                        @foreach ($projects as $p)
+                                        <option value="{{$p->id}}">{{$p->name}}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -125,17 +125,20 @@
                         project: project
                     },
                     success: function(data){
-                        if(data.items){
-                            $('tbody').remove();
-                            $('table').append('<tbody></tbody>')
-                            $items = data.items;
-                            $amount = data.amount;
-                            $items.forEach( (i) => {
-                                console.log(i.id);
-                                $('tbody').append('<tr> <td>'+i.id+'</td><td>'+i.date+'</td> <td>'+i.start+'</td> <td>'+i.end+'</td> <td>'+i.project+'</td> <td>'+i.approved+'</td> <td style="text-align: center"><a href="ot/post/'+i.id+'">Edit</a></td> </tr>');
-                            });
-                            $('tbody').append('<tr><td><b>Amount of OT: </b></td></td> <td >'+$amount+' hours</td> </tr>');
-                        }
+                        console.log(data.items);
+                        console.log(data.amount);
+                        $('tbody').remove();
+                        $('table').append('<tbody></tbody>')
+                        $items = data.items;
+                        $amount = data.amount;
+                        $items.forEach( (i) => {
+                            i.approved == 'No';
+                            if(i.approved == 1){
+                                i.approved == 'Yes';
+                            }
+                            $('tbody').append('<tr> <td>'+i.id+'</td><td>'+i.date+'</td> <td>'+i.start+'</td> <td>'+i.end+'</td> <td>'+i.project_name+'</td> <td>'+i.approved+'</td> <td style="text-align: center"><a href="ot/post/'+i.id+'">Edit</a></td> </tr>');
+                        });
+                        $('tbody').append('<tr><td><b>Amount of OT: </b></td></td> <td >'+$amount+' hours</td> </tr>');
                     }
                 })
             //end-AJAX
