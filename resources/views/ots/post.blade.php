@@ -1,18 +1,5 @@
 @extends('layout.index')
 
-@section('css')
-<style>
-  .displaySuccess,
-  .displayWarning,
-  .displayExistOT,
-  .displaySamePost,
-  .n-display,
-  .displayEditNotChange {
-    display: none
-  }
-</style>
-@endsection
-
 @section('content')
 <?php
   $o_select = 'selected';
@@ -132,12 +119,8 @@
       $.post('ot/post', $fValue, function(data){
         $('input[type=date], input[type=time]').css('color', 'green');
         if(data.samePosts){
-          $errorSamePosts = data.samePosts;
-          $('.displayWarning').css('display', 'none');
-          $('.displaySuccess').css('display', 'none');
-          $('.displayExistOT').css('display', 'none');
-          $('.displayEditNotChange').css('display', 'none');
-          $('.displaySamePost').css('display', 'block');
+          $errorSamePosts = data.samePosts; 
+          $('#displayAlert').removeClass().addClass('alert alert-danger').html('<h4>- You can\'t enter same posts</h4>');
           if($errorSamePosts.length > 0){
             $errorSamePosts.forEach( (e) => {
               $('#date' + e ).css('color', 'red');
@@ -147,34 +130,24 @@
           }
         }
         if(data.errorDates){
-          $('.displayWarning').css('display', 'block');
-          $('.displaySuccess').css('display', 'none');
-          $('.displayExistOT').css('display', 'none');
-          $('.displaySamePost').css('display', 'none');
-          $('.displayEditNotChange').css('display', 'none');
+          $('#displayAlert').removeClass().addClass('alert alert-danger').html('<h4>- Date must be greater or equal today</h4> <h4>- End must by greater than start</h4>');
           $('#' + data.errorDates).css('color', 'red');
         }
         if(data.errorTimes){
+          $('#displayAlert').removeClass().addClass('alert alert-danger').html('<h4>- Date must be greater or equal today</h4> <h4>- End must by greater than start</h4>');
           $errorTimes = data.errorTimes;
-          $('.displayWarning').css('display', 'block');
-          $('.displaySuccess').css('display', 'none');
-          $('.displayExistOT').css('display', 'none');
-          $('.displaySamePost').css('display', 'none');
-          $('.displayEditNotChange').css('display', 'none');
           $errorTimes.forEach( (e) => {
             $('#' + e).css('color', 'red');
           });
         }
-        if(data.existOT >= 0){
+        if(data.existOT){
           $existOT = data.existOT;
-          $('.displayWarning').css('display', 'none');
-          $('.displayEditNotChange').css('display', 'none');
-          $('.displaySuccess').css('display', 'none');
-          $('.displaySamePost').css('display', 'none');
-          $('.displayExistOT').css('display', 'block');
-          $('#date' + $existOT ).css('color', 'red');
-          $('#start' + $existOT ).css('color', 'red');
-          $('#end' + $existOT ).css('color', 'red');
+          $('#displayAlert').removeClass().addClass('alert alert-danger').html('<h4>- Your ot time is conflict</h4>');
+          $existOT.forEach( (e) => {
+            $('#date' + e).css('color', 'red');
+            $('#start' + e).css('color', 'red');
+            $('#end' + e).css('color', 'red');
+          })
         }
         if(data.success){
           if(post_id != 'post'){
@@ -185,11 +158,7 @@
             $("[class^='oBox']").remove();
             dynamic_field(0);
             x=0;
-            $('.displayWarning').css('display', 'none');
-            $('.displayEditNotChange').css('display', 'none');
-            $('.displayExistOT').css('display', 'none');
-            $('.displaySamePost').css('display', 'none');
-            $('.displaySuccess').css('display', 'block');
+            $('#displayAlert').removeClass().addClass('alert alert-success').html('<h4><i class="icon fa fa-check"></i>Save successfully</h4>');
           }
         }
       });

@@ -2,10 +2,6 @@
 
 use App\Constants;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Carbon;
-use function Opis\Closure\serialize;
-
-// use DB;
 
 $roleAdmin = 'role:' . Constants::ROLE_ADMIN;
 $roleMember = 'role:' . Constants::ROLE_MEMBER;
@@ -14,7 +10,6 @@ $roleManager = 'role:' . Constants::ROLE_ADMIN . ',' . Constants::ROLE_STAFF;
 
 
 Route::get('test', function () {
-
 });
 
 
