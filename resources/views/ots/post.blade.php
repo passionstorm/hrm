@@ -1,5 +1,13 @@
 @extends('layout.index')
 
+@section('css')
+<style>
+.n-display{
+  display: none
+}
+</style>
+@endsection
+
 @section('content')
 <?php
   $o_select = 'selected';
@@ -28,10 +36,10 @@
   </section>
   <section class="content">
     <div style="padding: 0 40px">
-      <div class="box box-primary">
+      
         @include('messages.success')
         @include('forms.PostOTs')
-      </div>
+      
     </div>
   </section>
 </div>
@@ -45,21 +53,22 @@
           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       }
     });
+
     //Web strorage-check message
     if( sessionStorage.getItem('message') == 'success' ){
-      $('.displaySuccess').css('display', 'block');
+      $('#displayAlert').removeClass().addClass('alert alert-success').html('<h4><i class="icon fa fa-check"></i>Save successfully</h4>');
       sessionStorage.removeItem('message');
     }
     //end-Web strorage-check message
+
     var x=0;
     dynamic_field(x);
     function dynamic_field(i){
       if(i<1){
-        $('.box-body').append('<div class="oBox'+i+'"><div class="row" id="row'+i+'"><br> <div class="col-md-3"> <div class="input-group"> <div class="input-group-addon"> <span><b>Date</b></span> </div> <input id="date'+i+'" name="date[]" type="date" class="form-control" value="{{$data->date}}" required> </div> </div> <div class="col-md-2"> <div class="input-group"> <div class="input-group-addon"> <span><b>Start</b></span> </div> <input id="start'+i+'" required name="start[]" type="time" class="form-control" value="{{$data->start}}"> </div> </div> <div class="col-md-2"> <div class="input-group"> <div class="input-group-addon"> <span><b>End</b></span> </div> <input id="end'+i+'" required name="end[]" type="time" class="form-control" value="{{$data->end}}"> </div> </div> <div class="col-md-3"> <div class="input-group"><div class="input-group-addon"> <span><b>Project</b></span> </div> <select name="project[]" class="form-control" style="width: 100%;"> @foreach($projects as $project) <option value="{{$project->id}}" @if($project->id == $data->project_id){{$o_select}}@endif>{{$project->name}}</option> @endforeach </select> </div> </div> <div class="col-md-1"> <button type="button" class="btn btn-primary {{$e_v}}" id="add">Add More</button> </div> </div><br><textarea rows="4" cols="50" name="comment[]" placeholder="Your comment">{{$data->comment}}</textarea></div>');
+        $('.ccc').append('<div id="oBox'+i+'" class="box box-primary"> <div class="box-body" style="padding-bottom: 20px"> <div class="ctn-fbtn" style="text-align: right"> <button type="button" class="btn btn-danger remove-btn {{$e_v}}" id="'+i+'"><i class="fa fa-remove"></i></button> </div> <div style="display:flex;justify-content: space-between;"> <div style="width: 48%"> <div class="form-group"> <label for="">Date</label> <input id="date'+i+'" name="date[]" type="date" class="form-control" value="{{$data->date}}" required> </div> </div> <div style="width: 48%"> <div class="form-group"> <label for="">Project</label> <select name="project[]" class="form-control" style="width: 100%;"> @foreach($projects as $project) <option value="{{$project->id}}" @if($project->id == $data->project_id){{$o_select}}@endif>{{$project->name}}</option> @endforeach </select> </div> </div> </div> <div style="display:flex;justify-content: space-between;"> <div style="width: 48%"> <div class="form-group"> <label for="">Start</label> <input id="start'+i+'" required name="start[]" type="time" class="form-control" value="{{$data->start}}"> </div> </div> <div style="width: 48%"> <div class="form-group"> <label for="">End</label> <input id="end'+i+'" required name="end[]" type="time" class="form-control" value="{{$data->end}}"> </div> </div> </div> <br> <textarea rows="4" class="form-control" name="comment[]" placeholder="Your comment">{{$data->comment}}</textarea> </div> </div>');
       }else{
-        $('.box-body').append('<div class="oBox'+i+'"><div class="row" id="row'+i+'"> <br> <br> <div class="col-md-3"> <div class="input-group"> <div class="input-group-addon"> <span><b>Date</b></span> </div> <input id="date'+i+'" name="date[]" type="date" class="form-control" required> </div> </div> <div class="col-md-2"> <div class="input-group"> <div class="input-group-addon"> <span><b>Start</b></span> </div> <input id="start'+i+'" required name="start[]" type="time" class="form-control"> </div> </div> <div class="col-md-2"> <div class="input-group"> <div class="input-group-addon"> <span><b>End</b></span> </div> <input id="end'+i+'" required name="end[]" type="time" class="form-control"> </div> </div> <div class="col-md-3"> <div class="input-group"><div class="input-group-addon"> <span><b>Project</b></span> </div> <select name="project[]" class="form-control" style="width: 100%;"> @foreach($projects as $project) <option value="{{$project->id}}">{{$project->name}}</option> @endforeach </select> </div> </div> <div class="col-md-1"> <button type="button" class="btn btn-danger remove-btn" id="'+i+'">X</button> </div> </div><br><textarea rows="4" cols="50" placeholder="Your comment" name="comment[]" value="no comment"></textarea></div>');
+        $('.ccc').append('<div id="oBox'+i+'" class="box box-primary"> <div class="box-body" style="padding-bottom: 20px"> <div style="text-align: right"> <button type="button" class="btn btn-danger remove-btn" id="'+i+'"><i class="fa fa-remove"></i></button> </div> <div style="display:flex;justify-content: space-between;"> <div style="width: 48%"> <div class="form-group"> <label for="">Date</label> <input id="date'+i+'" name="date[]" type="date" class="form-control" value="{{$data->date}}" required> </div> </div> <div style="width: 48%"> <div class="form-group"> <label for="">Project</label> <select name="project[]" class="form-control" style="width: 100%;"> @foreach($projects as $project) <option value="{{$project->id}}" @if($project->id == $data->project_id){{$o_select}}@endif>{{$project->name}}</option> @endforeach </select> </div> </div> </div> <div style="display:flex;justify-content: space-between;"> <div style="width: 48%"> <div class="form-group"> <label for="">Start</label> <input id="start'+i+'" required name="start[]" type="time" class="form-control" value="{{$data->start}}"> </div> </div> <div style="width: 48%"> <div class="form-group"> <label for="">End</label> <input id="end'+i+'" required name="end[]" type="time" class="form-control" value="{{$data->end}}"> </div> </div> </div> <br> <textarea rows="4" class="form-control" name="comment[]" placeholder="Your comment">{{$data->comment}}</textarea> </div> </div>');
       }
-
     }
 
     $(document).on('click', '#add', function(){
@@ -68,7 +77,7 @@
     });
     $(document).on('click', '.remove-btn', function(){
       var btn_id = $(this).attr('id');
-      $('.oBox'+btn_id+'').remove();
+      $('#oBox'+btn_id+'').remove();
     });
     $('#dynamic_form').on('submit', function(e){
       e.preventDefault();
@@ -151,11 +160,11 @@
         }
         if(data.success){
           if(post_id != 'post'){
-            $("[class^='oBox']").remove();
+            $("[id^='oBox']").remove();
             sessionStorage.setItem('message', 'success');
             location.reload();
           }else{
-            $("[class^='oBox']").remove();
+            $("[id^='oBox']").remove();
             dynamic_field(0);
             x=0;
             $('#displayAlert').removeClass().addClass('alert alert-success').html('<h4><i class="icon fa fa-check"></i>Save successfully</h4>');
