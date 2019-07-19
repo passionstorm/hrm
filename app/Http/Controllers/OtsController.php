@@ -9,6 +9,7 @@ use DB;
 
 class OtsController extends Controller
 {
+
    function isWeekend($date)
    {
       return (date('N', strtotime($date)) >= 6);
@@ -102,12 +103,12 @@ class OtsController extends Controller
             }
          }
          //end-check error time
-         
+
          //check conflict ot post
-         if( $amount > 1 ){
-            for($i = 0; $i < $amount - 1; $i++){
-               for($y = $i + 1; $y < $amount; $y++){
-                  if( $request->date[$i] ==  $request->date[$y] ){
+         if ($amount > 1) {
+            for ($i = 0; $i < $amount - 1; $i++) {
+               for ($y = $i + 1; $y < $amount; $y++) {
+                  if ($request->date[$i] ==  $request->date[$y]) {
                      $time1 = (object) [
                         'start' => $request->start[$i], 'end' => $request->end[$i]
                      ];
@@ -116,7 +117,7 @@ class OtsController extends Controller
                      ];
                      if ($this->checkConflictTime($time1, $time2)) {
                         return response()->json([
-                           'existOT' => [$i,$y]
+                           'existOT' => [$i, $y]
                         ]);
                      }
                   }
@@ -237,15 +238,34 @@ class OtsController extends Controller
       //Advanced query join
       $projects = DB::table('ot')
          ->where('user_id', Auth::user()->id)
-         ->join('ot_detail', function($join){
-            $join->on('ot_detail.ot_id','ot.id');
+         ->join('ot_detail', function ($join) {
+            $join->on('ot.id', 'ot_detail.ot_id');
          })
-         ->join('projects', function($join){
-            $join->on('projects.id','ot_detail.id');
+         ->join('projects', function ($join) {
+            $join->on('ot_detail.project_id', 'projects.id');
          })
-         ->select('projects.name', 'projects.id')->get();
+         ->select('projects.name', 'projects.id')->distinct()->get();
       //end-Advanced query join
-      return view('ots.list', ['projects' => $projects]);
+
+      $month = date('m');
+      $yearMonth = date('Y-m');
+      $today = date('d');
+      $ots = DB::table('ot')
+         ->where('user_id', Auth::user()->id)->whereMonth('ot_date', $month)
+         ->join('ot_detail', 'ot.id', 'ot_detail.ot_id')
+         ->select('ot.ot_date', 'ot_detail.time_start', 'ot_detail.time_end', 'ot.approved')->get();
+      foreach ($ots as $i) {
+         $i->startToEnd = $i->time_start . '-' . $i->time_end;
+         $i->ot_t = number_format((strtotime($i->time_end) - strtotime($i->time_start)) / 3600,1);
+         unset($i->time_start, $i->time_end);
+      }
+
+      return view('ots.list', [
+         'yearMonth' => $yearMonth,
+         'projects' => $projects,
+         'today' => $today,
+         'ots' => $ots
+      ]);
    }
 
    public function AjaxList(Request $request)
@@ -254,33 +274,48 @@ class OtsController extends Controller
          $project = $request->project;
          $year = $request->year;
          $month = $request->month;
+         if(date('Y-m') == ($year . '-' . $month)){
+            $daysOfMonth = date('d');
+         }else{
+            $daysOfMonth = date('t', strtotime($year . '-' . $month));
+         }
          // Create appropriate data as required of request
-         $amount = 0;
          //Advanced query join
-         $ot_details = DB::table('ot')
-         ->where('user_id', Auth::user()->id)->whereYear('ot_date', $year)->whereMonth('ot_date', $month)
-         ->join('ot_detail', function ($join) use ($project) {
-             if ($project == 0) {
-                 $join->on('ot.id', '=', 'ot_detail.ot_id');
-             } else {
-                 $join->on('ot.id', '=', 'ot_detail.ot_id')->where('ot_detail.project_id', $project);
-             }
-         })
-         ->join('projects', function($join){
-             $join->on('projects.id', '=', 'ot_detail.project_id');
-         })
-         ->select('ot_detail.id', 'ot_detail.time_start as start', 'ot_detail.time_end as end', 'projects.name as project_name', 'ot.ot_date as date', 'ot.approved')->get();
+         $ots = DB::table('ot')
+            ->where('user_id', Auth::user()->id)->whereYear('ot_date', $year)->whereMonth('ot_date', $month)
+            ->join('ot_detail', function ($join) use ($project) {
+               if ($project == 0) {
+                  $join->on('ot.id', '=', 'ot_detail.ot_id');
+               } else {
+                  $join->on('ot.id', '=', 'ot_detail.ot_id')->where('ot_detail.project_id', $project);
+               }
+            })
+            ->select('ot.ot_date', 'ot_detail.time_start', 'ot_detail.time_end', 'ot.approved')->get();
          //end-Advanced query join
-         foreach($ot_details as $ot_detail){
-            if ($ot_detail->approved != 0) {
-               $amount += (strtotime($ot_detail->get()->end) - strtotime($ot_detail->get()->start)) / 3600;
-            }
+         foreach ($ots as $i) {
+            $i->startToEnd = $i->time_start . '-' . $i->time_end;
+            $i->ot_t = number_format((strtotime($i->time_end) - strtotime($i->time_start)) / 3600, 1);
+            unset($i->time_start, $i->time_end);
          }
          //end-Create appropriate data as required of request
          return response()->json([
-            'items' => $ot_details,
-            'amount' => $amount,
+            'daysOfMonth' => $daysOfMonth,
+            'ots' => $ots
          ]);
+      }
+   }
+
+   public function intermediate($date)
+   {
+      $ot_id = DB::table('ot')->where([
+         ['ot_date', $date],
+         ['user_id', Auth::user()->id],
+      ])->select('id')->get();
+      if (count($ot_id) == 0) {
+         return redirect()->route('ot/post', ['date' => $date]);
+      } else {
+         $otDetailIds = DB::table('ot_detail')->where('ot_id', $ot_id[0]->id)->select('id')->get();
+         return redirect()->route('ot/post', ['id' => $otDetailIds]);
       }
    }
 }
