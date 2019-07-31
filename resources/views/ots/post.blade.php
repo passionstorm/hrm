@@ -175,17 +175,17 @@
   }
 
   if( isset($approved) ){
-    if( $approved == 1 ){
+    if( $approved == Constants::APPROVED_OT ){
       $edit = 'disabled';
       $is_approved = 'Approved';
       $s_label = 'label-success';
-    }elseif($approved == 0){
+    }elseif($approved == Constants::PENDDING_OT){
       $is_approved = 'Pendding';
       $s_label = 'label-primary';
-    }elseif($approved == -1){
+    }elseif($approved == Constants::REJECT_OT){
       $is_approved = 'Reject';
       $s_label = 'label-danger';
-    }elseif($approved == -2){
+    }elseif($approved == Constants::DRAFT_OT){
       $is_approved = 'Draft';
       $s_label = 'label-default';
     }
@@ -244,8 +244,7 @@
 <!-- bootstrap time picker -->
 <script src="plugins/timepicker/bootstrap-timepicker.min.js"></script>
 <script>
-  var f_approved = 0;
-
+  var f_approved = <?php echo Constants::PENDDING_OT ?>;
   $(document).ready(function(){
 
     //setting to be able to use post ajax
@@ -283,7 +282,6 @@
     <?php $arr = explode('-', $date); $y = $arr[0]; $m = $arr[1]; $d = $arr[2] ?>;
     let y = <?php echo $y ?>, m = <?php echo $m ?>, d = <?php echo $d ?>;
     var date = y +'-'+ m.toString().padStart(2, '0') +'-'+ d.toString().padStart(2, '0');
-    console.log(data);
 
     $('[id^=e-ot]').click(function(){
       var id = $(this).attr('id').substr(4);
@@ -358,7 +356,7 @@
 
     $('#s-d').click(function(e){
       e.preventDefault();
-      f_approved = -2;
+      f_approved = <?php echo Constants::REJECT_OT ?>;
       $('input[type="submit"]').trigger('click');
     });
 
@@ -417,7 +415,6 @@
         });
       }//end-add ot
 
-      console.log(data);
       //AJAX
       $.ajax({
         url: 'ot/post',
@@ -434,7 +431,6 @@
            console.log(thrownError);
         },
         success: function(rdata){
-          console.log(rdata);
           $('input[type="text"]').css('color', 'black');
           if(rdata.samePosts){
             $errorSamePosts = rdata.samePosts; 
@@ -482,8 +478,6 @@
     });
 
     $('#test').click(function(){
-      console.log( $('#add').offset() );
-      console.log( document.getElementById('add').offsetTop );
     })
 
   });

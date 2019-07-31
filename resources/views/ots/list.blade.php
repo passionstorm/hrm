@@ -168,16 +168,17 @@
                                             if($y == $d){
                                                 $ot_t += $x->ot_t;
                                                 $approved = $x->approved;
-                                                if( $approved == 1 ){
+                                                if( $approved == Constants::APPROVED_OT ){
+                                                    $edit = 'disabled';
                                                     $is_approved = 'Approved';
                                                     $s_label = 'label-success';
-                                                }elseif($approved == 0){
+                                                }elseif($approved == Constants::PENDDING_OT){
                                                     $is_approved = 'Pendding';
                                                     $s_label = 'label-primary';
-                                                }elseif($approved == -1){
+                                                }elseif($approved == Constants::REJECT_OT){
                                                     $is_approved = 'Reject';
                                                     $s_label = 'label-danger';
-                                                }elseif($approved == -2){
+                                                }elseif($approved == Constants::DRAFT_OT){
                                                     $is_approved = 'Draft';
                                                     $s_label = 'label-default';
                                                 }
