@@ -268,17 +268,4 @@ class OtsController extends Controller
       }
    }
 
-   public function intermediate($date)
-   {
-      $ot_id = DB::table('ot')->where([
-         ['ot_date', $date],
-         ['user_id', Auth::user()->id],
-      ])->select('id')->get();
-      if (count($ot_id) == 0) {
-         return redirect()->route('ot/post', ['date' => $date]);
-      } else {
-         $otDetailIds = DB::table('ot_detail')->where('ot_id', $ot_id[0]->id)->select('id')->get();
-         return redirect()->route('ot/post', ['id' => $otDetailIds]);
-      }
-   }
 }

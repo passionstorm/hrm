@@ -61,4 +61,3 @@ Route::get('ot/list', 'OtsController@GetList')->middleware("login");
 Route::get('ot/list/ajax', 'OtsController@AjaxList')->middleware("login");
 Route::get('ot/post/{date}', 'OtsController@GetOTs')->middleware("login");
 Route::post('ot/post', 'OtsController@PostOT')->middleware("login");
-Route::get('ot/intermediate/{date}', 'OtsController@intermediate')->middleware("login");
