@@ -1,9 +1,17 @@
 @extends('layout.index')
 
 @section('css')
-<!-- DataTables -->
-<link rel="stylesheet" href="bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+<!-- bootstrap datepicker -->
+<link rel="stylesheet" href="bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
 <style>
+    .d-label{
+        display: none;
+    }
+
+    .c-label{
+        width: 60px !important;
+        display: inline-block;
+    }
     #spc:after {
         content: none;
     }
@@ -26,7 +34,7 @@
         border-bottom: 2px solid #D5DCD4 !important;
     }
 
-    tr:hover {
+    tr.row-list:hover {
         cursor: pointer;
         background-color: #D5DCD4 !important;
     }
@@ -36,7 +44,7 @@
     }
 
     td.date {
-        width: 15%;
+        width: 20%;
     }
 
     td.time {
@@ -135,8 +143,7 @@
                                     </select>
                                 </div>
                                 <div class="mgt col-md-3">
-                                    <input name="month_year" type="month" class="form-control" value={{$yearMonth}}
-                                        max="{{$yearMonth}}" required>
+                                    <input name="month_year" type="text" class="form-control" id="datepicker"  autocomplete="off" placeholder="Choose month" value={{$yearMonth}} required >
                                 </div>
                                 <div class="mgt2 col-md-1">
                                     <button class="btn btn-primary cbtn">Search</button>
@@ -151,20 +158,33 @@
                                 <?php
                                         $y = str_pad($i, 2, 0, STR_PAD_LEFT);
                                         $date = $yearMonth.'-'.$y;
-                                        $monthDate = substr($date,-5,5);
+                                        $date2 = implode('/', explode('-', $date));
+                                        $monthDate = substr($date2,-5,5);
                                         $is_approved = '';
+                                        $s_label = 'd-label';
                                         $ot_t = 0;
                                         foreach($ots as $x){
                                             $d = substr($x->ot_date,-2,2);
                                             if($y == $d){
                                                 $ot_t += $x->ot_t;
-                                                if( $x->approved == 1 ){
+                                                $approved = $x->approved;
+                                                if( $approved == 1 ){
                                                     $is_approved = 'Approved';
+                                                    $s_label = 'label-success';
+                                                }elseif($approved == 0){
+                                                    $is_approved = 'Pendding';
+                                                    $s_label = 'label-primary';
+                                                }elseif($approved == -1){
+                                                    $is_approved = 'Reject';
+                                                    $s_label = 'label-danger';
+                                                }elseif($approved == -2){
+                                                    $is_approved = 'Draft';
+                                                    $s_label = 'label-default';
                                                 }
                                             }
                                         }
                                     ?>
-                                <tr onclick="window.location='#';">
+                                <tr class="row-list" onclick="window.location='ot/post/{{$date}}';">
                                     <td class="date">{{$monthDate}}</td>
                                     <td class="time">
                                         @if($ot_t == 0)
@@ -175,9 +195,7 @@
                                     </td>
                                     <td class="mini {{$date}}"><span id="holder{{$y}}">...</span></td>
                                     <td class="appr">
-                                        @if($is_approved == 'Approved')
-                                        <span class="label label-success">{{$is_approved}}</span>
-                                        @endif
+                                        <span class="label {{$s_label}} c-label">{{$is_approved}}</span>
                                     </td>
                                     <td class="arr">
                                         <i class="fa fa-angle-right" style="font-size:24px"></i>
@@ -201,12 +219,19 @@
 @endsection
 
 @section('script')
-<!-- DataTables -->
-<script src="bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
-<script src="bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-<!-- page script -->
+<!-- bootstrap datepicker -->
+<script src="bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+
 <script>
     $(document).ready(function(){
+        //Date picker
+        $('#datepicker').datepicker({
+            autoclose: true,
+            format: 'yyyy-mm',
+            minViewMode:1,
+            endDate: new Date()
+        })
+
         var x = <?php echo json_encode($ots); ?>;
         addOTTime(x);
 
@@ -218,6 +243,7 @@
             var month = va[1];
             var year = va[0];
             var project = $('select[name="project"]').val();
+            console.log(v);
             //end-make data for AJAX request
             //AJAX
             $.ajax({
@@ -251,16 +277,28 @@
                     totalTimeOT = totalTimeOT.toFixed(1);
                     for(var i = data.daysOfMonth; i>=1; i--){
                         var y = String(i).padStart(2,'0');
-                        var date = $('input[type="month"]').val() + '-' + y;
+                        var date = $('input[name="month_year"]').val() + '-' + y;
                         var monthDate = date.substr(-5,5);
                         var is_approved = '';
                         var ot_t = 0;
+                        var s_label = 'd-label';
                         data.ots.forEach( (e) => {
                             var v = e.ot_date.substr(-2,2);
                             if(y == v){
                                 ot_t += parseFloat(e.ot_t);
-                                if(e.approved == 1){
+                                var approved = e.approved;
+                                if(approved == 1){
                                     is_approved = 'Approved';
+                                    s_label = 'label-success';
+                                }else if(approved == 0){
+                                    is_approved = 'Pendding';
+                                    s_label = 'label-primary';
+                                }else if(approved == -1){
+                                    is_approved = 'Reject';
+                                    s_label = 'label-danger';
+                                }else if(approved == -2){
+                                    is_approved = 'Draft';
+                                    s_label = 'label-default';
                                 }
                             }
                         })
@@ -269,7 +307,7 @@
                         }else{
                             ot_t += ' h';
                         }
-                        $('tbody').append('<tr onclick="window.location=\'#\';"> <td class="date">'+monthDate+'</td> <td class="time">'+ot_t+'</td> <td class="mini '+date+'"><span id="holder'+y+'">...</span></td> <td class="appr"><span class="label label-success">'+is_approved+'</span></td> <td class="arr"> <i class="fa fa-angle-right" style="font-size:24px"></i> </td> </tr>');
+                        $('tbody').append('<tr class="row-list" onclick="window.location=\'ot/post/'+date+'\';"> <td class="date">'+monthDate+'</td> <td class="time">'+ot_t+'</td> <td class="mini '+date+'"><span id="holder'+y+'">...</span></td> <td class="appr"><span class="label '+s_label+' c-label">'+is_approved+'</span></td> <td class="arr"> <i class="fa fa-angle-right" style="font-size:24px"></i> </td> </tr>');
                     }
                     $('#totalTimeOT').text(totalTimeOT);
                     addOTTime(data.ots);

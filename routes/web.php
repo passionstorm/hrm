@@ -8,15 +8,25 @@ $roleMember = 'role:' . Constants::ROLE_MEMBER;
 $roleManager = 'role:' . Constants::ROLE_ADMIN . ',' . Constants::ROLE_STAFF;
 
 Route::get('test', function () {
-    $project = 0;
-    $year = '2019';
-    $month = '7';
-    $daysOfMonth = date('t', strtotime($year . '-' . $month));
-    // Create appropriate data as required of request
-    //Advanced query join
-    $ots = date('d');
-
-    echo ($ots);
+    $data = [
+        (object) [
+          'id' => '1',
+          'start' => '1',
+          'end' => '1',
+          'project_id' => '1',
+          'name' => '1',
+          'comment' => '1',
+        ],
+        (object) [
+          'id' => '2',
+          'start' => '2',
+          'end' => '2',
+          'project_id' => '2',
+          'name' => '2',
+          'comment' => '2',
+        ]
+  ];
+    echo json_encode($data);
     echo '<hr>';
 });
 
@@ -49,6 +59,6 @@ Route::get('projects/delete/{id}', 'ProjectsController@DeleteProject')->middlewa
 //ot
 Route::get('ot/list', 'OtsController@GetList')->middleware("login");
 Route::get('ot/list/ajax', 'OtsController@AjaxList')->middleware("login");
-Route::get('ot/post/{id?}', 'OtsController@GetOTs')->middleware("login");
+Route::get('ot/post/{date}', 'OtsController@GetOTs')->middleware("login");
 Route::post('ot/post', 'OtsController@PostOT')->middleware("login");
 Route::get('ot/intermediate/{date}', 'OtsController@intermediate')->middleware("login");
