@@ -356,7 +356,7 @@
 
     $('#s-d').click(function(e){
       e.preventDefault();
-      f_approved = <?php echo Constants::REJECT_OT ?>;
+      f_approved = <?php echo Constants::DRAFT_OT ?>;
       $('input[type="submit"]').trigger('click');
     });
 
