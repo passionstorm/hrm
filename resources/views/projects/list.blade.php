@@ -7,28 +7,24 @@
     #spc:after {
         content: none;
     }
-
     .d-n {
         display: none !important;
     }
-
     .iga-1 {
         border-right: 1px solid #d2d6de !important;
         padding-left: 6px !important;
         padding-right: 6px !important;
     }
-
     .input-group-addon {
         width: 0% !important;
     }
-
     .is_deleted {
         display: none
     }
-
     .is_deleted_bg {
-        background: #d3d3d3;
+        background-color: #d3d3d3 !important
     }
+    .pd-r-15{padding-right: 15px}
 </style>
 
 @endsection
@@ -73,7 +69,7 @@
                                     </div>
                                 </label>
                             </div>
-                            <div class="col pull-right">
+                            <div class="col pull-right pd-r-15">
                                 <a href="projects/edit" class="btn btn-primary">Add project</a>
                             </div>
                         </div>
@@ -91,13 +87,18 @@
                             </thead>
                             <tbody>
                             @foreach($projects as $p)
-                            <tr class="@if($p->is_deleted){{" is_deleted is_deleted_bg
-                            "}}@endif">
+                            <?php
+                            $participants_c = 0;
+                            if( $p->participants ){
+                            $participants_c = count( explode(',',$p->participants) );
+                            }
+                            ?>
+                            <tr class="@if($p->is_deleted){{" is_deleted is_deleted_bg "}}@endif">
                             <td>{{$p->id}}</td>
                             <td>{{$p->name}}</td>
                             <td>{{$p->budget}}</td>
                             <td>{{$p->deadline}}</td>
-                            <td>0</td>
+                            <td><span>{{$participants_c}}</span><a href="projects/{{$p->id}}/participants/add" style="float: right">Add</a></td>
                             <td style="text-align: center" class='{{$OnlyAdmin}}'><a href="projects/edit/{{$p->id}}">Edit</a>
                             </td>
 

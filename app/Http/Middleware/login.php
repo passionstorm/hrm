@@ -20,7 +20,7 @@ class login
         if(Auth::check()){
             return $next($request);
         }else{
-            return abort(401);
+            return redirect('login')->with('fail', 'You must login!');
         }
     }
 }
