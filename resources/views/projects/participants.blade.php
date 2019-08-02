@@ -1,9 +1,13 @@
 @extends('layout.index')
 
 @section('css')
-<!-- DataTables -->
-<link rel="stylesheet" href="bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
 <style>
+    .mb-o1{
+        margin-bottom: 10px;
+    }
+    .mt-o1{
+        margin-top: 10px;
+    }
     #spc:after {
         content: none;
     }
@@ -37,6 +41,12 @@
     .oshow{
         display: inline-block;
     }
+    .d-flex-o1{
+        display: grid;
+    }
+    .opt1{
+        align-items: baseline;
+    }
 </style>
 
 @endsection
@@ -45,12 +55,23 @@
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     @include('messages.success')
-
+    {{-- <button id="test">test</button> --}}
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
             Add participants for project: {{$project_name}}
         </h1>
+        <div class="row opt1">
+            <div class="col-xs-12 col-md-6">
+                <input type="text" class="form-control mb-o1 mt-o1" id="search" onkeyup="search()" placeholder="Search for names..">
+            </div>
+            <div class="col-xs-12 col-md-6">
+                <select name="sort_by" class="form-control mb-o1 mt-o1" required>
+                    <option value="0" selected>Added</option>
+                    <option value="1" >Free</option>
+                </select>   
+            </div>
+        </div>
     </section>
     <!-- Main content -->
     <section class="content">
@@ -58,41 +79,26 @@
             <div class="col-xs-12">
                 <div class="box">
                     <div class="box-body">
-
-                        <div class="row" style="margin-bottom: 20px">
-                            <div class="pull-right  pd-r-15">
-                                <a href="users/edit" class="btn btn-primary">New user</a>
-                            </div>
-                        </div>
-
-                        <table id="example1" class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th width="10%">Id</th>
-                                    <th width="80%">Name</th>
-                                    <th></th>
-                                    <th></th>
-                                </tr>
-                            </thead>
+                        <table class="table table-bordered">
                             <tbody>
                                 @foreach($users as $u)
                                 <tr>
                                     <?php
-                                    $active = '';
-                                    $hidd = '';
-                                    $oshow = '';
-                                    foreach($project_participants as $p){
-                                        if($u->id == $p){
-                                            $active = 'yes';
-                                            $hidd = 'hidd';
-                                            $oshow = 'oshow';
+                                        $active = '';
+                                        $hidd = '';
+                                        $oshow = '';
+                                        foreach($project_participants as $p){
+                                            if($u->id == $p){
+                                                $active = 'yes';
+                                                $hidd = 'hidd';
+                                                $oshow = 'oshow';
+                                            }
                                         }
-                                    }
                                     ?>
-                                    <td class="td{{$u->id}} {{$active}}">{{$u->id}}</td>
-                                    <td class="td{{$u->id}} {{$active}}">{{$u->name}}</td>
-                                    <td><button class="btn btn-primary {{$hidd}}" id="add{{$u->id}}" name="{{$u->id}}">Add</button></td>
-                                    <td><button class="btn btn-danger {{$oshow}}" id="remove{{$u->id}}" name="{{$u->id}}">Remove</button></td>
+                                    <td width="10%" class="td{{$u->id}} {{$active}}">{{$u->id}}</td>
+                                    <td class="name td{{$u->id}} {{$active}}">{{$u->name}}</td>
+                                    <td width="10%"><button class="btn btn-primary {{$hidd}}" id="add{{$u->id}}" name="{{$u->id}}"><i class="fa fa-user-plus"></i></button></td>
+                                    <td width="10%"><button class="btn btn-danger {{$oshow}}" id="remove{{$u->id}}" name="{{$u->id}}"><i class="fa fa-user-times"></i></button></td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -117,19 +123,8 @@
 <script src="bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
 <!-- page script -->
 <script>
-    $(function() {
-        $('#example1').DataTable();
-        $('#example2').DataTable({
-            'paging': true,
-            'lengthChange': false,
-            'searching': false,
-            'ordering': true,
-            'info': true,
-            'autoWidth': false
-        })
-    });
-
     $(document).ready(function(){
+        sort();
         $(document).on('click', '[id*="add"]', function(){
             $addValue = $(this).attr('name');
             $p_id = <?php echo $project_id; ?>;
@@ -172,7 +167,73 @@
             });
             //end-AJAX
         });
+        //sort
+        $('select').change(function(){
+            sort(); 
+        });
+        //end-sort
+
+        $('#test').click(function(){
+            var list = document.getElementsByTagName('TABLE')[0].getElementsByTagName('TR');
+            var is_continue = true;
+            var is_switch;
+            var sort_by = $('select[name="sort_by"]').val();
+            while(is_continue){
+                is_continue = false;
+                for(var i = 0; i<list.length-1; i++){
+                    is_switch = false;
+                    var before = list[i].getElementsByClassName('yes').length;
+                    var after = list[i+1].getElementsByClassName('yes').length;
+                    if( sort_by == 0 && before < after || sort_by == 1 && before > after ){
+                        is_switch = true;
+                        break;
+                    }
+                }
+                if(is_switch){
+                    list[i].parentNode.insertBefore(list[i+1], list[i]);
+                    is_continue = true;
+                }
+            }
+        })
     });
+
+    //filter by text
+    function search(){
+        var search = $('#search').val().toUpperCase();
+        $('table tr').each(function(index){
+            if( $(this).find('td.name').text().toUpperCase().indexOf(search) != -1 ){
+                $( this ).css('display', 'table-row');
+            }else{
+                $( this ).css('display', 'none');
+            }
+        });
+    }
+    //end-filter by text
+
+    //sort
+    function sort(){
+        var list = document.getElementsByTagName('TABLE')[0].getElementsByTagName('TR');
+        var is_continue = true;
+        var is_switch;
+        var sort_by = $('select[name="sort_by"]').val();
+        while(is_continue){
+            is_continue = false;
+            for(var i = 0; i<list.length-1; i++){
+                is_switch = false;
+                var before = list[i].getElementsByClassName('yes').length;
+                var after = list[i+1].getElementsByClassName('yes').length;
+                if( sort_by == 0 && before < after || sort_by == 1 && before > after ){
+                    is_switch = true;
+                    break;
+                }
+            }
+            if(is_switch){
+                list[i].parentNode.insertBefore(list[i+1], list[i]);
+                is_continue = true;
+            }
+        }
+    }
+    //end-sort
 
 </script>
 
