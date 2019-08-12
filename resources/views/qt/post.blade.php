@@ -221,26 +221,27 @@
 
         //Date picker
         {   
-            let today = new Date();
             let tomorrow = new Date();
+            let nextTomorrow = new Date();
             tomorrow.setDate( tomorrow.getDate() + 1);
+            nextTomorrow.setDate( nextTomorrow.getDate() + 2);
             $('.hasSetDate').datepicker({
                 autoclose: true,
                 format: 'yyyy-mm-dd',
-                startDate: today
+                startDate: tomorrow
             });
-            $('.hasSetDate').datepicker('setDate', today);
+            $('.hasSetDate').datepicker('setDate', tomorrow);
             //Date range setting
             {
                 $('.startDate').datepicker({
                     autoclose: true,
                     format: 'yyyy-mm-dd',
-                    startDate: today
+                    startDate: tomorrow
                 })
                 $('.endDate').datepicker({
                     autoclose: true,
                     format: 'yyyy-mm-dd',
-                    startDate: tomorrow
+                    startDate: nextTomorrow
                 })
                 $('.startDate').change(function(){
                     let startDate2 = $(this).datepicker('getDate');
