@@ -1,111 +1,111 @@
 @extends('layout.index')
 
 @section('css')
-<!-- bootstrap datepicker -->
-<link rel="stylesheet" href="bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
-<style>
-    .d-label{
-        display: none;
-    }
+    <!-- bootstrap datepicker -->
+    <link rel="stylesheet" href="bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <style>
+        .d-label{
+            display: none;
+        }
 
-    .c-label{
-        width: 60px !important;
-        display: inline-block;
-    }
-    #spc:after {
-        content: none;
-    }
+        .c-label{
+            width: 60px !important;
+            display: inline-block;
+        }
+        #spc:after {
+            content: none;
+        }
 
-    .d-n {
-        display: none !important;
-    }
+        .d-n {
+            display: none !important;
+        }
 
-    .iga-1 {
-        border-right: 1px solid #d2d6de !important;
-        padding-left: 6px !important;
-        padding-right: 6px !important;
-    }
+        .iga-1 {
+            border-right: 1px solid #d2d6de !important;
+            padding-left: 6px !important;
+            padding-right: 6px !important;
+        }
 
-    .pd-r-15 {
-        padding-right: 15px
-    }
+        .pd-r-15 {
+            padding-right: 15px
+        }
 
-    td {
-        border-bottom: 2px solid #D5DCD4 !important;
-    }
+        td {
+            border-bottom: 2px solid #D5DCD4 !important;
+        }
 
-    tr.row-list:hover {
-        cursor: pointer;
-        background-color: #D5DCD4 !important;
-    }
+        tr.row-list:hover {
+            cursor: pointer;
+            background-color: #D5DCD4 !important;
+        }
 
-    td.mini {
-        display: none;
-    }
-
-    td.date {
-        width: 20%;
-    }
-
-    td.time {
-        width: 15%;
-    }
-
-    td.arr {
-        width: 5%;
-    }
-
-    .mgt {
-        margin-top: 7px
-    }
-
-    .mgt2 {
-        margin-top: 14px;
-    }
-
-    .cbtn {
-        display: block;
-        width: 100%;
-    }
-
-    td.arr {
-        text-align: right
-    }
-
-    td.appr {
-        text-align: right;
-        width: auto;
-    }
-
-    @media only screen and (min-width:992px) {
         td.mini {
-            display: table-cell;
+            display: none;
         }
 
         td.date {
-            width: 10%;
+            width: 20%;
         }
 
         td.time {
-            width: 10%;
+            width: 15%;
+        }
+
+        td.arr {
+            width: 5%;
+        }
+
+        .mgt {
+            margin-top: 7px
+        }
+
+        .mgt2 {
+            margin-top: 14px;
+        }
+
+        .cbtn {
+            display: block;
+            width: 100%;
+        }
+
+        td.arr {
+            text-align: right
         }
 
         td.appr {
             text-align: right;
-            width: 15%;
-        }
-
-        .cbtn {
-            display: inline-block;
             width: auto;
         }
 
-        .mgt,
-        .mgt2 {
-            margin-top: 0;
+        @media only screen and (min-width:992px) {
+            td.mini {
+                display: table-cell;
+            }
+
+            td.date {
+                width: 10%;
+            }
+
+            td.time {
+                width: 10%;
+            }
+
+            td.appr {
+                text-align: right;
+                width: 15%;
+            }
+
+            .cbtn {
+                display: inline-block;
+                width: auto;
+            }
+
+            .mgt,
+            .mgt2 {
+                margin-top: 0;
+            }
         }
-    }
-</style>
+    </style>
 @endsection
 
 @section('content')
@@ -138,7 +138,7 @@
                                     <select name="project" id="" class="form-control" required>
                                         <option value="0" selected>All projects</option>
                                         @foreach ($projects as $p)
-                                        <option value="{{$p->id}}">{{$p->name}}</option>
+                                            <option value="{{$p->id}}">{{$p->name}}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -222,7 +222,6 @@
 @section('script')
 <!-- bootstrap datepicker -->
 <script src="bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
-
 <script>
     $(document).ready(function(){
         //Date picker

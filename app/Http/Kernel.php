@@ -3,6 +3,7 @@
 namespace App\Http;
 
 use App\Http\Middleware\AdminLogin;
+use App\Http\Middleware\AllowOnlyAjaxRequests;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\CheckForMaintenanceMode;
 use App\Http\Middleware\EncryptCookies;
@@ -85,7 +86,8 @@ class Kernel extends HttpKernel
         'throttle' => ThrottleRequests::class,
         'verified' => EnsureEmailIsVerified::class,
         'login' => login::class,
-        'role' => Role::class
+        'role' => Role::class,
+        'AllowOnlyAjaxRequests' => AllowOnlyAjaxRequests::class,
     ];
 
     /**

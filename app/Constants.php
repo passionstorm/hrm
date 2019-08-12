@@ -16,11 +16,18 @@ class Constants
     const REJECT_OT = -1;
     const DRAFT_OT = -2;
 
+    const MORNING_SESSION = 'm';
+    const AFTERNOON_SESSION = 'a';
+    const EVENING_SESSION = 'e';
 
     const COUNTRIES = [
         'vn' => 'Vietnam',
         'jp' => 'Jappan',
     ];
+
+    const APPROVED_VACATION = 1;
+    const REJECTED_VACATION = -1;
+    const PENDDING_VACATION = 0;
 }
 
 ?>

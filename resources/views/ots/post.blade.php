@@ -223,7 +223,7 @@
           @endif
           @endforeach
           <tr>
-            <td colspan="4">Total of ot time: {{$totalTime}} hours</td>
+            <td colspan="4">Total of ot time: {{number_format($totalTime,1)}} hours</td>
           </tr>
         </table>
       </div>

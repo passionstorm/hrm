@@ -12,17 +12,9 @@
                 <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
             </div>
         </div>
-        <!-- search form -->
-        <form action="#" method="get" class="sidebar-form">
-            <div class="input-group">
-                <input type="text" name="q" class="form-control" placeholder="Search...">
-                <span class="input-group-btn">
-            <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
-            </button>
-          </span>
-            </div>
-        </form>
-        <!-- /.search form -->
+        <div style="padding: 0 20px">
+            <button class="btn btn-block" id="btn-check"></button>
+        </div>
         <!-- sidebar menu: : style can be found in sidebar.less -->
         <ul class="sidebar-menu" data-widget="tree">
             <li class="header">MAIN NAVIGATION</li>
@@ -59,6 +51,12 @@
                 <a href="ot/list">
                     <i class="fa fa-calendar-plus-o"></i>
                     <span>OT</span>
+                </a>
+            </li>
+            <li>
+                <a href="qt/list">
+                    <i class="fa fa-calendar-plus-o"></i>
+                    <span>Vacation</span>
                 </a>
             </li>
         </ul>
