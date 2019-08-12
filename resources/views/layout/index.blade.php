@@ -71,62 +71,6 @@
   <script src="dist/js/adminlte.min.js"></script>
   <!-- AdminLTE for demo purposes -->
   <script src="dist/js/demo.js"></script>
-  <script>
-    //check btn
-    {
-      <?php
-        $isCheckedOut = DB::table('vacations')->where([
-          ['user_id', Auth::user()->id],
-          ['check_in', null],
-        ])->count();
-        if( !isset($vacation) ){
-          $vacation = 1;
-        }
-      ?>
-      var isCheckedOut = <?php echo $isCheckedOut ?>;
-      $(document).ready(function(){
-        if( isCheckedOut ){
-          $('#btn-check').removeClass('btn-danger').addClass('btn-success').text('Check in');
-        }else{
-          $('#btn-check').removeClass('btn-success').addClass('btn-danger').text('Check out');
-        }
-        $('#btn-check').click(function(){
-          $.ajax({
-            url: 'qt/ajax/shortLeave',
-            method: 'get',
-            dataType: 'json',
-            error: function(xhr, ajaxOptions, thrownError){
-              console.log(xhr.status);
-              console.log(xhr.responseText);
-              console.log(thrownError);
-            },
-            success: function(data){
-              if(data.result==1){
-                $('#btn-check').removeClass('btn-success').addClass('btn-danger').text('Check out');
-              }else if(data.result==0){
-                $('#btn-check').removeClass('btn-danger').addClass('btn-success').text('Check in');
-              }
-              if(data.time_remaining && window.location.href.indexOf('qt/list') != -1){
-                if(Math.abs(data.time_remaining)>1){
-                  $('#timeRemaining').text(data.time_remaining+' minutes')
-                }else{
-                  $('#timeRemaining').text(data.time_remaining+' minute')
-                }
-                var vacation = <?php echo $vacation ?>;
-                var spent = Math.round((vacation - data.time_remaining)/vacation*100);
-                $('div.progress-bar').css('width', spent+'%');
-                $('span.spent-percent').text(spent);
-                if( $('input[name="date"]').val() == data.date ){
-                  $('#searchByDate').trigger('submit');
-                }
-              }
-            }
-          })
-        })
-      })
-    }
-    //end-check btn
-  </script>
   @yield('script')
 </body>
 

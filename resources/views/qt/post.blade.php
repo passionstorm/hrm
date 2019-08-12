@@ -6,6 +6,12 @@
     <!-- Bootstrap time Picker -->
     <link rel="stylesheet" href="plugins/timepicker/bootstrap-timepicker.min.css">
     <style>
+        .input-o1{
+            text-align: center;
+        }
+        .rmgt-o1{
+            margin-top: 10px;
+        }
         .w-70{
             width: 70px;
         }
@@ -61,6 +67,11 @@
         .mrb-o1{
             margin-bottom: 10px
         }
+        @media only screen and (min-width: 992px){
+            .rmgt-o1{
+                margin-top: 0;
+            }
+        }
     </style>
 @endsection
 
@@ -74,13 +85,60 @@
     <div class="box box-primary">
         <div style="padding: 10px 20px">
             <div class="flex-o2">
-                <a data-toggle="tab" href="#menu1" class="tab-o1 a-active">Session</a>
+                <a data-toggle="tab" href="#menu0" class="tab-o1 a-active">Moment</a>
+                <a data-toggle="tab" href="#menu1" class="tab-o1">Session</a>
                 <a data-toggle="tab" href="#menu2" class="tab-o1">All day</a>
                 <a data-toggle="tab" href="#menu3" class="tab-o1">Several days</a>
                 <span style="flex-grow: 2"></span>
             </div>
             <div class="tab-content">
-                <div id="menu1" class="tab-pane fade in active">
+                <div id="menu0" class="tab-pane fade in active">
+                    <form action="qt/post" method="post">
+                        @csrf
+                        <div class="flex-pcenter">
+                            <div style="width: 70%">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <span class="input-group-addon bg-primary"><i class="fa fa-calendar"></i></span>
+                                            <input type="text" class="form-control datepicker i-o1 f0 dayForMoment" readonly autocomplete="off" required name="dayForMoment">
+                                        </div>
+                                        <a href="" id="changeUX">Are you late?</a>
+                                    </div>
+                                    <div class="col-md-6 rmgt-o1">
+                                        <div class="input-group">
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-danger" type="button" id="minus-s-time">
+                                                    <i class="fa fa-minus"></i>
+                                                </button>
+                                            </div>
+                                            <input type="text" class="form-control input-o1 f0" placeholder="Out..." id="s-time" name="out" required autocomplete="off">
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-success" type="button" id="plus-s-time">
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>     
+                                <div class="row">
+                                    <div class="col-md-12 mgt15">
+                                        <textarea rows="1" name="comment" placeholder="Your comment..." class="form-control f0"></textarea>
+                                    </div>
+                                </div>  
+                                <div class="row mgt15">
+                                    <div class="col-xs-6">
+                                        <button class="btn btn-primary btn-block reset-btn" id="r0" type="button">Reset</button>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <button class="btn btn-success btn-block" type="submit">Submit</button>
+                                    </div>
+                                </div>    
+                            </div>
+                        </div>                   
+                    </form>
+                </div>
+                <div id="menu1" class="tab-pane fade">
                     <form action="qt/post" method="post">
                         @csrf
                         <div class="flex-pcenter">
@@ -231,6 +289,13 @@
                 startDate: tomorrow
             });
             $('.hasSetDate').datepicker('setDate', tomorrow);
+            $('.dayForMoment').datepicker({
+                autoclose: true,
+                format: 'yyyy-mm-dd',
+                startDate: new Date(),
+                enableOnReadonly: false ,
+            });
+            $('.dayForMoment').datepicker('setDate', new Date());
             //Date range setting
             {
                 $('.startDate').datepicker({
@@ -267,10 +332,37 @@
         }
         //end-dynamic text area
 
+        //late or just go out
+        {
+            $('#changeUX').click(function(e){
+                e.preventDefault();
+                if($('input.dayForMoment').attr('readonly') == 'readonly'){
+                    $('input.dayForMoment').removeAttr('readonly');
+                    $('#changeUX').text('Do you just go out?');
+                    $('#s-time').attr({
+                        placeholder: 'Late...',
+                        name: 'late',
+                    });
+                }else if($('input.dayForMoment').attr('readonly') == undefined){
+                    $('input.dayForMoment').attr('readonly', 'readonly');
+                    $('#changeUX').text('Are you late?');
+                    $('#s-time').attr({
+                        placeholder: 'Out...',
+                        name: 'out',
+                    });
+                    $('.dayForMoment').datepicker('setDate', new Date());
+                }
+            });
+        }
+        //end-late or just go out
+
         //time input
         {
+            $('input[name="out"], input[name="late"]').keypress(function(e) {
+                e.preventDefault();
+            });
             var s_time = 0;
-            var maxShortOutTime = <?php echo $setting->vacation ?>;
+            var maxShortOutTime = <?php echo $setting->shortLeave ?>;
             $('#minus-s-time').click(function(){
                 s_time -= 15;
                 if(s_time < 0){
@@ -304,6 +396,16 @@
                 }else if(id == 3){
                     $('input[name="allDay"]').val( ymd );
                     $( 'textarea.f'+id ).val('');
+                }else if(id == 0){
+                    $('input[name="out"], input[name="late"]').val('');
+                    $( 'textarea.f'+id ).val('');
+                    $('input.dayForMoment').attr('readonly', 'readonly');
+                    $('#changeUX').text('Are you late?');
+                    $('#s-time').attr({
+                        placeholder: 'Out...',
+                        name: 'out',
+                    });
+                    $('.dayForMoment').datepicker('setDate', new Date());
                 }else{
                     $( '.f' + id ).val('');
                 }

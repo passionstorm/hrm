@@ -11,7 +11,7 @@ use Constants;
 class QTController extends Controller
 {
     public function GetQT(){
-        $setting = DB::table('setting')->select('vacation', 'workTime')->get()[0];
+        $setting = DB::table('setting')->select('vacation', 'workTime', 'shortLeave')->get()[0];
         return view('qt.post', ['setting'=>$setting]);
     }
 
@@ -26,10 +26,14 @@ class QTController extends Controller
             'time_remaining'=>$time_remaining
         ]);
         $history = DB::table('vacations')->where([
+            ['user_id', Auth::user()->id],
             ['date', date('Y-m-d')],
             ['is_approved', 1]
         ])->orderBy('check_out', 'desc')->select('check_out', 'check_in', 'spent')->get();
-        $pendding = DB::table('vacations')->where('is_approved', Constants::PENDDING_VACATION)->count();
+        $pendding = DB::table('vacations')->where([
+            ['is_approved', Constants::PENDDING_VACATION],
+            ['user_id', Auth::user()->id],
+            ])->count();
         return view('qt.list',[
             'time_remaining'=>$time_remaining,
             'vacation'=>$vacation,
@@ -40,7 +44,10 @@ class QTController extends Controller
     }
 
     public function GetListPendding(){
-        $pendding = DB::table('vacations')->where('is_approved', Constants::PENDDING_VACATION)->select('check_out', 'check_in', 'date', 'spent')->orderBy('date', 'asc')->get();
+        $pendding = DB::table('vacations')->where([
+            ['is_approved', Constants::PENDDING_VACATION],
+            ['user_id', Auth::user()->id],
+        ])->select('check_out', 'check_in', 'date', 'spent')->orderBy('date', 'asc')->get();
         return view('qt.listPendding',[
             'pendding'=>$pendding,
         ]);
@@ -174,6 +181,35 @@ class QTController extends Controller
                     }
                 }
             }
+        }elseif($request->dayForMoment){
+            $dayForMoment = $request->dayForMoment;
+            $comment = $request->comment;
+            if($request->out){
+                $spent = explode(' ', $request->out)[0];
+                $check_out = date('H:i:s');
+                $check_in = date('H:i:s', strtotime($check_out) + $spent*60);
+            }elseif($request->late){
+                $spent = explode(' ', $request->late)[0];
+                $arr = explode('-', DB::table('setting')->select('workTime')->get()[0]->workTime);
+                for($i = 0; $i < count($arr); $i++){
+                    if($arr[$i] == Constants::MORNING_SESSION || $arr[$i] == Constants::AFTERNOON_SESSION || $arr[$i] == Constants::EVENING_SESSION){
+                        $check_out = str_replace('h',':', $arr[$i+1]).':00';
+                        $check_in = date('H:i:s', strtotime(str_replace('h',':', $arr[$i+1]).':00') + $spent*60);
+                        break;
+                    }
+                }
+            }
+            DB::table('vacations')->insert([
+                'user_id'=>$userId,
+                'date'=>$dayForMoment,
+                'check_out'=>$check_out,
+                'check_in'=>$check_in,
+                'spent'=>$spent,
+                'comment'=>$comment,
+                'is_approved'=>0,
+                'created_at'=>date("Y-m-d H:i:s"),
+                'created_by'=>$userId,
+            ]);
         }
         return redirect('qt/list/pendding');
     }

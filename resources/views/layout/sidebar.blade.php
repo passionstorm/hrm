@@ -12,9 +12,6 @@
                 <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
             </div>
         </div>
-        <div style="padding: 0 20px">
-            <button class="btn btn-block" id="btn-check"></button>
-        </div>
         <!-- sidebar menu: : style can be found in sidebar.less -->
         <ul class="sidebar-menu" data-widget="tree">
             <li class="header">MAIN NAVIGATION</li>
@@ -32,30 +29,26 @@
                 }
                 ?>
                 <a href="index">
-                    <i class="fa fa-dashboard"></i> <span>Dashboard</span>
+                    <span>Dashboard</span>
                 </a>
             </li>
             <li style="display: {{$PreventMember}}">
                 <a href="users/list">
-                    <i class="fa fa-users"></i>
                     <span>Users</span>
                 </a>
             </li>
             <li  style="display: {{$PreventMember}}">
                 <a href="projects/list">
-                    <i class="fa fa-users"></i>
                     <span>Projects</span>
                 </a>
             </li>
             <li>
                 <a href="ot/list">
-                    <i class="fa fa-calendar-plus-o"></i>
                     <span>OT</span>
                 </a>
             </li>
             <li>
                 <a href="qt/list">
-                    <i class="fa fa-calendar-plus-o"></i>
                     <span>Vacation</span>
                 </a>
             </li>
