@@ -184,26 +184,16 @@ class QTController extends Controller
         }elseif($request->dayForMoment){
             $dayForMoment = $request->dayForMoment;
             $comment = $request->comment;
-            if($request->out){
-                $spent = explode(' ', $request->out)[0];
-                $check_out = date('H:i:s');
-                $check_in = date('H:i:s', strtotime($check_out) + $spent*60);
-            }elseif($request->late){
-                $spent = explode(' ', $request->late)[0];
-                $arr = explode('-', DB::table('setting')->select('workTime')->get()[0]->workTime);
-                for($i = 0; $i < count($arr); $i++){
-                    if($arr[$i] == Constants::MORNING_SESSION || $arr[$i] == Constants::AFTERNOON_SESSION || $arr[$i] == Constants::EVENING_SESSION){
-                        $check_out = str_replace('h',':', $arr[$i+1]).':00';
-                        $check_in = date('H:i:s', strtotime(str_replace('h',':', $arr[$i+1]).':00') + $spent*60);
-                        break;
-                    }
-                }
-            }
+            $start = $request->start;
+            $end = $request->end;
+            $arrStart = explode(':', $start);
+            $arrEnd = explode(':', $end);
+            $spent = ( $arrEnd[0]*60 + ($arrEnd[1]) )-( $arrStart[0]*60 + ($arrStart[1]) );
             DB::table('vacations')->insert([
                 'user_id'=>$userId,
                 'date'=>$dayForMoment,
-                'check_out'=>$check_out,
-                'check_in'=>$check_in,
+                'check_out'=>$start,
+                'check_in'=>$end,
                 'spent'=>$spent,
                 'comment'=>$comment,
                 'is_approved'=>0,

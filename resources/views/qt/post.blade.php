@@ -101,24 +101,16 @@
                                     <div class="col-md-6">
                                         <div class="input-group">
                                             <span class="input-group-addon bg-primary"><i class="fa fa-calendar"></i></span>
-                                            <input type="text" class="form-control datepicker i-o1 f0 dayForMoment" readonly autocomplete="off" required name="dayForMoment">
+                                            <input type="text" class="form-control datepicker i-o1 f0 dayForMoment" autocomplete="off" required name="dayForMoment">
                                         </div>
-                                        <a href="" id="changeUX">Are you late?</a>
                                     </div>
                                     <div class="col-md-6 rmgt-o1">
                                         <div class="input-group">
-                                            <div class="input-group-btn">
-                                                <button class="btn btn-danger" type="button" id="minus-s-time">
-                                                    <i class="fa fa-minus"></i>
-                                                </button>
-                                            </div>
-                                            <input type="text" class="form-control input-o1 f0" placeholder="Out..." id="s-time" name="out" required autocomplete="off">
-                                            <div class="input-group-btn">
-                                                <button class="btn btn-success" type="button" id="plus-s-time">
-                                                    <i class="fa fa-plus"></i>
-                                                </button>
-                                            </div>
+                                            <input type="text" class="form-control startTimepicker i-o1" placeholder="start" name="start" required autocomplete="off">
+                                            <span class="input-group-addon bg-primary"><i class="fa fa-arrow-right"></i></span>
+                                            <input type="text" class="form-control endTimepicker i-o1" placeholder="end" name="end" required autocomplete="off">
                                         </div>
+                                        <span id="spent"></span>
                                     </div>
                                 </div>     
                                 <div class="row">
@@ -131,7 +123,7 @@
                                         <button class="btn btn-primary btn-block reset-btn" id="r0" type="button">Reset</button>
                                     </div>
                                     <div class="col-xs-6">
-                                        <button class="btn btn-success btn-block" type="submit">Submit</button>
+                                        <button class="btn btn-success btn-block" type="submit" id="sBtnf0">Submit</button>
                                     </div>
                                 </div>    
                             </div>
@@ -332,53 +324,41 @@
         }
         //end-dynamic text area
 
-        //late or just go out
+        //bootstrap-timepicker
         {
-            $('#changeUX').click(function(e){
-                e.preventDefault();
-                if($('input.dayForMoment').attr('readonly') == 'readonly'){
-                    $('input.dayForMoment').removeAttr('readonly');
-                    $('#changeUX').text('Do you just go out?');
-                    $('#s-time').attr({
-                        placeholder: 'Late...',
-                        name: 'late',
-                    });
-                }else if($('input.dayForMoment').attr('readonly') == undefined){
-                    $('input.dayForMoment').attr('readonly', 'readonly');
-                    $('#changeUX').text('Are you late?');
-                    $('#s-time').attr({
-                        placeholder: 'Out...',
-                        name: 'out',
-                    });
-                    $('.dayForMoment').datepicker('setDate', new Date());
-                }
+            $('.startTimepicker, .endTimepicker').timepicker({
+                showMeridian: false,
+                minuteStep: 1,
+                defaultTime: false,
             });
+            
         }
-        //end-late or just go out
+        //end-bootstrap-timepicker
 
-        //time input
+        //count spent time
         {
-            $('input[name="out"], input[name="late"]').keypress(function(e) {
-                e.preventDefault();
+            $('.startTimepicker, .endTimepicker').change(function(){
+                $('.startTimepicker, .endTimepicker').css('color', 'black');
+                let start = $('.startTimepicker').val();
+                let end = $('.endTimepicker').val();
+                if( start.length >= 4 && end.length >= 4 ){
+                    let arrStart = start.split(':');
+                    let arrEnd = end.split(':');
+                    let spent = ( arrEnd[0]*60 + Number(arrEnd[1]) )-( arrStart[0]*60 + Number(arrStart[1]) );
+                    if(spent > 0 && spent < 120){
+                        $('#spent').text('Out in '+spent+' minutes').css('color', 'green');
+                        $('#sBtnf0').removeAttr('disabled');
+                    }else{
+                        $('#spent').text('Invalid time, please try again!').css('color', 'red');
+                        $('.startTimepicker, .endTimepicker').css('color', 'red');
+                        $('#sBtnf0').attr('disabled', 'disabled');
+                    }
+                }else{
+                    $('#sBtnf0').attr('disabled', 'disabled');
+                }
             });
-            var s_time = 0;
-            var maxShortOutTime = <?php echo $setting->shortLeave ?>;
-            $('#minus-s-time').click(function(){
-                s_time -= 15;
-                if(s_time < 0){
-                    s_time = 0;
-                }
-                $('#s-time').val(s_time + ' minutes');
-            })
-            $('#plus-s-time').click(function(){
-                s_time += 15;
-                if(s_time > maxShortOutTime){
-                    s_time = 120;
-                }
-                $('#s-time').val(s_time + ' minutes');
-            })
         }
-        //end-time input
+        //end-count spent time
 
         //reset form
         {
@@ -397,14 +377,8 @@
                     $('input[name="allDay"]').val( ymd );
                     $( 'textarea.f'+id ).val('');
                 }else if(id == 0){
-                    $('input[name="out"], input[name="late"]').val('');
-                    $( 'textarea.f'+id ).val('');
-                    $('input.dayForMoment').attr('readonly', 'readonly');
-                    $('#changeUX').text('Are you late?');
-                    $('#s-time').attr({
-                        placeholder: 'Out...',
-                        name: 'out',
-                    });
+                    $('input.startTimepicker, input.endTimepicker, textarea.f'+id).val('');
+                    $('#spent').text('');
                     $('.dayForMoment').datepicker('setDate', new Date());
                 }else{
                     $( '.f' + id ).val('');

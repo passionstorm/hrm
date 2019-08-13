@@ -4,6 +4,8 @@ namespace App;
 
 class Constants
 {
+    const WEB_NAME = 'hrm';
+
     const ROLE_ADMIN = '1';
     const ROLE_STAFF = '2';
     const ROLE_MEMBER = '0';

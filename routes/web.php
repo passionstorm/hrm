@@ -21,8 +21,8 @@ Route::get('test', function () {
 
 
 Route::get('/', function () {
-    return view('layout.index');
-})->middleware("login");
+    echo 'hello';
+});
 
 Route::get('login', 'UserController@GetLogin');
 Route::post('login', 'UserController@PostLogin');
