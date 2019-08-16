@@ -1,6 +1,5 @@
 <?php
 
-use ___PHPSTORM_HELPERS\object;
 use App\Constants;
 use Illuminate\Support\Facades\Route;
 
@@ -21,8 +20,8 @@ Route::get('test', function () {
 
 
 Route::get('/', function () {
-    echo 's';
-})->middleware("login");
+    return view('welcome');
+});
 
 Route::get('login', 'UserController@GetLogin');
 Route::post('login', 'UserController@PostLogin');
