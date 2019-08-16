@@ -36,7 +36,7 @@ class Constants
         Constants::EARLY_VACATION => 'Leave Early',
         Constants::LATE_VACATION => 'Come Late',
         Constants::OUT_VACATION => 'Go Out',
-        Constants::OFF_VACATION => 'Vavation',
+        Constants::OFF_VACATION => 'Vacation',
     ];
 }
 
