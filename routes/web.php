@@ -1,5 +1,6 @@
 <?php
 
+use ___PHPSTORM_HELPERS\object;
 use App\Constants;
 use Illuminate\Support\Facades\Route;
 
@@ -8,21 +9,20 @@ $roleMember = 'role:' . Constants::ROLE_MEMBER;
 $roleManager = 'role:' . Constants::ROLE_ADMIN . ',' . Constants::ROLE_STAFF;
 
 Route::get('test', function () {
-    $vacation = DB::table('setting')->select('vacation')->get()[0]->vacation;
-    $spent = DB::table('vacations')->where([
-        ['is_approved', Constants::APPROVED_VACATION],
+    $rawHistory = DB::table('vacations')->where([
         ['user_id', Auth::user()->id],
-    ])->sum('spent');
-    $time_remaining = $vacation - $spent;
-    echo var_dump($spent);
+        ['is_approved', 1]
+    ])->select('start', 'end', 'spent', 'type')->get();
+    $history = filterHistory($rawHistory, '2019-08-18');
+    // echo json_encode( $history );
     echo '<hr>';
     // echo '<hr>';
 });
 
 
 Route::get('/', function () {
-    echo 'hello';
-});
+    echo 's';
+})->middleware("login");
 
 Route::get('login', 'UserController@GetLogin');
 Route::post('login', 'UserController@PostLogin');

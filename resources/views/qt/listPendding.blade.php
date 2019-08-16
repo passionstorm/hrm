@@ -22,26 +22,32 @@
           <div class="row">
             <div class="box box-info" style="border: none">
               <div class="box-header with-border">
-                  Pendding
+                  <span style="font-weight:bold">Pendding</span>
               </div>
               <div class="box-body">
                 <div class="table-responsive">
                   <table class="table no-margin">
                     <thead>
                       <tr>
-                        <th class="r-w-o1" >Date</th>
-                        <th class="r-w-o1" >Check out</th>
-                        <th class="r-w-o1">Check in</th>
+                        <th class="r-w-o1" >Start</th>
+                        <th class="r-w-o1">End</th>
                         <th>Spent</th>
+                        <th>Type</th>
                       </tr>
                     </thead>
                     <tbody>
                       @foreach ($pendding as $i)
                           <tr>
-                            <td>{{$i->date}}</td>
-                            <td>{{$i->check_out}}</td>
-                            <td>{{$i->check_in}}</td>
+                            <td>{{$i->start}}</td>
+                            <td>{{$i->end}}</td>
                             <td>{{$i->spent}} minutes</td>
+                            <td>
+                              @foreach (Constants::VACATION_TYPE as $key => $item)
+                                @if($i->type == $key)
+                                  {{$item}}
+                                @endif
+                              @endforeach
+                            </td>
                           </tr>
                       @endforeach
                     </tbody>

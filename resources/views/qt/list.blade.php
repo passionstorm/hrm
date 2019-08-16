@@ -73,17 +73,25 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
                   <table class="table no-margin">
                     <thead>
                       <tr>
-                        <th class="r-w-o1" >Check out</th>
-                        <th class="r-w-o1">Check in</th>
+                        <th class="r-w-o1" >Start</th>
+                        <th class="r-w-o1">End</th>
                         <th>Spent</th>
+                        <th>Type</th>
                       </tr>
                     </thead>
                     <tbody>
                       @foreach ($history as $i)
                           <tr>
-                            <td>{{$i->check_out}}</td>
-                            <td>{{$i->check_in}}</td>
+                            <td>{{explode(' ', $i->start)[1]}}</td>
+                            <td>{{explode(' ', $i->end)[1]}}</td>
                             <td>{{$i->spent}} minutes</td>
+                            <td>
+                              @foreach (Constants::VACATION_TYPE as $key => $item)
+                                  @if($i->type == $key)
+                                    {{$item}}
+                                  @endif
+                              @endforeach
+                            </td>
                           </tr>
                       @endforeach
                     </tbody>
@@ -127,7 +135,15 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
           $('table>tbody tr').remove();
           var arr = data.data;
           arr.forEach((e)=>{
-            $('table>tbody').append('<tr> <td>'+e.check_out+'</td> <td>'+e.check_in+'</td> <td>'+e.spent+'</td> </tr>')
+            var vacationType = <?php echo json_encode(Constants::VACATION_TYPE) ?>;
+            var type = '';
+            for(key in vacationType){
+              if(e.type == key){
+                type = vacationType[key];
+                break;
+              }
+            }
+            $('table>tbody').append('<tr> <td>'+e.start.split(' ')[1]+'</td> <td>'+e.end.split(' ')[1]+'</td> <td>'+e.spent+' minutes</td> <td>'+type+'</td> </tr>')
           });
         }
       });

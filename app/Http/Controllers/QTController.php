@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use ___PHPSTORM_HELPERS\object;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -11,7 +12,7 @@ use Constants;
 class QTController extends Controller
 {
     public function GetQT(){
-        $setting = DB::table('setting')->select('vacation', 'workTime', 'shortLeave')->get()[0];
+        $setting = DB::table('setting')->select('vacation', 'workTime', 'shortLeave', 'minTimeForHandling')->get()[0];
         return view('qt.post', ['setting'=>$setting]);
     }
 
@@ -25,11 +26,11 @@ class QTController extends Controller
         DB::table('users')->where('id', Auth::user()->id)->update([
             'time_remaining'=>$time_remaining
         ]);
-        $history = DB::table('vacations')->where([
+        $rawHistory = DB::table('vacations')->where([
             ['user_id', Auth::user()->id],
-            ['date', date('Y-m-d')],
             ['is_approved', 1]
-        ])->orderBy('check_out', 'desc')->select('check_out', 'check_in', 'spent')->get();
+        ])->select('start', 'end', 'spent', 'type')->get();
+        $history = $this->descSoftHistory(  $this->filterHistory($rawHistory, date('Y-m-d')) );
         $pendding = DB::table('vacations')->where([
             ['is_approved', Constants::PENDDING_VACATION],
             ['user_id', Auth::user()->id],
@@ -47,156 +48,83 @@ class QTController extends Controller
         $pendding = DB::table('vacations')->where([
             ['is_approved', Constants::PENDDING_VACATION],
             ['user_id', Auth::user()->id],
-        ])->select('check_out', 'check_in', 'date', 'spent')->orderBy('date', 'asc')->get();
+        ])->select('start', 'end', 'spent', 'type')->orderBy('start', 'asc')->get();
         return view('qt.listPendding',[
             'pendding'=>$pendding,
         ]);
     }
 
-    public function shortLeave(Request $request){
-        $isCheckedOut = DB::table('vacations')->where([
-            ['user_id', Auth::user()->id],
-            ['check_in', null],
-          ])->count();
-        $dateTime = date('Y-m-d H:i:s');
-        if($isCheckedOut){
-            $id = DB::table('vacations')->where([
-                ['user_id', Auth::user()->id],
-                ['check_in', null],
-              ])->select('id')->get()[0]->id;
-            $x = DB::table('vacations')->find($id);
-            $checkIn = date("H:i:s");
-            $spent = number_format((strtotime($checkIn) - strtotime($x->check_out))/60, 0);
-            if($spent > DB::table('setting')->select('shortLeave')->get()[0]->shortLeave){
-                DB::table('vacations')->where('id', $id)->update([
-                      'spent'=>$spent,
-                      'check_in'=>$checkIn,
-                      'updated_at'=>$dateTime,
-                      'updated_by'=>Auth::user()->id,
-                      'is_approved'=>1,
-                  ]);
-                $time_remaining = DB::table('users')->find(Auth::user()->id)->time_remaining - $spent;
-                DB::table('users')->where('id', Auth::user()->id)->update([
-                    'time_remaining'=>$time_remaining
-                ]);
-                return response()->json([
-                    'result'=>1,
-                    'time_remaining'=>$time_remaining,
-                    'date'=>$x->date,
-                ]);
-            }
-            DB::table('vacations')->where('id', $id)->delete();
-            return response()->json([
-                'result'=>1,
-                'spent'=>$spent,
-            ]);
-        }else{
-            $checkOut = date("H:i:s");
-            DB::table('vacations')->insert([
-                'user_id'=>Auth::user()->id,
-                'date'=>date('Y-m-d'),
-                'check_out'=>$checkOut,
-                'created_at'=>$dateTime,
-                'created_by'=>Auth::user()->id,
-            ]);
-            return response()->json([
-                'result'=>0,
-            ]);
-        }
-
-    }
-
     public function PostQT(Request $request){
         $userId = Auth::user()->id;
-        if($request->dayForSession){
-            $dayForSession = $request->dayForSession;
+        if($request->LEDate){
+            $date = $request->LEDate;
             $session = $request->session;
+            $type = $request->type;
+            $spent = explode(' ', $request->time)[0];
             $comment = $request->comment;
             $arr = explode('-', DB::table('setting')->select('workTime')->get()[0]->workTime);
             for($i = 0; $i < count($arr); $i++){
                 if($arr[$i] == $session){
-                    $check_out = str_replace('h',':', $arr[$i+1]).':00';
-                    $check_in = str_replace('h',':', $arr[$i+2]).':00';
+                    $startS = str_replace('h',':', $arr[$i+1]);
+                    $endS = str_replace('h',':', $arr[$i+2]);
                     break;
                 }
             }
-            $spent = number_format((strtotime($check_in) - strtotime($check_out))/60, 0);
+            if($type == Constants::EARLY_VACATION){
+                $start = $date.' '.date("H:i:s", strtotime($endS) - $spent*60);
+                $end = $date.' '.$endS;
+            }elseif($type == Constants::LATE_VACATION){
+                $start = $date.' '.$startS;
+                $end = $date.' '.date("H:i:s", strtotime($startS) + $spent*60);
+            }
             DB::table('vacations')->insert([
                 'user_id'=>$userId,
-                'date'=>$dayForSession,
-                'check_out'=>$check_out,
-                'check_in'=>$check_in,
+                'start'=>$start,
+                'end'=>$end,
                 'spent'=>$spent,
                 'comment'=>$comment,
-                'is_approved'=>0,
+                'is_approved'=>Constants::PENDDING_VACATION,
+                'type'=>$type,
                 'created_at'=>date("Y-m-d H:i:s"),
                 'created_by'=>$userId,
             ]);
-        }elseif($request->allDay){
-            $allDay = $request->allDay;
+        }elseif($request->dayForOut){
+            $date = $request->dayForOut;
             $comment = $request->comment;
-            $arr = explode('-', DB::table('setting')->select('workTime')->get()[0]->workTime);
-            for($i = 0; $i < count($arr); $i++){
-                if($arr[$i] == Constants::MORNING_SESSION || $arr[$i] == Constants::AFTERNOON_SESSION || $arr[$i] == Constants::EVENING_SESSION){
-                    $check_out = str_replace('h',':', $arr[$i+1]).':00';
-                    $check_in = str_replace('h',':', $arr[$i+2]).':00';
-                    $spent = number_format((strtotime($check_in) - strtotime($check_out))/60, 0);
-                    DB::table('vacations')->insert([
-                        'user_id'=>$userId,
-                        'date'=>$allDay,
-                        'check_out'=>$check_out,
-                        'check_in'=>$check_in,
-                        'spent'=>$spent,
-                        'comment'=>$comment,
-                        'is_approved'=>0,
-                        'created_at'=>date("Y-m-d H:i:s"),
-                        'created_by'=>$userId,
-                    ]);
-                    $i+=2;
-                }
-            }
-        }elseif($request->startDate){
-            $startDate = strtotime($request->startDate);
-            $endDate = strtotime($request->endDate);
-            $comment = $request->comment;
-            $arr = explode('-', DB::table('setting')->select('workTime')->get()[0]->workTime);
-            for($d = $startDate; $d <= $endDate; $d+=24*60*60){
-                for($i = 0; $i < count($arr); $i++){
-                    if($arr[$i] == Constants::MORNING_SESSION || $arr[$i] == Constants::AFTERNOON_SESSION || $arr[$i] == Constants::EVENING_SESSION){
-                        $check_out = str_replace('h',':', $arr[$i+1]).':00';
-                        $check_in = str_replace('h',':', $arr[$i+2]).':00';
-                        $spent = number_format((strtotime($check_in) - strtotime($check_out))/60, 0);
-                        DB::table('vacations')->insert([
-                                'user_id'=>$userId,
-                                'date'=>Date('Y-m-d', $d),
-                                'check_out'=>$check_out,
-                                'check_in'=>$check_in,
-                                'spent'=>$spent,
-                                'comment'=>$comment,
-                                'is_approved'=>0,
-                                'created_at'=>date("Y-m-d H:i:s"),
-                                'created_by'=>$userId,
-                            ]);
-                        $i+=2;
-                    }
-                }
-            }
-        }elseif($request->dayForMoment){
-            $dayForMoment = $request->dayForMoment;
-            $comment = $request->comment;
-            $start = $request->start;
-            $end = $request->end;
-            $arrStart = explode(':', $start);
-            $arrEnd = explode(':', $end);
-            $spent = ( $arrEnd[0]*60 + ($arrEnd[1]) )-( $arrStart[0]*60 + ($arrStart[1]) );
+            $start = $date.' '.$request->start.':00';
+            $end = $date.' '.$request->end.':00';
+            $spent = (strtotime($end) - strtotime($start))/60;
             DB::table('vacations')->insert([
                 'user_id'=>$userId,
-                'date'=>$dayForMoment,
-                'check_out'=>$start,
-                'check_in'=>$end,
+                'start'=>$start,
+                'end'=>$end,
                 'spent'=>$spent,
                 'comment'=>$comment,
-                'is_approved'=>0,
+                'is_approved'=>Constants::PENDDING_VACATION,
+                'type'=>Constants::OUT_VACATION,
+                'created_at'=>date("Y-m-d H:i:s"),
+                'created_by'=>$userId,
+            ]);
+        }elseif($request->startDT){
+            $start =  $request->startDT.':00';
+            $end =  $request->endDT.':00';
+            $comment = $request->comment;
+            $explodedVacation = $this->vacationExplode((object)[
+                'start'=>$start,
+                'end'=>$end,
+            ]);
+            $spent = 0;
+            foreach($explodedVacation as $ev){
+                $spent += $ev->spent;
+            }
+            DB::table('vacations')->insert([
+                'user_id'=>$userId,
+                'start'=>$start,
+                'end'=>$end,
+                'spent'=>$spent,
+                'comment'=>$comment,
+                'type'=>Constants::OFF_VACATION,
+                'is_approved'=>Constants::PENDDING_VACATION,
                 'created_at'=>date("Y-m-d H:i:s"),
                 'created_by'=>$userId,
             ]);
@@ -205,12 +133,126 @@ class QTController extends Controller
     }
 
     public function SearchByDate(Request $request){
-        $data = DB::table('vacations')->where([
-            ['date', $request->date],
+        $rawHistory = DB::table('vacations')->where([
+            ['user_id', Auth::user()->id],
             ['is_approved', Constants::APPROVED_VACATION],
-        ])->orderBy('check_out', 'desc')->select('check_out', 'check_in', 'spent')->get();
+        ])->select('start', 'end', 'spent', 'type')->get();
+        $history = $this->descSoftHistory(  $this->filterHistory($rawHistory, $request->date) );
         return response()->json([
-            'data'=>$data
+            'data'=>$history
         ]);
     }
+
+    //filter history by date
+    function filterHistory($rawHistory, $searchDate){
+        $filterHistory = [];
+        foreach($rawHistory as $i){
+            if($i->type == Constants::OFF_VACATION){
+                $arrXVacation = $this->vacationExplode($i);
+                foreach($arrXVacation as $axv){
+                    if( explode(' ', $axv->start)[0] == $searchDate ){
+                        array_push($filterHistory, $axv);
+                    }
+                }
+            }else{
+                if( explode(' ', $i->start)[0] == $searchDate ){
+                    array_push($filterHistory, $i);
+                }
+            }
+        }
+        return $filterHistory;
+    }
+    //end-filter history by date
+
+    //soft desc history
+    function descSoftHistory($rawHistory){
+        $isContinue = true;
+        while($isContinue){
+            $isContinue = false;
+            for($i = 0; $i<count($rawHistory)-1; $i++){
+                if( strtotime($rawHistory[$i]->start) < strtotime($rawHistory[$i+1]->start) ){
+                    $isContinue = true;
+                    $sp = $rawHistory[$i];
+                    $rawHistory[$i] = $rawHistory[$i+1];
+                    $rawHistory[$i+1] = $sp;
+                }
+            }
+        }
+        return $rawHistory;
+    }
+    //end-soft desc history
+
+    //handling vacation days
+    function vacationExplode($vacationDays){
+        $arrVacation = [];
+        $arrStart = explode(' ', $vacationDays->start);
+        $arrEnd = explode(' ', $vacationDays->end);
+        $startDate = $arrStart[0];
+        $endDate = $arrEnd[0];
+        $shift = DB::table('users')->find(Auth::user()->id)->shift;
+        $arrShift = explode('-', $shift);
+        for($thisDate = strtotime($startDate); $thisDate <= strtotime($arrEnd[0]); $thisDate += 24*60*60){
+            if( $thisDate == strtotime($startDate) ){
+                $startTime = $arrStart[1];
+                for($y = 0; $y < count($arrShift); $y += 3){
+                    if( strtotime($startTime) <= strtotime($arrShift[$y+1]) ){
+                        $obj = (object)[
+                            'start' => date('Y-m-d', $thisDate) . ' ' .$arrShift[$y+1],
+                            'end' => date('Y-m-d', $thisDate) . ' ' .$arrShift[$y+2],
+                        ];
+                        $obj->spent = (strtotime($obj->end) - strtotime($obj->start))/60;
+                        $obj->type = Constants::OFF_VACATION;
+                        array_push($arrVacation, $obj);
+                    }elseif( strtotime($startTime) > strtotime($arrShift[$y+1]) && strtotime($startTime) < strtotime($arrShift[$y+2]) ){
+                        $obj = (object)[
+                            'start' => date('Y-m-d', $thisDate) . ' ' .$startTime,
+                            'end' => date('Y-m-d', $thisDate) . ' ' .$arrShift[$y+2],
+                        ];
+                        $obj->spent = (strtotime($obj->end) - strtotime($obj->start))/60;
+                        $obj->type = Constants::OFF_VACATION;
+                        array_push($arrVacation, $obj);
+                    }elseif( strtotime($startTime) >= strtotime($arrShift[$y+2]) ){
+                        continue;
+                    }
+                }
+            }elseif($thisDate < strtotime($endDate)){
+                for($y = 0; $y < count($arrShift); $y += 3){
+                    $obj = (object)[
+                        'start' => date('Y-m-d', $thisDate) . ' ' .$arrShift[$y+1],
+                        'end' => date('Y-m-d', $thisDate) . ' ' .$arrShift[$y+2],
+                    ];
+                    $obj->spent = (strtotime($obj->end) - strtotime($obj->start))/60;
+                    $obj->type = Constants::OFF_VACATION;
+                    array_push($arrVacation, $obj);
+                }
+            }elseif($thisDate == strtotime($endDate)){
+                $endTime = $arrEnd[1];
+                for($y = 0; $y < count($arrShift); $y += 3){
+                    if( strtotime($endTime) <= strtotime($arrShift[$y+1]) ){
+                        break;
+                    }elseif( strtotime($endTime) > strtotime($arrShift[$y+1]) && strtotime($endTime) <= strtotime($arrShift[$y+2]) ){
+                        $obj = (object)[
+                            'start' => date('Y-m-d', $thisDate) . ' ' .$arrShift[$y+1],
+                            'end' => date('Y-m-d', $thisDate) . ' ' .$endTime,
+                        ];
+                        $obj->spent = (strtotime($obj->end) - strtotime($obj->start))/60;
+                        $obj->type = Constants::OFF_VACATION;
+                        array_push($arrVacation, $obj);
+                        break;
+                    }elseif( strtotime($endTime) > strtotime($arrShift[$y+2]) ){
+                        $obj = (object)[
+                            'start' => date('Y-m-d', $thisDate) . ' ' .$arrShift[$y+1],
+                            'end' => date('Y-m-d', $thisDate) . ' ' .$arrShift[$y+2],
+                        ];
+                        $obj->spent = (strtotime($obj->end) - strtotime($obj->start))/60;
+                        $obj->type = Constants::OFF_VACATION;
+                        array_push($arrVacation, $obj);
+                    }
+                }
+            }
+        }
+        return $arrVacation;
+    }
+    //end-handling vacation days
+
 }

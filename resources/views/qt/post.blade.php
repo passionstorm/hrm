@@ -1,3 +1,5 @@
+<?php $arrSession = explode('-',$setting->workTime) ?>
+
 @extends('layout.index')
 
 @section('css')
@@ -5,7 +7,30 @@
     <link rel="stylesheet" href="bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
     <!-- Bootstrap time Picker -->
     <link rel="stylesheet" href="plugins/timepicker/bootstrap-timepicker.min.css">
+    <link rel="stylesheet" href="datetimepicker/bootstrap-datetimepicker.min.css">
     <style>
+        .f-w-o1{
+            width: 90%;
+        }
+        .cn-n{
+            border-radius: 0;
+        }
+        #sessionPicker{
+            color: green;
+            padding-left: 10px;
+        }
+        .flex-o3{
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+        }
+        .flex-o3>div{
+            flex-basis: 100%;
+        }
+        .flex-o4{
+            display: flex;
+            flex-wrap: wrap;
+        }
         .input-o1{
             text-align: center;
         }
@@ -68,8 +93,17 @@
             margin-bottom: 10px
         }
         @media only screen and (min-width: 992px){
+            .f-w-o1{
+                width: 70%;
+            }
             .rmgt-o1{
                 margin-top: 0;
+            }
+            .flex-o3>div:first-child{
+                flex-basis: 50%;
+            }
+            .flex-o3>div:last-child{
+                flex-basis: 100%;
             }
         }
     </style>
@@ -85,10 +119,9 @@
     <div class="box box-primary">
         <div style="padding: 10px 20px">
             <div class="flex-o2">
-                <a data-toggle="tab" href="#menu0" class="tab-o1 a-active">Moment</a>
-                <a data-toggle="tab" href="#menu1" class="tab-o1">Session</a>
-                <a data-toggle="tab" href="#menu2" class="tab-o1">All day</a>
-                <a data-toggle="tab" href="#menu3" class="tab-o1">Several days</a>
+                <a data-toggle="tab" href="#menu0" class="tab-o1 a-active">Late/Early</a>
+                <a data-toggle="tab" href="#menu1" class="tab-o1">Go out</a>
+                <a data-toggle="tab" href="#menu2" class="tab-o1">Vacation</a>
                 <span style="flex-grow: 2"></span>
             </div>
             <div class="tab-content">
@@ -96,23 +129,47 @@
                     <form action="qt/post" method="post">
                         @csrf
                         <div class="flex-pcenter">
-                            <div style="width: 70%">
+                            <div  class="f-w-o1">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="input-group">
                                             <span class="input-group-addon bg-primary"><i class="fa fa-calendar"></i></span>
-                                            <input type="text" class="form-control datepicker i-o1 f0 dayForMoment" autocomplete="off" required name="dayForMoment">
+                                            <input type="text" class="form-control datepicker i-o1 f0 LEDate" autocomplete="off" required name="LEDate">
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="row mgt15">
+                                    <div class="col-md-6">
+                                        <select class="form-control sessionPicker f0" name="session">
+                                            @for($i = 0; $i < count($arrSession); $i+=3)
+                                                <option value="{{$arrSession[$i]}}">{{$arrSession[$i]}}</option>
+                                            @endfor
+                                        </select>
                                     </div>
                                     <div class="col-md-6 rmgt-o1">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control startTimepicker i-o1" placeholder="start" name="start" required autocomplete="off">
-                                            <span class="input-group-addon bg-primary"><i class="fa fa-arrow-right"></i></span>
-                                            <input type="text" class="form-control endTimepicker i-o1" placeholder="end" name="end" required autocomplete="off">
-                                        </div>
-                                        <span id="spent"></span>
+                                        <select name="type" id="" class="form-control f0">
+                                            <option value="{{Constants::LATE_VACATION}}">Come late</option>
+                                            <option value="{{Constants::EARLY_VACATION}}">leave early</option>
+                                        </select>
                                     </div>
-                                </div>     
+                                </div>      
+                                <div class="row mgt15">
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-danger" type="button" id="mBtn">
+                                                <i class="fa fa-minus"></i>
+                                                </button>
+                                            </div>
+                                            <input type="text" style="text-align: center" class="form-control f0" placeholder="How long..." id="vI" name="time" required autocomplete="off">
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-success" type="button" id="pBtn">
+                                                <i class="fa fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="row">
                                     <div class="col-md-12 mgt15">
                                         <textarea rows="1" name="comment" placeholder="Your comment..." class="form-control f0"></textarea>
@@ -123,7 +180,7 @@
                                         <button class="btn btn-primary btn-block reset-btn" id="r0" type="button">Reset</button>
                                     </div>
                                     <div class="col-xs-6">
-                                        <button class="btn btn-success btn-block" type="submit" id="sBtnf0">Submit</button>
+                                        <button class="btn btn-success btn-block" type="submit">Submit</button>
                                     </div>
                                 </div>    
                             </div>
@@ -134,49 +191,34 @@
                     <form action="qt/post" method="post">
                         @csrf
                         <div class="flex-pcenter">
-                            <div style="width: 70%">
+                            <div  class="f-w-o1">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="input-group">
                                             <span class="input-group-addon bg-primary"><i class="fa fa-calendar"></i></span>
-                                            <input type="text" class="form-control datepicker i-o1 f2 hasSetDate" autocomplete="off" required name="dayForSession">
+                                            <input type="text" class="form-control datepicker dayForOut i-o1 f1" autocomplete="off" required name="dayForOut">
                                         </div>
+                                    </div>
+                                    <div class="col-md-6 rmgt-o1">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control startTimepicker i-o1 f1" placeholder="start" name="start" required autocomplete="off">
+                                            <span class="input-group-addon bg-primary"><i class="fa fa-arrow-right"></i></span>
+                                            <input type="text" class="form-control endTimepicker i-o1 f1" placeholder="end" name="end" required autocomplete="off">
+                                        </div>
+                                        <span id="spent"></span>
                                     </div>
                                 </div>     
-                                <div class="row mgt15">
-                                    <div class="col-md-6 mrb-o1">
-                                        <select class="form-control sessionPicker f2" name="session">
-                                            <?php $arrSession = explode('-',$setting->workTime) ?>
-                                            @foreach ($arrSession as $item)
-                                                @if($item == Constants::MORNING_SESSION)
-                                                    <option value="{{Constants::MORNING_SESSION}}">Morning</option>
-                                                @elseif($item == Constants::AFTERNOON_SESSION)
-                                                    <option value="{{Constants::AFTERNOON_SESSION}}">Afternoon</option>
-                                                @elseif($item == Constants::EVENING_SESSION)
-                                                    <option value="{{Constants::EVENING_SESSION}}">Evening</option>
-                                                @endif
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="input-group">
-                                            <input disabled name="start" type="text" class="form-control timepicker1 i-o1" autocomplete="off">
-                                            <span class="input-group-addon bg-primary"><i class="fa fa-arrow-right"></i></span>
-                                            <input disabled name="end" type="text" class="form-control timepicker2 i-o1" autocomplete="off">
-                                        </div>
-                                    </div>
-                                </div>  
                                 <div class="row">
                                     <div class="col-md-12 mgt15">
-                                        <textarea rows="1" name="comment" placeholder="Your comment..." class="form-control f2"></textarea>
+                                        <textarea rows="1" name="comment" placeholder="Your comment..." class="form-control f1"></textarea>
                                     </div>
                                 </div>  
                                 <div class="row mgt15">
                                     <div class="col-xs-6">
-                                        <button class="btn btn-primary btn-block reset-btn" id="r2" type="button">Reset</button>
+                                        <button class="btn btn-primary btn-block reset-btn" id="r1" type="button">Reset</button>
                                     </div>
                                     <div class="col-xs-6">
-                                        <button class="btn btn-success btn-block" type="submit">Submit</button>
+                                        <button class="btn btn-success btn-block" type="submit" id="sBtnf0">Submit</button>
                                     </div>
                                 </div>    
                             </div>
@@ -187,54 +229,24 @@
                     <form action="qt/post" method="post">
                         @csrf
                         <div class="flex-pcenter">
-                            <div style="width: 70%">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="input-group">
-                                            <span class="input-group-addon bg-primary"><i class="fa fa-calendar"></i></span>
-                                            <input type="text" class="form-control datepicker i-o1 f3 hasSetDate" autocomplete="off" required name="allDay">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12 mgt15">
-                                        <textarea rows="1" name="comment" placeholder="Your comment..." class="form-control f3"></textarea>
-                                    </div>
-                                </div>  
-                                <div class="row mgt15">
-                                    <div class="col-xs-6">
-                                        <button class="btn btn-primary btn-block reset-btn" id ="r3" type="button">Reset</button>
-                                    </div>
-                                    <div class="col-xs-6">
-                                        <button class="btn btn-success btn-block" type="submit">Submit</button>
-                                    </div>
-                                </div>  
-                            </div>
-                        </div>
-                    </form>                             
-                </div>
-                <div id="menu3" class="tab-pane fade">
-                    <form action="qt/post" method="post">
-                        @csrf
-                        <div class="flex-pcenter">
-                            <div style="width: 70%">
+                            <div class="f-w-o1">
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="input-group">
-                                            <input type="text" class="form-control datepicker startDate i-o1 f4" placeholder="from..." name="startDate" autocomplete="off">
-                                            <div class="input-group-addon bg-primary"><i class="fa fa-arrow-right"></i></div>
-                                            <input type="text" class="form-control datepicker endDate i-o1 f4" placeholder="to..." name="endDate" autocomplete="off">
+                                            <input type="text" id="dtpStart" class="form-control i-o1 f2" placeholder="start" name="startDT" autocomplete="off">
+                                            <span class="input-group-addon bg-primary"><i class="fa fa-arrow-right"></i></span>
+                                            <input type="text" id="dtpEnd" class="form-control i-o1 f2" placeholder="end" name="endDT" autocomplete="off">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12 mgt15">
-                                        <textarea rows="1" name="comment" placeholder="Your comment..." class="form-control f4"></textarea>
+                                        <textarea rows="1" name="comment" placeholder="Your comment..." class="form-control f2"></textarea>
                                     </div>
                                 </div>  
                                 <div class="row mgt15">
                                     <div class="col-xs-6">
-                                        <button class="btn btn-primary btn-block reset-btn" id="r4" type="button">Reset</button>
+                                        <button class="btn btn-primary btn-block reset-btn" id="r2" type="button">Reset</button>
                                     </div>
                                     <div class="col-xs-6">
                                         <button class="btn btn-success btn-block" type="submit">Submit</button>
@@ -256,8 +268,29 @@
 <script src="bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
 <!-- bootstrap time picker -->
 <script src="plugins/timepicker/bootstrap-timepicker.min.js"></script>
+
+
+<script src="datetimepicker/moment.min.js"></script>
+<script src="datetimepicker/bootstrap-datetimepicker.min.js"></script>
 <script>
     $(document).ready(function(){
+        //bootstrap datetimepicker
+        {
+            $('#dtpStart, #dtpEnd').datetimepicker({
+                format: 'YYYY-MM-DD HH:mm',
+                minDate: new Date(),
+                stepping: 15,
+                useCurrent: false
+            });
+            $("#dtpStart").on("dp.change", function (e) {
+                $('#dtpEnd').data("DateTimePicker").minDate(new Date(e.date._d.getTime()+15*60*1000));
+            });
+            $("#dtpEnd").on("dp.change", function (e) {
+                $('#dtpStart').data("DateTimePicker").maxDate(new Date(e.date._d.getTime()-15*60*1000));
+            });
+        }
+        //end-bootstrap datetimepicker
+
         //bootstrap tab setting
         {
             $('a.tab-o1').click(function(){
@@ -278,40 +311,54 @@
             $('.hasSetDate').datepicker({
                 autoclose: true,
                 format: 'yyyy-mm-dd',
-                startDate: tomorrow
+                startDate: tomorrow,
+                orientation: 'bottom',
             });
             $('.hasSetDate').datepicker('setDate', tomorrow);
-            $('.dayForMoment').datepicker({
+            $('.LEDate, .dayForOut, .startDate, .endDate').datepicker({
                 autoclose: true,
                 format: 'yyyy-mm-dd',
                 startDate: new Date(),
                 enableOnReadonly: false ,
+                orientation: 'bottom',
             });
-            $('.dayForMoment').datepicker('setDate', new Date());
+            $('.LEDate, .dayForOut').datepicker('setDate', new Date());
+
             //Date range setting
             {
-                $('.startDate').datepicker({
-                    autoclose: true,
-                    format: 'yyyy-mm-dd',
-                    startDate: tomorrow
-                })
-                $('.endDate').datepicker({
-                    autoclose: true,
-                    format: 'yyyy-mm-dd',
-                    startDate: nextTomorrow
-                })
                 $('.startDate').change(function(){
-                    let startDate2 = $(this).datepicker('getDate');
-                    startDate2.setDate( startDate2.getDate() + 1 ); 
-                    $('.endDate').datepicker('setStartDate', startDate2 );
+                    $('.endDate').datepicker('setStartDate', $(this).datepicker('getDate') );
                 })
                 $('.endDate').change(function(){
-                    let endDate1 = $(this).datepicker('getDate');
-                    endDate1.setDate( endDate1.getDate() - 1 ); 
-                    $('.startDate').datepicker('setEndDate', endDate1 );
+                    $('.startDate').datepicker('setEndDate', $(this).datepicker('getDate') );
                 })
             }
             //end-Date range setting
+
+            //limited date
+            {
+                $('.rangeDate').datepicker({
+                    autoclose: true,
+                    format: 'yyyy-mm-dd',
+                    orientation: 'bottom',
+                });
+                $('.startDate').change(function(){
+                    if($(this).val() && $('.endDate').val()){
+                        $('.rangeDate, #spForV').removeAttr('disabled');
+                        updateData(arrV);
+                    }
+                    $('.rangeDate').datepicker('setStartDate', $(this).datepicker('getDate') );
+                })
+                $('.endDate').change(function(){
+                    if($(this).val() && $('.endDate').val()){
+                        $('.rangeDate, #spForV').removeAttr('disabled');
+                        updateData(arrV);
+                    }
+                    $('.rangeDate').datepicker('setEndDate', $(this).datepicker('getDate') );
+                })
+            }
+            //end-limited date
+
         }
         //end-Date picker
 
@@ -328,12 +375,42 @@
         {
             $('.startTimepicker, .endTimepicker').timepicker({
                 showMeridian: false,
-                minuteStep: 1,
+                minuteStep: 15,
                 defaultTime: false,
+                snapToStep: true,
             });
             
         }
         //end-bootstrap-timepicker
+
+        //time picker
+        {
+            var step = <?php echo $setting->minTimeForHandling ?>;
+            var maxTime = <?php echo $setting->shortLeave ?>;
+            var value = 0;
+            $('#vI').keypress(function(e) {
+                e.preventDefault();
+            });
+            $('#pBtn').click(function(){
+                if(value >= maxTime){
+                    return ;
+                }
+                value += step;
+                $('#vI').val(value + ' minutes');
+            });
+            $('#mBtn').click(function(){
+                if(value <= 0){
+                    return ;
+                }
+                value -= step;
+                if(value == 0){
+                    $('#vI').val(value + ' minute');
+                }else{
+                    $('#vI').val(value + ' minutes');
+                }
+            });
+        }
+        //end-time picker
 
         //count spent time
         {
@@ -369,19 +446,17 @@
                 let d = date.getDate() +'';
                 let ymd = date.getFullYear() + '-' + m.padStart(2,'0') + '-' + d.padStart(2,'0');
                 if(id == 2){
-                    $('input[name="dayForSession"]').val( ymd );
-                    $('.sessionPicker').val( $('.sessionPicker').find('option:first').val() );
-                    $('.sessionPicker').trigger('change');
-                    $( 'textarea.f'+id ).val('');
-                }else if(id == 3){
-                    $('input[name="allDay"]').val( ymd );
-                    $( 'textarea.f'+id ).val('');
-                }else if(id == 0){
-                    $('input.startTimepicker, input.endTimepicker, textarea.f'+id).val('');
+                    $( '.f'+id ).val('');
+                    $('#dtpEnd, #dtpStart').data("DateTimePicker").minDate(new Date());
+                    $('#dtpEnd, #dtpStart').data("DateTimePicker").maxDate(false);
+                }else if(id == 1){
+                    $('.dayForOut').datepicker('setDate', new Date());
+                    $( 'input[name="start"], input[name="end"], textarea.f'+id ).val('');
                     $('#spent').text('');
-                    $('.dayForMoment').datepicker('setDate', new Date());
-                }else{
-                    $( '.f' + id ).val('');
+                }else if(id == 0){
+                    $('input[name="time"], textarea.f'+id).val('');
+                    $('.LEDate').datepicker('setDate', new Date());
+                    $('select.f0>option:first-child').attr('selected', 'selected')
                 }
             })
         }
@@ -389,43 +464,7 @@
 
         //session picker
         {
-            const MORNING_SESSION = <?php echo json_encode(Constants::MORNING_SESSION) ?>;
-            const AFTERNOON_SESSION = <?php echo json_encode(Constants::AFTERNOON_SESSION) ?>;
-            const EVENING_SESSION = <?php echo json_encode(Constants::EVENING_SESSION) ?>;
-            var arrSession = <?php echo json_encode( explode('-',$setting->workTime) ) ?>;
-            var x = [];
-            var y = [];
-            arrSession.forEach((e)=>{
-                e = e.replace('h',':');
-                y.push(e)
-                if(y.length == 3){
-                    x.push(y);
-                    y = [];
-                }
-            })
-            arrSession = x;
-            var sessionName = $('.sessionPicker').val();
-            arrSession.forEach((e)=>{
-                if(e[0] == sessionName){
-                    $('.timepicker1').timepicker({
-                        showMeridian: false,
-                        defaultTime: e[1]
-                    });
-                    $('.timepicker2').timepicker({
-                        showMeridian: false,
-                        defaultTime: e[2]
-                    });
-                }
-            })
-            $('.sessionPicker').change(function(){
-                var sessionName = $('.sessionPicker').val();
-                arrSession.forEach((e)=>{
-                    if(e[0] == sessionName){
-                        $('.timepicker1').val(e[1]);
-                        $('.timepicker2').val(e[2]);
-                    }
-                })
-            })
+            
         }
         //end-session picker
 
