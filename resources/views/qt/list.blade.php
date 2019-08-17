@@ -58,16 +58,11 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
           <div class="row">
             <div class="box box-info">
               <div class="box-header with-border">
-                <form id="searchByDate">
-                  <div class="row mgt-10">
-                    <div class="col-xs-8 col-sm-4">
-                    <input name="date" type="text" class="form-control" id="datepicker"  autocomplete="off" placeholder="Choose date" value="{{$today}}" required >
-                    </div>
-                    <div class="col-xs-4">
-                      <button class="btn btn-primary">Search</button>
-                    </div>
+                <div class="row mgt-10">
+                  <div class="col-xs-8 col-sm-4">
+                  <input name="date" type="text" class="form-control searchByDate" id="datepicker"  autocomplete="off" placeholder="Choose date" value="{{$today}}" required >
                   </div>
-                </form>
+                </div>
               </div>
               <div class="box-body">
                 <div class="table-responsive">
@@ -121,12 +116,14 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
         todayHighlight: true,
     })
 
-    $('#searchByDate').submit(function(e){
-      e.preventDefault();
+    $('.searchByDate').change(function(){
+      let date = $('.searchByDate').val();
       $.ajax({
         url:'qt/ajax/searchByDate',
         method:'get',
-        data:$('#searchByDate').serialize(),
+        data:{
+          date: date
+        },
         dataType:'json',
         error: function(xhr, ajaxOptions, thrownError){
            console.log(xhr.status);

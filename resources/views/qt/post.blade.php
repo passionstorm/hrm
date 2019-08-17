@@ -212,10 +212,7 @@ foreach($rawArrSession as $ras){
                                     </div>
                                 </div>  
                                 <div class="row mgt15">
-                                    <div class="col-xs-6">
-                                        <button class="btn btn-primary btn-block reset-btn" id="r0" type="button">Reset</button>
-                                    </div>
-                                    <div class="col-xs-6">
+                                    <div class="col-xs-12">
                                         <button class="btn btn-success btn-block" type="submit">Submit</button>
                                     </div>
                                 </div>    
@@ -250,10 +247,7 @@ foreach($rawArrSession as $ras){
                                     </div>
                                 </div>  
                                 <div class="row mgt15">
-                                    <div class="col-xs-6">
-                                        <button class="btn btn-primary btn-block reset-btn" id="r1" type="button">Reset</button>
-                                    </div>
-                                    <div class="col-xs-6">
+                                    <div class="col-xs-12">
                                         <button class="btn btn-success btn-block" type="submit" id="sBtnf0">Submit</button>
                                     </div>
                                 </div>    
@@ -271,15 +265,15 @@ foreach($rawArrSession as $ras){
                                         <input type="text" id="dStart" class="form-control i-o1 f2 startDate" placeholder="Start date" name="startD" autocomplete="off" required>
                                     </div>
                                     <div class="col-md-6">
+                                        <input type="text" id="dEnd" class="form-control i-o1 f2 endDate" placeholder="End date" name="endD" autocomplete="off" required>
+                                    </div>
+                                </div>
+                                <div class="row mgt15">
+                                    <div class="col-md-6">
                                         <div class="dropdown">
                                             <input class="dropdown-toggle form-control vStartTime i-o1 f2" data-toggle="dropdown" placeholder="Start time" autocomplete="off" name="vStartTime" required>
                                             <ul class="dropdown-menu dropdown-menu-o1">
                                                 @for($i = 0; $i < count($arrSession); $i+=3)
-                                                    @if($i == 0)
-                                                        <li class="mr-b-5">
-                                                            <a title="{{ substr($arrSession[$i+1],0,5) }}" style="cursor:default" class="pd-lr-20 optionSTime">Start of Work Date</a>
-                                                        </li>
-                                                    @endif
                                                     <li class="mr-b-5">
                                                         <a title="{{ substr($arrSession[$i+1],0,5) }}" style="cursor:default"  class="pd-lr-20 optionSTime">Start of {{$arrSession[$i]}}</a>
                                                     </li>
@@ -290,11 +284,6 @@ foreach($rawArrSession as $ras){
                                             </ul>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row mgt15">
-                                    <div class="col-md-6">
-                                        <input type="text" id="dEnd" class="form-control i-o1 f2 endDate" placeholder="End date" name="endD" autocomplete="off" required>
-                                    </div>
                                     <div class="col-md-6">
                                         <div class="dropdown">
                                             <input class="dropdown-toggle form-control vEndTime i-o1 f2" data-toggle="dropdown" placeholder="End time" autocomplete="off" name="vEndTime" required>
@@ -303,11 +292,6 @@ foreach($rawArrSession as $ras){
                                                     <li class="mr-b-5">
                                                         <a title="{{substr($arrSession[$i+2],0,5)}}" style="cursor:default" class="pd-lr-20 optionETime">End of {{$arrSession[$i]}}</a>
                                                     </li>
-                                                    @if($i == (count($arrSession)-3))
-                                                        <li class="mr-b-5">
-                                                            <a title="{{ substr($arrSession[$i+2],0,5) }}" style="cursor:default" class="pd-lr-20 optionETime">End of Work Date</a>
-                                                        </li>
-                                                    @endif
                                                 @endfor
                                                 <li class="virusInput">
                                                     <input type="text" class="form-control cEndTime mr-b-8 f2" placeholder="Your custom time" autocomplete="off" name="cEndTime">
@@ -323,10 +307,7 @@ foreach($rawArrSession as $ras){
                                     </div>
                                 </div>  
                                 <div class="row mgt15">
-                                    <div class="col-xs-6">
-                                        <button class="btn btn-primary btn-block reset-btn" id="r2" type="button">Reset</button>
-                                    </div>
-                                    <div class="col-xs-6">
+                                    <div class="col-xs-12">
                                         <button class="btn btn-success btn-block" type="submit" id="btnfv">Submit</button>
                                     </div>
                                 </div>
@@ -385,11 +366,20 @@ foreach($rawArrSession as $ras){
 
             //Date range setting
             {
+                let date = new Date();
                 $('.startDate').change(function(){
-                    $('.endDate').datepicker('setStartDate', $(this).datepicker('getDate') );
+                    if($(this).datepicker('getDate') == null){
+                        $('.endDate').datepicker('setStartDate', date);
+                    }else{
+                        $('.endDate').datepicker('setStartDate', $(this).datepicker('getDate') );
+                    }
                 })
                 $('.endDate').change(function(){
-                    $('.startDate').datepicker('setEndDate', $(this).datepicker('getDate') );
+                    if($(this).datepicker('getDate') == null){
+                        $('.startDate').datepicker('setEndDate', false);
+                    }else{
+                        $('.startDate').datepicker('setEndDate', $(this).datepicker('getDate') );
+                    }
                 })
             }
             //end-Date range setting
