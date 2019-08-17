@@ -15,6 +15,13 @@ foreach($rawArrSession as $ras){
     <!-- Bootstrap time Picker -->
     <link rel="stylesheet" href="plugins/timepicker/bootstrap-timepicker.min.css">
     <style>
+        .mgr-t-o1{
+            margin-top: 15px;
+        }
+        .g-c{
+            display: grid;
+            grid-template-columns: 100%;
+        }
         .virusInput{
             padding: 0 20px;
         }
@@ -141,6 +148,26 @@ foreach($rawArrSession as $ras){
             .flex-o3>div:last-child{
                 flex-basis: 100%;
             }
+            .mgr-t-o1{
+            margin-top: 0px;
+            }
+            .g-c{
+                display: grid;
+                grid-template-columns: 47.5% 47.5%;
+                grid-column-gap: 5%;
+            }
+            .c-vStartTime{
+                grid-area: 2/ 1/ 3 / 2;
+            }
+            .c-endDate{
+                grid-area: 1/ 2/ 2 / 3;
+            }
+            .c-startDate{
+                grid-area: 1/ 1/ 2 / 2;
+            }
+            .c-vEndTime{
+                grid-area: 2/ 2/ 3 / 3;
+            }
         }
     </style>
 @endsection
@@ -260,16 +287,11 @@ foreach($rawArrSession as $ras){
                         @csrf
                         <div class="flex-pcenter">
                             <div class="f-w-o1">
-                                <div class="row">
-                                    <div class="col-md-6">
+                                <div class="g-c">
+                                    <div class="c-startDate">
                                         <input type="text" id="dStart" class="form-control i-o1 f2 startDate" placeholder="Start date" name="startD" autocomplete="off" required>
                                     </div>
-                                    <div class="col-md-6">
-                                        <input type="text" id="dEnd" class="form-control i-o1 f2 endDate" placeholder="End date" name="endD" autocomplete="off" required>
-                                    </div>
-                                </div>
-                                <div class="row mgt15">
-                                    <div class="col-md-6">
+                                    <div class="c-vStartTime">
                                         <div class="dropdown">
                                             <input class="dropdown-toggle form-control vStartTime i-o1 f2" data-toggle="dropdown" placeholder="Start time" autocomplete="off" name="vStartTime" required>
                                             <ul class="dropdown-menu dropdown-menu-o1">
@@ -284,7 +306,10 @@ foreach($rawArrSession as $ras){
                                             </ul>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="mgr-t-o1 c-endDate">
+                                        <input type="text" id="dEnd" class="form-control i-o1 f2 endDate" placeholder="End date" name="endD" autocomplete="off" required>
+                                    </div>
+                                    <div class="c-startDate c-vEndTime">
                                         <div class="dropdown">
                                             <input class="dropdown-toggle form-control vEndTime i-o1 f2" data-toggle="dropdown" placeholder="End time" autocomplete="off" name="vEndTime" required>
                                             <ul class="dropdown-menu dropdown-menu-o1">
