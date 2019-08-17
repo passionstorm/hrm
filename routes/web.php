@@ -8,14 +8,15 @@ $roleMember = 'role:' . Constants::ROLE_MEMBER;
 $roleManager = 'role:' . Constants::ROLE_ADMIN . ',' . Constants::ROLE_STAFF;
 
 Route::get('test', function () {
-    $rawHistory = DB::table('vacations')->where([
-        ['user_id', Auth::user()->id],
-        ['is_approved', 1]
-    ])->select('start', 'end', 'spent', 'type')->get();
-    $history = filterHistory($rawHistory, '2019-08-18');
-    // echo json_encode( $history );
+    $rawArr = explode('-', DB::table('setting')->where('companyId', Auth::user()->companyId)->select('workTime')->get()[0]->workTime);
+    $arr = [];
+    foreach($rawArr as $ra){
+        $d = DB::table('session')->find($arr);
+        array_push($arr, $d->name);
+        // array_push($arr, $d->name, $d->start, $d->end);
+    }
+    echo json_encode( $arr );
     echo '<hr>';
-    // echo '<hr>';
 });
 
 
@@ -57,3 +58,4 @@ Route::get('qt/list', 'QTController@GetList')->middleware("login");
 Route::get('qt/list/pendding', 'QTController@GetListPendding')->middleware("login");
 Route::get('qt/ajax/shortLeave', 'QTController@shortLeave')->middleware("AllowOnlyAjaxRequests");
 Route::get('qt/ajax/searchByDate', 'QTController@SearchByDate')->middleware("AllowOnlyAjaxRequests");
+Route::get('qt/ajax/handlingVacation', 'QTController@HandlingVacation')->middleware("AllowOnlyAjaxRequests");

@@ -40,7 +40,7 @@
                           <tr>
                             <td>{{$i->start}}</td>
                             <td>{{$i->end}}</td>
-                            <td>{{$i->spent}} minutes</td>
+                            <td>{{$i->spent/60}} hours</td>
                             <td>
                               @foreach (Constants::VACATION_TYPE as $key => $item)
                                 @if($i->type == $key)

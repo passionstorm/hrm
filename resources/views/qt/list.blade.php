@@ -43,7 +43,8 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
             <div class="info-box-content">
               <span class="info-box-text">Time remaining</span>
               <span class="info-box-number" id="timeRemaining">
-                {{$time_remaining}} @if(abs($time_remaining)>1){{'minutes'}}@else{{'minute'}}@endif
+                <?php $hours_remaining = $time_remaining/60?>
+                {{$hours_remaining.' hours' }}
               </span>
               <div class="progress">
                 <div class="progress-bar" style="width: {{$spent}}%"></div>
@@ -81,10 +82,11 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
                     </thead>
                     <tbody>
                       @foreach ($history as $i)
+                        <?php $hours_spent = $i->spent/60 ?>
                           <tr>
                             <td>{{explode(' ', $i->start)[1]}}</td>
                             <td>{{explode(' ', $i->end)[1]}}</td>
-                            <td>{{$i->spent}} minutes</td>
+                            <td>{{$hours_spent}} hours</td>
                             <td>
                               @foreach (Constants::VACATION_TYPE as $key => $item)
                                   @if($i->type == $key)
@@ -143,7 +145,8 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
                 break;
               }
             }
-            $('table>tbody').append('<tr> <td>'+e.start.split(' ')[1]+'</td> <td>'+e.end.split(' ')[1]+'</td> <td>'+e.spent+' minutes</td> <td>'+type+'</td> </tr>')
+            let hour_spent  = (e.spent/60);
+            $('table>tbody').append('<tr> <td>'+e.start.split(' ')[1]+'</td> <td>'+e.end.split(' ')[1]+'</td> <td>'+hour_spent+' hours</td> <td>'+type+'</td> </tr>')
           });
         }
       });
