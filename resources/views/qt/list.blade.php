@@ -95,84 +95,28 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
           </div>
         </div>
         <div class="row">
-          <div class="flex-o2">
-            <a data-toggle="tab" href="#menu0" class="tab-o1 a-active">Aprroved</a>
-            <a data-toggle="tab" href="#menu1" class="tab-o1">Pendding</a>
-            <span style="flex-grow: 2"></span>
-          </div>
-          <div class="tab-content">
-            <div id="menu0" class="tab-pane fade in active">
-              <div class="row">
-                <div class="col-xs-12">
-                  <div class="box" style="border: none">
-                    <div class="box-body">
-                      <table id="example1" class="table table-bordered table-striped">
-                        <thead>
-                          <tr>
-                            <th>Start</th>
-                            <th>End</th>
-                            <th>Spent</th>
-                            <th class="r-d">Type</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($history as $i)
-                              <?php $hours_spent = $i->spent/60 ?>
-                              <tr>
-                                <td>{{ $i->start }}</td>
-                                <td>{{ $i->end }}</td>
-                                <td>{{ $hours_spent }} hours</td>
-                                <td class="r-d">
-                                  @foreach (Constants::VACATION_TYPE as $key => $item)
-                                    @if($i->type == $key)
-                                      {{ $item }}
-                                    @endif
-                                  @endforeach
-                                </td>
-                              </tr>
-                            @endforeach
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div id="menu1" class="tab-pane fade">
-              <div class="row">
-                <div class="col-xs-12">
-                  <div class="box" style="border: none">
-                    <div class="box-body">
-                      <table id="example2" class="table table-bordered table-striped">
-                        <thead>
-                          <tr>
-                            <th>Start</th>
-                            <th>End</th>
-                            <th>Spent</th>
-                            <th class="r-d">Type</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($pendding as $i)
-                              <?php $hours_spent = $i->spent/60 ?>
-                              <tr>
-                                <td>{{ $i->start }}</td>
-                                <td>{{ $i->end }}</td>
-                                <td>{{ $hours_spent }} hours</td>
-                                <td class="r-d">
-                                  @foreach (Constants::VACATION_TYPE as $key => $item)
-                                    @if($i->type == $key)
-                                      {{ $item }}
-                                    @endif
-                                  @endforeach
-                                </td>
-                              </tr>
-                            @endforeach
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
+          <div class="col-xs-12">
+            <div class="box" style="border: none">
+              <div class="box-body">
+                <table id="example1" class="table table-bordered table-striped">
+                  <thead>
+                    <tr>
+                      <th>Start</th>
+                      <th>End</th>
+                      <th>Spent</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                      @foreach ($history as $i)
+                        <?php $hours_spent = $i->spent/60 ?>
+                        <tr>
+                          <td>{{ $i->start }}</td>
+                          <td>{{ $i->end }}</td>
+                          <td>{{ $hours_spent }} hours</td>
+                        </tr>
+                      @endforeach
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>

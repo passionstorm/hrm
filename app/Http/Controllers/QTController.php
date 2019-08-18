@@ -27,18 +27,12 @@ class QTController extends Controller
         ]);
         $history = DB::table('vacations')->where([
             ['user_id', Auth::user()->id],
-            ['is_approved', 1]
+            ['is_approved', '!=', Constants::REJECTED_VACATION],
         ])->select('start', 'end', 'spent', 'type', 'updated_at', 'created_at')->get();
-        $pendding = DB::table('vacations')->where([
-            ['is_approved', Constants::PENDDING_VACATION],
-            ['user_id', Auth::user()->id],
-            ])->select('start', 'end', 'spent', 'type', 'updated_at', 'created_at')->get();
-        $this->descSoftByUpdatedTime($pendding);
         return view('qt.list',[
             'time_remaining'=>$time_remaining,
             'vacation'=>$vacation,
             'history'=>$history,
-            'pendding'=>$pendding,
             'today'=>date('Y-m-d'),
         ]);
     }
