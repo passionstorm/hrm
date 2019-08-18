@@ -25,15 +25,15 @@ class QTController extends Controller
         DB::table('users')->where('id', Auth::user()->id)->update([
             'time_remaining'=>$time_remaining
         ]);
-        $rawHistory = DB::table('vacations')->where([
+        $history = DB::table('vacations')->where([
             ['user_id', Auth::user()->id],
             ['is_approved', 1]
-        ])->select('start', 'end', 'spent', 'type')->get();
-        $history = $this->descSoftHistory(  $this->filterHistory($rawHistory, date('Y-m-d')) );
+        ])->select('start', 'end', 'spent', 'type', 'updated_at', 'created_at')->get();
         $pendding = DB::table('vacations')->where([
             ['is_approved', Constants::PENDDING_VACATION],
             ['user_id', Auth::user()->id],
-            ])->count();
+            ])->select('start', 'end', 'spent', 'type', 'updated_at', 'created_at')->get();
+        $this->descSoftByUpdatedTime($pendding);
         return view('qt.list',[
             'time_remaining'=>$time_remaining,
             'vacation'=>$vacation,
@@ -60,7 +60,11 @@ class QTController extends Controller
             $session = $request->session;
             $type = $request->type;
             $spent = explode(' ', $request->time)[0];
-            $comment = $request->comment;
+            if($request->rSelect == 0){
+                $comment = '0-'.$request->comment;
+            }else{
+                $comment = $request->rSelect;
+            }
             $rawArr = explode('-', DB::table('setting')->where('companyId', Auth::user()->companyId)->select('workTime')->get()[0]->workTime);
             $arr = [];
             foreach($rawArr as $ra){
@@ -94,7 +98,11 @@ class QTController extends Controller
             ]);
         }elseif($request->dayForOut){
             $date = $request->dayForOut;
-            $comment = $request->comment;
+            if($request->rSelect == 0){
+                $comment = '0-'.$request->comment;
+            }else{
+                $comment = $request->rSelect;
+            }
             $start = $date.' '.$request->start.':00';
             $end = $date.' '.$request->end.':00';
             $spent = (strtotime($end) - strtotime($start))/60;
@@ -112,7 +120,11 @@ class QTController extends Controller
         }elseif($request->startD){
             $start =  $request->startD.' '.$request->vStartTime.':00';
             $end =  $request->endD.' '.$request->vEndTime.':00';
-            $comment = $request->comment;
+            if($request->rSelect == 0){
+                $comment = '0-'.$request->comment;
+            }else{
+                $comment = $request->rSelect;
+            }
             $explodedVacation = $this->vacationExplode((object)[
                 'start'=>$start,
                 'end'=>$end,
@@ -133,7 +145,7 @@ class QTController extends Controller
                 'created_by'=>$userId,
             ]);
         }
-        return redirect('qt/list/pendding');
+        return redirect('qt/post');
     }
 
     public function SearchByDate(Request $request){
@@ -217,6 +229,31 @@ class QTController extends Controller
         return $rawHistory;
     }
     //end-soft desc history
+
+    //soft desc history by updated time
+    function descSoftByUpdatedTime($rawHistory){
+        $isContinue = true;
+        while($isContinue){
+            $isContinue = false;
+            for($i = 0; $i<count($rawHistory)-1; $i++){
+                $start1 = $rawHistory[$i]->created_at;
+                $start2 = $rawHistory[$i+1]->created_at;
+                if($rawHistory[$i]->updated_at){
+                    $start1 = $rawHistory[$i]->updated_at;
+                }
+                if($rawHistory[$i+1]->updated_at){
+                    $start2 = $rawHistory[$i+1]->updated_at;
+                }
+                if( strtotime($start1) < strtotime($start2) ){
+                    $isContinue = true;
+                    $sp = $rawHistory[$i];
+                    $rawHistory[$i] = $rawHistory[$i+1];
+                    $rawHistory[$i+1] = $sp;
+                }
+            }
+        }
+    }
+    //end-soft desc history by updated time
 
     //handling vacation days
     function vacationExplode($vacationDays){

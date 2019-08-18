@@ -38,6 +38,11 @@ class Constants
         Constants::OUT_VACATION => 'Go Out',
         Constants::OFF_VACATION => 'Vacation',
     ];
+
+    const VACATION_REASON = [
+        'Sick'=>'I am sick',
+        'Go home'=>'I must go home',
+    ];
 }
 
 ?>

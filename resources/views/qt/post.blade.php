@@ -103,15 +103,15 @@ foreach($rawArrSession as $ras){
             background-color: #3c8dbc !important;
             color: white;
         }
-        .flex-o2{
-            display: flex;
-        }
         a.tab-o1{
             color: blue;
             padding: 10px;
             display: inline-block;
             margin: 0;
             border-bottom: 1px solid blue;
+        }
+        .flex-o2{
+            display: flex;
         }
         div.flex-o2>span{
             border-bottom: 1px solid blue;
@@ -176,6 +176,7 @@ foreach($rawArrSession as $ras){
 <div class="content-wrapper">
   {{-- <button id="test">test</button> --}}
   <section class="content-header">
+      <a href="qt/list" style="text-decoration: underline;"><i class="fa fa-mail-reply"></i>Back to list</a>
       <h3 style="margin-left:10px"><span>Vacation</span></h3>
   </section>
   <section class="content">
@@ -235,7 +236,20 @@ foreach($rawArrSession as $ras){
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12 mgt15">
-                                        <textarea rows="1" name="comment" placeholder="Your comment..." class="form-control f0"></textarea>
+                                        <div class="dropdown">
+                                            <select name="rSelect" id="rSelect0" class="form-control" required>
+                                                <option value="" disabled selected style="display: none">Your reason...</option>
+                                                @foreach(DB::table('reason')->where('companyId', Auth::user()->companyId)->select('reason', 'id')->get() as $vr)
+                                                    <option value="{{$vr->id}}">{{$vr->reason}}</option>
+                                                @endforeach
+                                                <option  value="0">Other...</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>  
+                                <div class="row c-comment0" style="display: none">
+                                    <div class="col-md-12 mgt15">
+                                        <textarea rows="1" name="comment" placeholder="Your reason..." class="dropdown-toggle form-control f2 comment" data-toggle="dropdown" autocomplete="off">Other reason...</textarea>
                                     </div>
                                 </div>  
                                 <div class="row mgt15">
@@ -270,7 +284,20 @@ foreach($rawArrSession as $ras){
                                 </div>     
                                 <div class="row">
                                     <div class="col-md-12 mgt15">
-                                        <textarea rows="1" name="comment" placeholder="Your comment..." class="form-control f1"></textarea>
+                                        <div class="dropdown">
+                                            <select name="rSelect" id="rSelect1" class="form-control" required>
+                                                <option value="" disabled selected style="display: none">Your reason...</option>
+                                                @foreach(DB::table('reason')->where('companyId', Auth::user()->companyId)->select('reason', 'id')->get() as $vr)
+                                                    <option value="{{$vr->id}}">{{$vr->reason}}</option>
+                                                @endforeach
+                                                <option  value="0">Other...</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>  
+                                <div class="row c-comment1" style="display: none">
+                                    <div class="col-md-12 mgt15">
+                                        <textarea rows="1" name="comment" placeholder="Your reason..." class="dropdown-toggle form-control f2 comment" data-toggle="dropdown" autocomplete="off">Other reason...</textarea>
                                     </div>
                                 </div>  
                                 <div class="row mgt15">
@@ -287,11 +314,16 @@ foreach($rawArrSession as $ras){
                         @csrf
                         <div class="flex-pcenter">
                             <div class="f-w-o1">
-                                <div class="g-c">
-                                    <div class="c-startDate">
+                                <div class="row">
+                                    <div class="col-xs-6">
                                         <input type="text" id="dStart" class="form-control i-o1 f2 startDate" placeholder="Start date" name="startD" autocomplete="off" required>
                                     </div>
-                                    <div class="c-vStartTime">
+                                    <div class="col-xs-6">
+                                        <input type="text" id="dEnd" class="form-control i-o1 f2 endDate" placeholder="End date" name="endD" autocomplete="off" required>
+                                    </div>
+                                </div>
+                                <div class="row mgt15">
+                                    <div class="col-xs-6">
                                         <div class="dropdown">
                                             <input class="dropdown-toggle form-control vStartTime i-o1 f2" data-toggle="dropdown" placeholder="Start time" autocomplete="off" name="vStartTime" required>
                                             <ul class="dropdown-menu dropdown-menu-o1">
@@ -306,10 +338,7 @@ foreach($rawArrSession as $ras){
                                             </ul>
                                         </div>
                                     </div>
-                                    <div class="mgr-t-o1 c-endDate">
-                                        <input type="text" id="dEnd" class="form-control i-o1 f2 endDate" placeholder="End date" name="endD" autocomplete="off" required>
-                                    </div>
-                                    <div class="c-startDate c-vEndTime">
+                                    <div class="col-xs-6">
                                         <div class="dropdown">
                                             <input class="dropdown-toggle form-control vEndTime i-o1 f2" data-toggle="dropdown" placeholder="End time" autocomplete="off" name="vEndTime" required>
                                             <ul class="dropdown-menu dropdown-menu-o1">
@@ -328,7 +357,20 @@ foreach($rawArrSession as $ras){
                                 <span id="vSpent"></span>
                                 <div class="row">
                                     <div class="col-md-12 mgt15">
-                                        <textarea rows="1" name="comment" placeholder="Your comment..." class="form-control f2"></textarea>
+                                        <div class="dropdown">
+                                            <select name="rSelect" id="rSelect2" class="form-control" required>
+                                                <option value="" disabled selected style="display: none">Your reason...</option>
+                                                @foreach(DB::table('reason')->where('companyId', Auth::user()->companyId)->select('reason', 'id')->get() as $vr)
+                                                    <option value="{{$vr->id}}">{{$vr->reason}}</option>
+                                                @endforeach
+                                                <option  value="0">Other...</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>  
+                                <div class="row c-comment2" style="display: none">
+                                    <div class="col-md-12 mgt15">
+                                        <textarea rows="1" name="comment" placeholder="Your reason..." class="dropdown-toggle form-control f2 comment" data-toggle="dropdown" autocomplete="off">Other reason...</textarea>
                                     </div>
                                 </div>  
                                 <div class="row mgt15">
@@ -468,6 +510,19 @@ foreach($rawArrSession as $ras){
             //end-setting for vacation time
         }
         //end-bootstrap-timepicker
+
+        //comment picker
+        {
+            $('select[id^="rSelect"]').change(function(){
+                let id = $(this).attr('id').substr(7);
+                if($(this).val() == 0){
+                    $('.c-comment'+id).css('display', 'block').find('textarea').val('Other reason...');
+                }else{
+                    $('.c-comment'+id).css('display', 'none');
+                }
+            });
+        }
+        //end-comment picker
 
         //time picker
         {
@@ -609,12 +664,6 @@ foreach($rawArrSession as $ras){
             })
         }
         //end-reset form
-
-        //session picker
-        {
-            
-        }
-        //end-session picker
 
         //test
         {

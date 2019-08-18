@@ -194,6 +194,7 @@
 ?>
 <div class="content-wrapper">
   <section class="content-header">
+    <a href="ot/list" style="text-decoration: underline; padding-bottom: 15px; display:block"><i class="fa fa-mail-reply"></i>Back to list</a>
     <div id="displayAlert"></div>
     <div class="box">
       <h3 style="margin-left:10px"><span>OT in </span><span class="ot-date">{{$date}} </span><span

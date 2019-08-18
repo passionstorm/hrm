@@ -8,16 +8,39 @@ $roleMember = 'role:' . Constants::ROLE_MEMBER;
 $roleManager = 'role:' . Constants::ROLE_ADMIN . ',' . Constants::ROLE_STAFF;
 
 Route::get('test', function () {
-    $rawArr = explode('-', DB::table('setting')->where('companyId', Auth::user()->companyId)->select('workTime')->get()[0]->workTime);
-    $arr = [];
-    foreach($rawArr as $ra){
-        $d = DB::table('session')->find($arr);
-        array_push($arr, $d->name);
-        // array_push($arr, $d->name, $d->start, $d->end);
-    }
-    echo json_encode( $arr );
+    $rawPendding = DB::table('vacations')->where([
+        ['is_approved', Constants::PENDDING_VACATION],
+        ['user_id', Auth::user()->id],
+        ])->select('start', 'end', 'spent', 'type', 'updated_at', 'created_at')->get();
+    // $pendding = descSoftByUpdatedTime($rawPendding);
+    echo json_encode( $rawPendding );
     echo '<hr>';
+    // echo json_encode( $pendding );
+    // echo '<hr>';
 });
+function descSoftByUpdatedTime($rawHistory){
+    $isContinue = true;
+    while($isContinue){
+        $isContinue = false;
+        for($i = 0; $i<count($rawHistory)-1; $i++){
+            $start1 = $rawHistory[$i]->created_at;
+            $start2 = $rawHistory[$i+1]->created_at;
+            if($rawHistory[$i]->updated_at){
+                $start1 = $rawHistory[$i]->updated_at;
+            }
+            if($rawHistory[$i+1]->updated_at){
+                $start2 = $rawHistory[$i+1]->updated_at;
+            }
+            if( strtotime($start1) < strtotime($start2) ){
+                $isContinue = true;
+                $sp = $rawHistory[$i];
+                $rawHistory[$i] = $rawHistory[$i+1];
+                $rawHistory[$i+1] = $sp;
+            }
+        }
+    }
+    return $rawHistory;
+}
 
 
 Route::get('/', function () {

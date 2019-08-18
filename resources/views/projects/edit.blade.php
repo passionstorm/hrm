@@ -10,6 +10,7 @@
 <div class="content-wrapper">
   <!-- Content Header (Page header) -->
   <section class="content-header">
+    <a href="projects/list" style="text-decoration: underline; padding-bottom: 15px; display:block"><i class="fa fa-mail-reply"></i>Back to list</a>
     <h1>
       @if( isset($project) )
         {{'Edit project'}}
