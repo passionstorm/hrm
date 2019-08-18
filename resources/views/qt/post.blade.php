@@ -612,20 +612,20 @@ foreach($rawArrSession as $ras){
                                             console.log(thrownError);
                                         },
                                         success: function(data){
-                                            let spent = data.spent/60;
+                                            let time = data.spent.time/60;
                                             let nonFullShift = '';
                                             let fullShift = '';
                                             let and = '';
                                             if(data.nonFullShift != 0){
-                                                nonFullShift += data.nonFullShift+' non-full shift';
+                                                nonFullShift += data.spent.nonFullShift+' non-full shift';
                                             }
                                             if(data.fullShift != 0){
-                                                fullShift += data.fullShift+' full shift';
+                                                fullShift += data.spent.fullShift+' full shift';
                                             }
                                             if(data.fullShift != 0 && data.nonFullShift != 0){
                                                 and = ' and ';
                                             }
-                                            $('#vSpent').text('You will spend '+spent+' hours in '+fullShift+and+nonFullShift).css('color', 'green');
+                                            $('#vSpent').text('You will spend '+time+' hours in '+fullShift+and+nonFullShift).css('color', 'green');
                                         }
                                     });
                                 }

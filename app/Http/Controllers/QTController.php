@@ -119,19 +119,15 @@ class QTController extends Controller
             }else{
                 $comment = $request->rSelect;
             }
-            $explodedVacation = $this->vacationExplode((object)[
+            $spentObj = $this->vacationSpent((object)[
                 'start'=>$start,
                 'end'=>$end,
-            ]);echo json_encode($explodedVacation);
-            $spent = 0;
-            foreach($explodedVacation as $ev){
-                $spent += $ev->spent;
-            }
+            ]);
             DB::table('vacations')->insert([
                 'user_id'=>$userId,
                 'start'=>$start,
                 'end'=>$end,
-                'spent'=>$spent,
+                'spent'=>$spentObj->time,
                 'comment'=>$comment,
                 'type'=>Constants::OFF_VACATION,
                 'is_approved'=>Constants::PENDDING_VACATION,
@@ -157,35 +153,13 @@ class QTController extends Controller
         $vacationDays = new stdClass();
         $vacationDays->start = $request->start;
         $vacationDays->end = $request->end;
-        $arrVacationDays  = $this->vacationExplode($vacationDays);
-        $spent = 0;
-        $rawArrShift = DB::table('users')->find(Auth::user()->id)->shift;
-        $arrShift = [];
-        $fullShift = 0;
-        $nonFullShift = 0;
-        $c1 = [];
-        foreach(explode('-', $rawArrShift) as $ras){
-            $v = DB::table('session')->find($ras);
-            array_push($arrShift, $v->start, $v->end);
-        }
-        foreach($arrVacationDays as $a){
-            $spent += $a->spent;
-            array_push($c1, array_search(explode(' ', $a->start)[1], $arrShift), array_search(explode(' ', $a->end)[1], $arrShift));
-            if( array_search(explode(' ', $a->start)[1], $arrShift) !== false && array_search(explode(' ', $a->end)[1], $arrShift) !== false ){
-                $fullShift++;
-            }else{
-                $nonFullShift++;
-            }
-        }
+        $spentObj  = $this->vacationSpent($vacationDays);
         return response()->json([
-            'arr'=>$arrVacationDays,
-            'spent'=>$spent,
-            'fullShift'=>$fullShift,
-            'nonFullShift'=>$nonFullShift,
+            'spent'=>$spentObj 
         ]);
     }
 
-    //filter history by date
+    //not necessary for current template//filter history by date
     function filterHistory($rawHistory, $searchDate){
         $filterHistory = [];
         foreach($rawHistory as $i){
@@ -249,7 +223,76 @@ class QTController extends Controller
     }
     //end-soft desc history by updated time
 
-    //handling vacation days
+    //count spent in vacation days
+    function vacationSpent($vacationDays){
+        $spent = new stdClass();
+        $spent->time = 0;
+        $spent->fullShift = 0;
+        $spent->nonFullShift = 0;
+        $arrStart = explode(' ', $vacationDays->start);
+        $arrEnd = explode(' ', $vacationDays->end);
+        $startDate = strtotime($arrStart[0]);
+        $startTime = strtotime($arrStart[1]);
+        $endDate = strtotime($arrEnd[0]);
+        $endTime = strtotime($arrEnd[1]);
+        if($endDate == $startDate){
+            $middleDays = 0;
+        }else{
+            $middleDays = ($endDate - $startDate)/60/60/24 - 1;
+        }
+        $rawShift = DB::table('users')->find(Auth::user()->id)->shift;
+        $rawArrShift = explode('-', $rawShift);
+        $arrShift = [];
+        foreach($rawArrShift as $ras){
+            $sp = DB::table('session')->find($ras);
+            array_push($arrShift, $sp->start, $sp->end);
+        }
+        $workTimesPerDay = 0;
+        $amountShiftsPerDay = 0;
+        for($y = 0; $y < count($arrShift); $y += 2){
+            $startShift = strtotime($arrShift[$y]);
+            $endShift = strtotime($arrShift[$y+1]);
+            $workTimesPerDay += ($endShift - $startShift)/60;
+            $amountShiftsPerDay++;
+            if($startDate == $endDate){
+                if($endTime <= $startShift){
+                    break;
+                }elseif($endTime > $startShift && $endTime < $endShift){
+                    if($startTime <= $startShift){
+                        $spent->time += ($endTime - $startShift)/60;
+                        $spent->nonFullShift++;
+                    }elseif($startTime > $startShift){
+                        $spent->time += ($endTime - $startTime)/60;
+                        $spent->nonFullShift++;
+                    }
+                    break;
+                }
+            }
+            if($startTime <= $startShift){
+                $spent->time += ($endShift - $startShift)/60;
+                $spent->fullShift++;
+            }elseif($startTime > $startShift && $startTime < $endShift){
+                $spent->time += ($endShift - $startTime)/60;
+                $spent->nonFullShift++;
+            }
+            if($startDate == $endDate){
+                continue;
+            }if($endTime > $startShift && $endTime < $endShift){
+                $spent->time += ($endTime - $startShift)/60;
+                $spent->nonFullShift++;
+            }elseif($endTime >= $endShift){
+                $spent->time += ($endShift - $startShift)/60;
+                $spent->fullShift++;
+            }
+    
+        }
+        $spent->time += $middleDays*$workTimesPerDay;
+        $spent->fullShift += $middleDays*$amountShiftsPerDay;
+        return $spent;
+    }
+    //end-count spent in vacation days
+
+    //not necessary for current template//explode vacation days to array object
     function vacationExplode($vacationDays){
         $arrVacation = [];
         $arrStart = explode(' ', $vacationDays->start);
@@ -272,13 +315,23 @@ class QTController extends Controller
                         if(strtotime($endTime) <= strtotime($arrShift[$y+1])){
                             break;
                         }elseif( strtotime($endTime) > strtotime($arrShift[$y+1]) && strtotime($endTime) <= strtotime($arrShift[$y+2]) ){
-                            $obj = (object)[
-                                'start' => date('Y-m-d', $thisDate) . ' ' .$arrShift[$y+1],
-                                'end' => date('Y-m-d', $thisDate) . ' ' .$endTime,
-                            ];
-                            $obj->spent = (strtotime($obj->end) - strtotime($obj->start))/60;
-                            $obj->type = Constants::OFF_VACATION;
-                            array_push($arrVacation, $obj);
+                            if(strtotime($startTime) <= strtotime($arrShift[$y+1])){
+                                $obj = (object)[
+                                    'start' => date('Y-m-d', $thisDate) . ' ' .$arrShift[$y+1],
+                                    'end' => date('Y-m-d', $thisDate) . ' ' .$endTime,
+                                ];
+                                $obj->spent = (strtotime($obj->end) - strtotime($obj->start))/60;
+                                $obj->type = Constants::OFF_VACATION;
+                                array_push($arrVacation, $obj);
+                            }elseif(strtotime($startTime) > strtotime($arrShift[$y+1])){
+                                $obj = (object)[
+                                    'start' => date('Y-m-d', $thisDate) . ' ' .$startTime,
+                                    'end' => date('Y-m-d', $thisDate) . ' ' .$endTime,
+                                ];
+                                $obj->spent = (strtotime($obj->end) - strtotime($obj->start))/60;
+                                $obj->type = Constants::OFF_VACATION;
+                                array_push($arrVacation, $obj);
+                            }
                             break;
                         }
                     }
@@ -340,6 +393,6 @@ class QTController extends Controller
         }
         return $arrVacation;
     }
-    //end-handling vacation days
+    //end-explode vacation days to array object
 
 }

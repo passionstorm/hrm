@@ -8,38 +8,77 @@ $roleMember = 'role:' . Constants::ROLE_MEMBER;
 $roleManager = 'role:' . Constants::ROLE_ADMIN . ',' . Constants::ROLE_STAFF;
 
 Route::get('test', function () {
-    $rawPendding = DB::table('vacations')->where([
-        ['is_approved', Constants::PENDDING_VACATION],
-        ['user_id', Auth::user()->id],
-        ])->select('start', 'end', 'spent', 'type', 'updated_at', 'created_at')->get();
-    // $pendding = descSoftByUpdatedTime($rawPendding);
-    echo json_encode( $rawPendding );
+    echo json_encode( vacationSpent((object)['start'=> '2019-08-18 08:00:00', 'end'=> '2019-08-18 17:00:00']) );
     echo '<hr>';
-    // echo json_encode( $pendding );
-    // echo '<hr>';
+    // echo json_encode($arrShift);echo '<hr>';
 });
-function descSoftByUpdatedTime($rawHistory){
-    $isContinue = true;
-    while($isContinue){
-        $isContinue = false;
-        for($i = 0; $i<count($rawHistory)-1; $i++){
-            $start1 = $rawHistory[$i]->created_at;
-            $start2 = $rawHistory[$i+1]->created_at;
-            if($rawHistory[$i]->updated_at){
-                $start1 = $rawHistory[$i]->updated_at;
-            }
-            if($rawHistory[$i+1]->updated_at){
-                $start2 = $rawHistory[$i+1]->updated_at;
-            }
-            if( strtotime($start1) < strtotime($start2) ){
-                $isContinue = true;
-                $sp = $rawHistory[$i];
-                $rawHistory[$i] = $rawHistory[$i+1];
-                $rawHistory[$i+1] = $sp;
+function vacationSpent($vacationDays){
+    $spent = new stdClass();
+    $spent->time = 0;
+    $spent->fullShift = 0;
+    $spent->nonFullShift = 0;
+    $arrStart = explode(' ', $vacationDays->start);
+    $arrEnd = explode(' ', $vacationDays->end);
+    $startDate = strtotime($arrStart[0]);
+    $startTime = strtotime($arrStart[1]);
+    $endDate = strtotime($arrEnd[0]);
+    $endTime = strtotime($arrEnd[1]);
+    if($endDate == $startDate){
+        $middleDays = 0;
+    }else{
+        $middleDays = ($endDate - $startDate)/60/60/24 - 1;
+    }
+    $rawShift = DB::table('users')->find(Auth::user()->id)->shift;
+    $rawArrShift = explode('-', $rawShift);
+    $arrShift = [];
+    foreach($rawArrShift as $ras){
+        $sp = DB::table('session')->find($ras);
+        array_push($arrShift, $sp->start, $sp->end);
+    }
+    $workTimesPerDay = 0;
+    $amountShiftsPerDay = 0;
+    for($y = 0; $y < count($arrShift); $y += 2){
+        $startShift = strtotime($arrShift[$y]);
+        $endShift = strtotime($arrShift[$y+1]);
+        $workTimesPerDay += ($endShift - $startShift)/60;
+        $amountShiftsPerDay++;
+        if($startDate == $endDate){echo json_encode($middleDays);echo '<hr>';
+            if($endTime <= $startShift){echo json_encode(-1);echo '<hr>';
+                break;
+            }elseif($endTime > $startShift && $endTime < $endShift){echo json_encode(-2);echo '<hr>';
+                if($startTime <= $startShift){
+                    $spent->time += ($endTime - $startShift)/60;
+                    $spent->nonFullShift++;
+                }elseif($startTime > $startShift){
+                    $spent->time += ($endTime - $startTime)/60;
+                    $spent->nonFullShift++;
+                }
+                break;
             }
         }
+
+        if($startTime <= $startShift){echo json_encode(1);echo '<hr>';
+            $spent->time += ($endShift - $startShift)/60;
+            $spent->fullShift++;
+        }elseif($startTime > $startShift && $startTime < $endShift){echo json_encode(2);echo '<hr>';
+            $spent->time += ($endShift - $startTime)/60;
+            $spent->nonFullShift++;
+        }
+
+        if($startDate == $endDate){
+            continue;
+        }elseif($endTime > $startShift && $endTime < $endShift){echo json_encode(3);echo '<hr>';
+            $spent->time += ($endTime - $startShift)/60;
+            $spent->nonFullShift++;
+        }elseif($endTime >= $endShift){echo json_encode(4);echo '<hr>';
+            $spent->time += ($endShift - $startShift)/60;
+            $spent->fullShift++;
+        }
+
     }
-    return $rawHistory;
+    $spent->time += $middleDays*$workTimesPerDay;
+    $spent->fullShift += $middleDays*$amountShiftsPerDay;
+    return $spent;
 }
 
 
