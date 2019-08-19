@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use DB;
@@ -49,7 +50,7 @@ class QTController extends Controller
 
     public function PostQT(Request $request){
         $userId = Auth::user()->id;
-        if($request->LEDate){
+        if ($request->LEDate) {
             $date = $request->LEDate;
             $session = $request->session;
             $type = $request->type;
@@ -221,7 +222,90 @@ class QTController extends Controller
             }
         }
     }
+
     //end-soft desc history by updated time
+
+
+    function getTimeShifts()
+    {
+        $rawShift = DB::table('users')->find(Auth::user()->id)->shift;
+        $listShiftId = explode('-', $rawShift);
+        $shifts = DB::table('session')->whereIn('id', $listShiftId)->get()->toArray();
+        return array_map(function ($shift) {
+            $shiftStart = Carbon::parse($shift->start);
+            $shiftEnd = Carbon::parse($shift->end);
+            $start = $shiftStart->hour + $shiftStart->minute / 60; //hour unit
+            $end = $shiftEnd->hour + $shiftEnd->minute / 60; //hour unit
+            $spent = $end - $start;
+            return [
+                'start' => $start,
+                'end' => $end,
+                'spent' => $spent
+            ];
+        }, $shifts);
+    }
+
+
+    function _getSpentTimeSameDate($listShift, $startTime, $endTime)
+    {
+        $spentTime = 0;
+        $spentShift = 0;
+        foreach ($listShift as $shift) {
+            $shiftS = $shift['start'];
+            $shiftE = $shift['end'];
+
+            if ($shiftS <= $endTime && $endTime <= $shiftE) {
+                $spentTime += $endTime - $shiftS + $spentShift;
+            }
+
+            if ($shiftS <= $startTime && $startTime <= $shiftE) {
+                $spentTime -=  ($startTime - $shiftS);
+            }
+            $spentShift += $shift['spent'];
+        }
+        return $spentTime;
+    }
+
+    function _getSpentTimeDiffDate($listShift, $startTime, $endTime)
+    {
+        $spentShift = 0;
+        $spentTime = 0;
+        foreach ($listShift as $shift) {
+            $shiftS = $shift['start'];
+            $shiftE = $shift['end'];
+            if ($shiftS <= $startTime && $startTime <= $shiftE) {
+                $spentTime += 8 - ($startTime - $shiftS) - $spentShift;
+            }
+            if ($shiftS <= $endTime && $endTime <= $shiftE) {
+                $spentTime += $endTime - $shiftS + $spentShift;
+            }
+            $spentShift += $shift['spent'];
+        }
+
+        return $spentTime;
+    }
+
+    /**
+     * @param $startDate
+     * @param $endDate
+     * @return float
+     */
+    function getSpentTime($startDate, $endDate)
+    {
+        $dateTimeStart = Carbon::parse($startDate);
+        $dateTimeEnd = Carbon::parse($endDate);
+        $diffDate = $dateTimeEnd->diffInDays($dateTimeStart); //day unit
+        $startTime = $dateTimeStart->hour + $dateTimeStart->minute / 60; //hour unit
+        $endTime = $dateTimeEnd->hour + $dateTimeEnd->minute / 60;//hour unit
+        $spentTime = max($diffDate - 1, 0) * 8.0;//hour unit
+        $listShift = $this->getTimeShifts();
+        if ($diffDate == 0) { //same date
+            $spentTime += $this->_getSpentTimeSameDate($listShift, $startTime, $endTime);
+        } else {//diff date
+            $spentTime += $this->_getSpentTimeDiffDate($listShift, $startTime, $endTime);
+        }
+        return $spentTime;
+    }
 
     //count spent in vacation days
     function vacationSpent($vacationDays){
