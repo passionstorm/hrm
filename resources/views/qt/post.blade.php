@@ -176,7 +176,6 @@ foreach($rawArrSession as $ras){
 <div class="content-wrapper">
   {{-- <button id="test">test</button> --}}
   <section class="content-header">
-      <a href="qt/list" style="text-decoration: underline;"><i class="fa fa-mail-reply"></i>Back to list</a>
       <h3 style="margin-left:10px"><span>Vacation</span></h3>
   </section>
   <section class="content">
@@ -253,7 +252,10 @@ foreach($rawArrSession as $ras){
                                     </div>
                                 </div>  
                                 <div class="row mgt15">
-                                    <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <button class="btn btn-block" type="button" onclick="window.location.href='qt/list'">Back</button>
+                                    </div>
+                                    <div class="col-xs-6">
                                         <button class="btn btn-success btn-block" type="submit">Submit</button>
                                     </div>
                                 </div>    
@@ -301,7 +303,10 @@ foreach($rawArrSession as $ras){
                                     </div>
                                 </div>  
                                 <div class="row mgt15">
-                                    <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <button class="btn btn-block" type="button" onclick="window.location.href='qt/list'">Back</button>
+                                    </div>
+                                    <div class="col-xs-6">
                                         <button class="btn btn-success btn-block" type="submit" id="sBtnf0">Submit</button>
                                     </div>
                                 </div>    
@@ -374,7 +379,10 @@ foreach($rawArrSession as $ras){
                                     </div>
                                 </div>  
                                 <div class="row mgt15">
-                                    <div class="col-xs-12">
+                                    <div class="col-xs-6">
+                                        <button class="btn btn-block" type="button" onclick="window.location.href='qt/list'">Back</button>
+                                    </div>
+                                    <div class="col-xs-6">
                                         <button class="btn btn-success btn-block" type="submit" id="btnfv">Submit</button>
                                     </div>
                                 </div>
