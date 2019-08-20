@@ -1,5 +1,5 @@
 # HRM
-<div>Server address: http://139.180.141.70/login</div>
+<div>Server address: https://toman.cf/login</div>
 <div>Account admin: username: admin, password: admin</div>
 <div>Account staff: username: staff, password: staff</div>
 <div>Account member: username: member1, password: member1</div>
