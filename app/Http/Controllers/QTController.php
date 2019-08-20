@@ -53,7 +53,7 @@ class QTController extends Controller
             $date = $request->LEDate;
             $session = $request->session;
             $type = $request->type;
-            $spent = explode(' ', $request->time)[0];
+            $spent = explode(' ', $request->time)[0]/60;//unit:hours
             if($request->rSelect == 0){
                 $comment = $request->comment;
             }else{
@@ -99,7 +99,7 @@ class QTController extends Controller
             }
             $start = $date.' '.$request->start.':00';
             $end = $date.' '.$request->end.':00';
-            $spent = (strtotime($end) - strtotime($start))/60;
+            $spent = (strtotime($end) - strtotime($start))/60/60;//unit: hours
             DB::table('vacations')->insert([
                 'user_id'=>$userId,
                 'start'=>$start,
@@ -125,7 +125,6 @@ class QTController extends Controller
                 'start'=>$start,
                 'end'=>$end,
             ]);
-            
             DB::table('vacations')->insert([
                 'user_id'=>$userId,
                 'start'=>$start,
@@ -138,7 +137,7 @@ class QTController extends Controller
                 'created_by'=>$userId,
             ]);
         }
-        return redirect('qt/post');
+        return redirect('qt/list');
     }
 
     public function SearchByDate(Request $request){
@@ -228,8 +227,8 @@ class QTController extends Controller
         }
     }
 
-    //count spent in vacation days
     /**
+     * count spent(hours) in vacation days
      * @param object 
      * @return number
      */
@@ -277,7 +276,6 @@ class QTController extends Controller
         $spent += $middleDays*$workTimesPerDay;
         return $spent;
     }
-    //end-count spent in vacation days
 
     /**
      * create list shift inlude start, end, spent(hour)

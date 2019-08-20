@@ -132,7 +132,6 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
                   <tbody>
                       @foreach ($history as $i)
                         <?php 
-                          $hours_spent = $i->spent/60;
                           $start =  explode(' ',substr($i->start, 0, strlen($i->start)-3));
                           $startDate =  $start[0];
                           $startTime =  $start[1];
@@ -148,8 +147,8 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
                               <span>{{ $endDate }}<br>{{ $endTime }}</span>
                           </td>
                           <td>
-                            <span class="h-md">{{ $hours_spent }} hours</span>
-                            <span class="h-xs">{{ $hours_spent }} h</span>
+                            <span class="h-md">{{ $i->spent }} hours</span>
+                            <span class="h-xs">{{ $i->spent }} h</span>
                           </td>
                           @if ($i->is_approved == Constants::APPROVED_VACATION)
                             <td>
