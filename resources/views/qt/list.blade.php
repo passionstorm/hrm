@@ -10,6 +10,19 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
 <!-- DataTables -->
 <link rel="stylesheet" href="bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
 <style>
+  .w-60{
+    width: 60px !important;
+  }
+  .noSidePad{
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .h-xs{
+    display: inline;
+  }
+  .h-md{
+    display: none;
+  }
   .r-d{
     display: none !important;
   }
@@ -59,6 +72,15 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
   }
 
   @media only screen and (min-width:992px) {
+    .r-sidePad{
+      padding: 10px 20px
+    }
+    .h-xs{
+      display: none;
+    }
+    .h-md{
+      display: inline-block;
+    }
     .r-w-o1 {
       width: 25%;
     }
@@ -75,9 +97,9 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
   <section class="content-header">
     <h3><span>Vacation</span><a href="qt/post" style="color: white" class="btn btn-primary">New plan</a></h3>
   </section>
-  <section class="content">
+  <section class="content noSidePad">
     <div class="box box-primary">
-      <div style="padding: 10px 20px">
+      <div style="" class="r-sidePad">
         <div class="info-box bg-primary">
           <span class="info-box-icon"><i class="fa fa-clock-o"></i></span>
           <div class="info-box-content">
@@ -104,15 +126,47 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
                       <th>Start</th>
                       <th>End</th>
                       <th>Spent</th>
+                      <th></th>
                     </tr>
                   </thead>
                   <tbody>
                       @foreach ($history as $i)
-                        <?php $hours_spent = $i->spent/60 ?>
+                        <?php 
+                          $hours_spent = $i->spent/60;
+                          $start =  explode(' ',substr($i->start, 0, strlen($i->start)-3));
+                          $startDate =  $start[0];
+                          $startTime =  $start[1];
+                          $end =  explode(' ',substr($i->end, 0, strlen($i->end)-3));
+                          $endDate =  $end[0];
+                          $endTime =  $end[1];
+                        ?>
                         <tr>
-                          <td>{{ $i->start }}</td>
-                          <td>{{ $i->end }}</td>
-                          <td>{{ $hours_spent }} hours</td>
+                          <td>
+                            <span>{{ $startDate }}<br>{{ $startTime }}</span>
+                          </td>
+                          <td>
+                              <span>{{ $endDate }}<br>{{ $endTime }}</span>
+                          </td>
+                          <td>
+                            <span class="h-md">{{ $hours_spent }} hours</span>
+                            <span class="h-xs">{{ $hours_spent }} h</span>
+                          </td>
+                          @if ($i->is_approved == Constants::APPROVED_VACATION)
+                            <td>
+                                <i class="fa fa-check h-xs" style="color:green"></i>
+                                <span class="label label-success h-md w-60">Approved</span>
+                            </td>
+                          @elseif ($i->is_approved == Constants::PENDDING_VACATION)
+                            <td>
+                                <i class="fa fa-hourglass-start h-xs"></i>
+                                <span class="label label-default h-md w-60">Pendding</span>
+                            </td>
+                          @elseif ($i->is_approved == Constants::REJECTED_VACATION)
+                            <td>
+                                <i class="fa fa-ban h-xs" style="color:red"></i>
+                                <span class="label label-danger h-md w-60">Reject</span>
+                            </td>
+                          @endif
                         </tr>
                       @endforeach
                   </tbody>

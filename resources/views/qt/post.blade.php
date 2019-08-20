@@ -233,22 +233,9 @@ foreach($rawArrSession as $ras){
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">
+                                <div class="row c-comment0">
                                     <div class="col-md-12 mgt15">
-                                        <div class="dropdown">
-                                            <select name="rSelect" id="rSelect0" class="form-control" required>
-                                                <option value="" disabled selected style="display: none">Your reason...</option>
-                                                @foreach(DB::table('reason')->where('companyId', Auth::user()->companyId)->select('reason', 'id')->get() as $vr)
-                                                    <option value="{{$vr->id}}">{{$vr->reason}}</option>
-                                                @endforeach
-                                                <option  value="0">Other...</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>  
-                                <div class="row c-comment0" style="display: none">
-                                    <div class="col-md-12 mgt15">
-                                        <textarea rows="1" name="comment" placeholder="Your reason..." class="dropdown-toggle form-control f2 comment" data-toggle="dropdown" autocomplete="off">Other reason...</textarea>
+                                        <textarea rows="1" name="comment" placeholder="Your reason..." class="form-control f0 comment" autocomplete="off"></textarea>
                                     </div>
                                 </div>  
                                 <div class="row mgt15">
@@ -284,22 +271,9 @@ foreach($rawArrSession as $ras){
                                         <span id="spent"></span>
                                     </div>
                                 </div>     
-                                <div class="row">
+                                <div class="row c-comment1">
                                     <div class="col-md-12 mgt15">
-                                        <div class="dropdown">
-                                            <select name="rSelect" id="rSelect1" class="form-control" required>
-                                                <option value="" disabled selected style="display: none">Your reason...</option>
-                                                @foreach(DB::table('reason')->where('companyId', Auth::user()->companyId)->select('reason', 'id')->get() as $vr)
-                                                    <option value="{{$vr->id}}">{{$vr->reason}}</option>
-                                                @endforeach
-                                                <option  value="0">Other...</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>  
-                                <div class="row c-comment1" style="display: none">
-                                    <div class="col-md-12 mgt15">
-                                        <textarea rows="1" name="comment" placeholder="Your reason..." class="dropdown-toggle form-control f2 comment" data-toggle="dropdown" autocomplete="off">Other reason...</textarea>
+                                        <textarea rows="1" name="comment" placeholder="Your reason..." class="form-control f1 comment" autocomplete="off"></textarea>
                                     </div>
                                 </div>  
                                 <div class="row mgt15">
@@ -620,20 +594,8 @@ foreach($rawArrSession as $ras){
                                             console.log(thrownError);
                                         },
                                         success: function(data){
-                                            let time = data.spent.time/60;
-                                            let nonFullShift = '';
-                                            let fullShift = '';
-                                            let and = '';
-                                            if(data.nonFullShift != 0){
-                                                nonFullShift += data.spent.nonFullShift+' non-full shift';
-                                            }
-                                            if(data.fullShift != 0){
-                                                fullShift += data.spent.fullShift+' full shift';
-                                            }
-                                            if(data.fullShift != 0 && data.nonFullShift != 0){
-                                                and = ' and ';
-                                            }
-                                            $('#vSpent').text('You will spend '+time+' hours in '+fullShift+and+nonFullShift).css('color', 'green');
+                                            let time = data.spent;
+                                            $('#vSpent').text('You will spend '+time+' hours ').css('color', 'green');
                                         }
                                     });
                                 }

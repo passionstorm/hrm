@@ -16,7 +16,7 @@ class QTController extends Controller
     }
 
     public function GetList(){
-        $vacation = DB::table('setting')->select('vacation')->get()[0]->vacation;
+        $vacation = DB::table('setting')->where('companyId',Auth::user()->companyId)->select('vacation')->get()[0]->vacation;
         $spent = DB::table('vacations')->where([
             ['is_approved', Constants::APPROVED_VACATION],
             ['user_id', Auth::user()->id],
@@ -25,10 +25,8 @@ class QTController extends Controller
         DB::table('users')->where('id', Auth::user()->id)->update([
             'time_remaining'=>$time_remaining
         ]);
-        $history = DB::table('vacations')->where([
-            ['user_id', Auth::user()->id],
-            ['is_approved', '!=', Constants::REJECTED_VACATION],
-        ])->select('start', 'end', 'spent', 'type', 'updated_at', 'created_at')->get();
+        $history = DB::table('vacations')->where('user_id', Auth::user()->id)->select('start', 'end', 'spent', 'is_approved', 'created_at', 'updated_at' )->get();
+        $this->descSoftByUpdatedTime($history);
         return view('qt.list',[
             'time_remaining'=>$time_remaining,
             'vacation'=>$vacation,
@@ -37,6 +35,7 @@ class QTController extends Controller
         ]);
     }
 
+    //not necessary for current template
     public function GetListPendding(){
         $pendding = DB::table('vacations')->where([
             ['is_approved', Constants::PENDDING_VACATION],
@@ -153,9 +152,9 @@ class QTController extends Controller
         $vacationDays = new stdClass();
         $vacationDays->start = $request->start;
         $vacationDays->end = $request->end;
-        $spentObj  = $this->vacationSpent($vacationDays);
+        $spentTime  = $this->vacationSpent($vacationDays);
         return response()->json([
-            'spent'=>$spentObj 
+            'spent'=>$spentTime 
         ]);
     }
 
@@ -180,7 +179,7 @@ class QTController extends Controller
     }
     //end-filter history by date
 
-    //soft desc history
+    //not necessary for current template//soft desc history by start date
     function descSoftHistory($rawHistory){
         $isContinue = true;
         while($isContinue){
@@ -198,7 +197,10 @@ class QTController extends Controller
     }
     //end-soft desc history
 
-    //soft desc history by updated time
+    /**
+     * soft desc history by updated time
+     * @param array 
+     */
     function descSoftByUpdatedTime($rawHistory){
         $isContinue = true;
         while($isContinue){
@@ -221,76 +223,73 @@ class QTController extends Controller
             }
         }
     }
-    //end-soft desc history by updated time
 
     //count spent in vacation days
+    /**
+     * @param object 
+     * @return number
+     */
     function vacationSpent($vacationDays){
-        $spent = new stdClass();
-        $spent->time = 0;
-        $spent->fullShift = 0;
-        $spent->nonFullShift = 0;
+        $spent = 0;
         $arrStart = explode(' ', $vacationDays->start);
         $arrEnd = explode(' ', $vacationDays->end);
         $startDate = strtotime($arrStart[0]);
         $startTime = strtotime($arrStart[1]);
         $endDate = strtotime($arrEnd[0]);
         $endTime = strtotime($arrEnd[1]);
-        if($endDate == $startDate){
-            $middleDays = 0;
-        }else{
-            $middleDays = ($endDate - $startDate)/60/60/24 - 1;
-        }
-        $rawShift = DB::table('users')->find(Auth::user()->id)->shift;
-        $rawArrShift = explode('-', $rawShift);
-        $arrShift = [];
-        foreach($rawArrShift as $ras){
-            $sp = DB::table('session')->find($ras);
-            array_push($arrShift, $sp->start, $sp->end);
-        }
+        $middleDays = max(0, ($endDate - $startDate)/3600/24 - 1);
+        $shifts = $this->getTimeShifts();
         $workTimesPerDay = 0;
-        $amountShiftsPerDay = 0;
-        for($y = 0; $y < count($arrShift); $y += 2){
-            $startShift = strtotime($arrShift[$y]);
-            $endShift = strtotime($arrShift[$y+1]);
-            $workTimesPerDay += ($endShift - $startShift)/60;
-            $amountShiftsPerDay++;
+        for($y = 0; $y < count($shifts); $y++){
+            $startShift = strtotime($shifts[$y]['start']);
+            $endShift = strtotime($shifts[$y]['end']);
+            $workTimesPerDay += $shifts[$y]['spent'];
             if($startDate == $endDate){
                 if($endTime <= $startShift){
                     break;
-                }elseif($endTime > $startShift && $endTime < $endShift){
+                }elseif($endTime > $startShift && $endTime <= $endShift){
                     if($startTime <= $startShift){
-                        $spent->time += ($endTime - $startShift)/60;
-                        $spent->nonFullShift++;
+                        $spent += ($endTime - $startShift)/3600;
                     }elseif($startTime > $startShift){
-                        $spent->time += ($endTime - $startTime)/60;
-                        $spent->nonFullShift++;
+                        $spent += ($endTime - $startTime)/3600;
                     }
                     break;
                 }
             }
             if($startTime <= $startShift){
-                $spent->time += ($endShift - $startShift)/60;
-                $spent->fullShift++;
+                $spent += ($endShift - $startShift)/3600;
             }elseif($startTime > $startShift && $startTime < $endShift){
-                $spent->time += ($endShift - $startTime)/60;
-                $spent->nonFullShift++;
+                $spent += ($endShift - $startTime)/3600;
             }
-            if($startDate == $endDate){
+            if($startDate == $endDate || $endTime <= $startShift){
                 continue;
-            }if($endTime > $startShift && $endTime < $endShift){
-                $spent->time += ($endTime - $startShift)/60;
-                $spent->nonFullShift++;
+            }elseif($endTime > $startShift && $endTime < $endShift){
+                $spent += ($endTime - $startShift)/3600;
             }elseif($endTime >= $endShift){
-                $spent->time += ($endShift - $startShift)/60;
-                $spent->fullShift++;
+                $spent += ($endShift - $startShift)/3600;
             }
     
         }
-        $spent->time += $middleDays*$workTimesPerDay;
-        $spent->fullShift += $middleDays*$amountShiftsPerDay;
+        $spent += $middleDays*$workTimesPerDay;
         return $spent;
     }
     //end-count spent in vacation days
+
+    /**
+     * create list shift inlude start, end, spent(hour)
+     * @return array 
+     */
+    function getTimeShifts(){
+        $idShiftList = explode( '-', DB::table('users')->find(Auth::user()->id)->shift );
+        $shifts = DB::table('session')->whereIn('id', $idShiftList)->get()->all();
+        return array_map(function($shift){
+            return [
+                'start' => $shift->start,
+                'end' => $shift->end,
+                'spent' => (strtotime($shift->end) - strtotime($shift->start))/60/60,
+            ];
+        }, $shifts);
+    }
 
     //not necessary for current template//explode vacation days to array object
     function vacationExplode($vacationDays){
