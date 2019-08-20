@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Constants;
 use App\Http\Requests\login;
-use App\Http\Requests\PostUser;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -166,73 +165,4 @@ class UserController extends Controller
         return redirect('users/edit')->with('success', 'Additional success!');
     }
 
-
-    //this is for reference
-    // public function PostEdit(EditUser $request, $id){
-
-    //     //validate password and rpassword. Then save it
-    //     // if($request->ChangePassword == 'on'){           
-    //     //     $request->validate(
-    //     //         [
-    //     //             'password' => 'required',
-    //     //             'rpassword' => 'required'
-    //     //         ]
-    //     //     );
-    //     //     DB::table('users')->where('id', $id)->update(
-    //     //         [
-    //     //             'password'=>bcrypt($request->password),
-    //     //         ]
-    //     //     );
-    //     // }
-
-    //     //validate username
-    //     // if($request->username != $user->username){
-    //     //     $request->validate(
-    //     //         [
-    //     //             'username' => 'unique:users,username'
-    //     //         ]
-    //     //     );
-    //     // }
-
-    //     $user = DB::table('users')->find($id);
-
-    //     //validate email
-    //     if($request->email != $user->email){
-    //         $request->validate(
-    //             [
-    //                 'email' => 'unique:users,email'
-    //             ]
-    //         );
-    //     }
-
-    //     //save file if available
-    //     if($request->hasFile('avatar')){
-    //         $file = $request->avatar;
-    //         $name = md5(time()).'_'.$file->getClientOriginalName();
-    //         $file->move(public_path('upload/avatar'), $name);
-    //         $user->avatar = $name;//cover case of no file
-    //     }
-
-    //     //only admin. because attr of select input must be disabled
-    //     if(Auth::user()->role == Constants::ROLE_ADMIN){
-    //         $user->role = $request->role;
-    //         $user->organization = $request->organization;
-    //         $user->salary = $request->salary;
-    //     }
-
-    //     DB::table('users')->where('id', $id)->update(
-    //         [
-    //             'role'=>$user->role,
-    //             'name'=>$request->name,
-    //             // 'username'=>$request->username,
-    //             'email'=>$request->email,
-    //             'organization'=>$user->organization,
-    //             'salary'=>$user->salary,
-    //             'avatar'=>$user->avatar,
-    //             'updated_at'=>Carbon::now(),
-    //             'updated_by'=>Auth::user()->username
-    //         ]
-    //     );
-    //     return redirect('users/edit/'.$id)->with('success', 'successful editing!');
-    // }
 }

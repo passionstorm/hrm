@@ -1,6 +1,20 @@
 @extends('layout.index')
 
+@section('css')
+<style>
+.d-n{
+  display: none !important;
+}
+</style>
+@endsection
+
 @section('content')
+<?php 
+  $PreventMember = '';
+  if(Auth::user()->role == Constants::ROLE_MEMBER){
+    $PreventMember = 'd-n';
+  }
+?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
   <!-- Content Header (Page header) -->
@@ -13,7 +27,7 @@
   <section class="content">
     
     <!-- Small boxes (Stat box) -->
-    <div class="row">
+    <div class="row {{$PreventMember}}">
       <!-- ./col -->
       <div class="col-lg-3 col-xs-6">
         <!-- small box -->

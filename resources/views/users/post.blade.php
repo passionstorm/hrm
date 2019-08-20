@@ -2,17 +2,19 @@
 
 @section('css')
 <style>
-    .iga-1{
-        border-right: 1px solid #d2d6de !important;
-        padding-left: 6px !important;
-        padding-right: 6px !important;
-    }
-    .input-group-addon{
-        width: 0% !important;
-    }
-    .d-n{
-      display: none !important;
-    }
+  .iga-1 {
+    border-right: 1px solid #d2d6de !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+
+  .input-group-addon {
+    width: 0% !important;
+  }
+
+  .d-n {
+    display: none !important;
+  }
 </style>
 @endsection
 
@@ -23,9 +25,9 @@
   <section class="content-header">
     <h1>
       @if( isset($user) )
-        {{'Edit user'}}
+      {{'Edit user'}}
       @else
-        {{'Add user'}}
+      {{'Add user'}}
       @endif
     </h1>
   </section>
@@ -48,8 +50,8 @@
 
 @section('script')
 
-    {{-- checkbox để chuyển đổi giữa có và không hiển thị change password --}}
-{{--     <script>
+{{-- checkbox để chuyển đổi giữa có và không hiển thị change password --}}
+{{-- <script>
         $(document).ready(function(){
             $('#ChangePassword').change(function(){
                 if( $(this).is(':checked') ){

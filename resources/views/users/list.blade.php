@@ -27,7 +27,11 @@
     }
 
     .is_deleted_bg {
-        background: #d3d3d3;
+        background-color: #d3d3d3 !important
+    }
+
+    .pd-r-15 {
+        padding-right: 15px
     }
 </style>
 
@@ -66,42 +70,39 @@
                             <div class="col-lg-3">
                                 <div class="input-group">
                                     <label for="osau">
-                                        <div class="icheckbox_flat-green"><input type="checkbox" id="osau"
-                                                                                 checked class="hiddent">Show only
+                                        <div class="icheckbox_flat-green"><input type="checkbox" id="osau" checked class="hiddent">Show only
                                             available users
                                         </div>
                                 </div>
                             </div>
-                            <div class="pull-right">
+                            <div class="pull-right  pd-r-15">
                                 <a href="users/edit" class="btn btn-primary">New user</a>
                             </div>
                         </div>
 
                         <table id="example1" class="table table-bordered table-striped">
                             <thead>
-                            <tr>
-                                <th>Id</th>
-                                <th>Name</th>
-                                @if (Auth::user()->role == Constants::ROLE_ADMIN)
-                                <th>Salary</th>
-                                @endif
-                                <th id='spc' class='{{$OnlyAdmin}}'></th>
-                            </tr>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Name</th>
+                                    @if (Auth::user()->role == Constants::ROLE_ADMIN)
+                                    <th>Salary</th>
+                                    @endif
+                                    <th id='spc' class='{{$OnlyAdmin}}'></th>
+                                </tr>
                             </thead>
                             <tbody>
-                            @foreach($users as $u)
-                            <tr class="@if($u->is_deleted){{" is_deleted is_deleted_bg
-                            "}}@endif">
-                            <td>{{$u->id}}</td>
-                            <td>{{$u->name}}</td>
-                            @if (Auth::user()->role == Constants::ROLE_ADMIN)
-                            <td>{{$u->salary}}</td>
-                            @endif
-                            <td style="text-align: center" class='{{$OnlyAdmin}}'><a
-                                        href="users/edit/{{$u->id}}">Edit</a></td>
-                            </td>
-                            </tr>
-                            @endforeach
+                                @foreach($users as $u)
+                                <tr class="@if($u->is_deleted){{" is_deleted is_deleted_bg "}}@endif">
+                                    <td>{{$u->id}}</td>
+                                    <td>{{$u->name}}</td>
+                                    @if (Auth::user()->role == Constants::ROLE_ADMIN)
+                                    <td>{{$u->salary}}</td>
+                                    @endif
+                                    <td style="text-align: center" class='{{$OnlyAdmin}}'><a href="users/edit/{{$u->id}}">Edit</a></td>
+                                    </td>
+                                </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -124,7 +125,7 @@
 <script src="bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
 <!-- page script -->
 <script>
-    $(function () {
+    $(function() {
         $('#example1').DataTable();
         $('#example2').DataTable({
             'paging': true,
@@ -137,8 +138,8 @@
     });
 
     //chuyen doi hien thi va ko hien thi is_deleted user
-    $(document).ready(function () {
-        $('#osau').change(function () {
+    $(document).ready(function() {
+        $('#osau').change(function() {
             if (!$(this).is(':checked')) {
                 $('.is_deleted').css('display', 'table-row');
             } else {
@@ -146,7 +147,6 @@
             }
         });
     });
-
 </script>
 
 @endsection
