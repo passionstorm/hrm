@@ -27,22 +27,18 @@ class Constants
     const REJECTED_VACATION = -1;
     const PENDDING_VACATION = 0;
 
-    const EARLY_VACATION = 1;
-    const LATE_VACATION = 2;
-    const OUT_VACATION = 3;
-    const OFF_VACATION = 4;
+    const EARLY_VACATION = -1;
+    const LATE_VACATION = -2;
+    const OUT_VACATION = -3;
+    const OTHER_VACATION = -4;
 
     const VACATION_TYPE = [
         Constants::EARLY_VACATION => 'Leave Early',
         Constants::LATE_VACATION => 'Come Late',
         Constants::OUT_VACATION => 'Go Out',
-        Constants::OFF_VACATION => 'Vacation',
+        Constants::OTHER_VACATION => 'Other',
     ];
 
-    const VACATION_REASON = [
-        'Sick'=>'I am sick',
-        'Go home'=>'I must go home',
-    ];
 }
 
 ?>

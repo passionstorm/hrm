@@ -54,9 +54,9 @@ class QTController extends Controller
             $type = $request->type;
             $spent = explode(' ', $request->time)[0];
             if($request->rSelect == 0){
-                $comment = '0-'.$request->comment;
+                $comment = $request->comment;
             }else{
-                $comment = $request->rSelect;
+                $comment = '';
             }
             $rawArr = explode('-', DB::table('setting')->where('companyId', Auth::user()->companyId)->select('workTime')->get()[0]->workTime);
             $arr = [];
@@ -92,9 +92,9 @@ class QTController extends Controller
         }elseif($request->dayForOut){
             $date = $request->dayForOut;
             if($request->rSelect == 0){
-                $comment = '0-'.$request->comment;
+                $comment = $request->comment;
             }else{
-                $comment = $request->rSelect;
+                $comment = '';
             }
             $start = $date.' '.$request->start.':00';
             $end = $date.' '.$request->end.':00';
@@ -113,22 +113,25 @@ class QTController extends Controller
         }elseif($request->startD){
             $start =  $request->startD.' '.$request->vStartTime.':00';
             $end =  $request->endD.' '.$request->vEndTime.':00';
-            if($request->rSelect == 0){
-                $comment = '0-'.$request->comment;
+            $type = $request->rSelect;
+            if($request->rSelect == Constants::OTHER_VACATION){
+                $comment = $request->comment;
             }else{
-                $comment = $request->rSelect;
+                $comment = '';
+                
             }
-            $spentObj = $this->vacationSpent((object)[
+            $spentTime = $this->vacationSpent((object)[
                 'start'=>$start,
                 'end'=>$end,
             ]);
+            
             DB::table('vacations')->insert([
                 'user_id'=>$userId,
                 'start'=>$start,
                 'end'=>$end,
-                'spent'=>$spentObj->time,
+                'spent'=>$spentTime,
                 'comment'=>$comment,
-                'type'=>Constants::OFF_VACATION,
+                'type'=>$type,
                 'is_approved'=>Constants::PENDDING_VACATION,
                 'created_at'=>date("Y-m-d H:i:s"),
                 'created_by'=>$userId,

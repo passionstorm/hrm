@@ -184,7 +184,7 @@ foreach($rawArrSession as $ras){
             <div class="flex-o2">
                 <a data-toggle="tab" href="#menu0" class="tab-o1 a-active">Late/Early</a>
                 <a data-toggle="tab" href="#menu1" class="tab-o1">Go out</a>
-                <a data-toggle="tab" href="#menu2" class="tab-o1">Vacation</a>
+                <a data-toggle="tab" href="#menu2" class="tab-o1">Other</a>
                 <span style="flex-grow: 2"></span>
             </div>
             <div class="tab-content">
@@ -233,11 +233,6 @@ foreach($rawArrSession as $ras){
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row c-comment0">
-                                    <div class="col-md-12 mgt15">
-                                        <textarea rows="1" name="comment" placeholder="Your reason..." class="form-control f0 comment" autocomplete="off"></textarea>
-                                    </div>
-                                </div>  
                                 <div class="row mgt15">
                                     <div class="col-xs-6">
                                         <button class="btn btn-block" type="button" onclick="window.location.href='qt/list'">Back</button>
@@ -273,7 +268,7 @@ foreach($rawArrSession as $ras){
                                 </div>     
                                 <div class="row c-comment1">
                                     <div class="col-md-12 mgt15">
-                                        <textarea rows="1" name="comment" placeholder="Your reason..." class="form-control f1 comment" autocomplete="off"></textarea>
+                                        <textarea rows="1" name="comment" placeholder="Your comment..." class="form-control f1 comment" autocomplete="off"></textarea>
                                     </div>
                                 </div>  
                                 <div class="row mgt15">
@@ -342,14 +337,14 @@ foreach($rawArrSession as $ras){
                                                 @foreach(DB::table('reason')->where('companyId', Auth::user()->companyId)->select('reason', 'id')->get() as $vr)
                                                     <option value="{{$vr->id}}">{{$vr->reason}}</option>
                                                 @endforeach
-                                                <option  value="0">Other...</option>
+                                                <option  value="{{Constants::OTHER_VACATION}}">Other...</option>
                                             </select>
                                         </div>
                                     </div>
                                 </div>  
                                 <div class="row c-comment2" style="display: none">
                                     <div class="col-md-12 mgt15">
-                                        <textarea rows="1" name="comment" placeholder="Your reason..." class="dropdown-toggle form-control f2 comment" data-toggle="dropdown" autocomplete="off">Other reason...</textarea>
+                                        <textarea rows="1" name="comment" placeholder="Your comment..." class="form-control f2 comment" autocomplete="off"></textarea>
                                     </div>
                                 </div>  
                                 <div class="row mgt15">
@@ -497,8 +492,8 @@ foreach($rawArrSession as $ras){
         {
             $('select[id^="rSelect"]').change(function(){
                 let id = $(this).attr('id').substr(7);
-                if($(this).val() == 0){
-                    $('.c-comment'+id).css('display', 'block').find('textarea').val('Other reason...');
+                if($(this).val() == {{Constants::OTHER_VACATION}}){
+                    $('.c-comment'+id).css('display', 'block').find('textarea');
                 }else{
                     $('.c-comment'+id).css('display', 'none');
                 }
