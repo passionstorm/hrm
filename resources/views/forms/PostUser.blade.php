@@ -47,7 +47,7 @@
           @if($m_user->role == Constants::ROLE_ADMIN)
             {{'selected'}} 
           @endif
-        >Admin</option>
+        >Admin</option>`
       </select>
     </div>
     <div class="form-group">

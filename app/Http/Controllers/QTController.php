@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use DB;
@@ -48,7 +49,7 @@ class QTController extends Controller
 
     public function PostQT(Request $request){
         $userId = Auth::user()->id;
-        if($request->LEDate){
+        if ($request->LEDate) {
             $date = $request->LEDate;
             $session = $request->session;
             $type = $request->type;
