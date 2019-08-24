@@ -255,6 +255,11 @@
                     year: year,
                     project: project
                 },
+                error: function(xhr, ajaxOptions, thrownError){
+                    console.log(xhr.status);
+                    console.log(xhr.responseText);
+                    console.log(thrownError);
+                },
                 success: function(data){
                     $('tbody').remove();
                     $('table').append('<tbody></tbody>')

@@ -1,11 +1,3 @@
-<?php 
-$rawArrSession = explode('-',$setting->workTime);
-$arrSession = [];
-foreach($rawArrSession as $ras){
-    $d = DB::table('session')->find($ras);
-    array_push($arrSession, $d->name, $d->start, $d->end);
-}
-?>
 
 @extends('layout.index')
 
@@ -58,8 +50,7 @@ foreach($rawArrSession as $ras){
         .cn-n{
             border-radius: 0;
         }
-        #sessionPicker{
-            color: green;
+        #shiftPicker{
             padding-left: 10px;
         }
         .flex-o3{
@@ -184,33 +175,36 @@ foreach($rawArrSession as $ras){
             <div class="flex-o2">
                 <a data-toggle="tab" href="#menu0" class="tab-o1 a-active">Late/Early</a>
                 <a data-toggle="tab" href="#menu1" class="tab-o1">Go out</a>
-                <a data-toggle="tab" href="#menu2" class="tab-o1">Other</a>
+                <a data-toggle="tab" href="#menu2" class="tab-o1">Vacation</a>
                 <span style="flex-grow: 2"></span>
             </div>
             <div class="tab-content">
                 <div id="menu0" class="tab-pane fade in active">
                     <form action="qt/post" method="post">
                         @csrf
+                        <input type="text" id="LEEDate" name="endDate" style="display: none">
+                        <input type="text" name="startTime" id="LESTime" style="display: none">
+                        <input type="text" name="endTime" id="LEETime" style="display: none">
                         <div class="flex-pcenter">
                             <div  class="f-w-o1">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="input-group">
                                             <span class="input-group-addon bg-primary"><i class="fa fa-calendar"></i></span>
-                                            <input type="text" class="form-control datepicker i-o1 f0 LEDate" autocomplete="off" required name="LEDate">
+                                            <input type="text" id="LESDate" class="form-control i-o1 f0 hasSetDate" autocomplete="off" required name="startDate">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row mgt15">
                                     <div class="col-md-6">
-                                        <select class="form-control sessionPicker f0" name="session">
-                                            @for($i = 0; $i < count($arrSession); $i+=3)
-                                                <option value="{{$arrSession[$i]}}">{{$arrSession[$i]}}</option>
-                                            @endfor
+                                        <select class="form-control f0" id="shiftPicker" name="shift">
+                                            @foreach($shifts as $s)
+                                                <option value="{{$s->id}}">{{$s->name}}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                     <div class="col-md-6 rmgt-o1">
-                                        <select name="type" id="" class="form-control f0">
+                                        <select name="type" id="typePicker" class="form-control f0">
                                             <option value="{{Constants::LATE_VACATION}}">Come late</option>
                                             <option value="{{Constants::EARLY_VACATION}}">leave early</option>
                                         </select>
@@ -224,7 +218,7 @@ foreach($rawArrSession as $ras){
                                                 <i class="fa fa-minus"></i>
                                                 </button>
                                             </div>
-                                            <input type="text" style="text-align: center" class="form-control f0" placeholder="How long..." id="vI" name="time" required autocomplete="off">
+                                            <input type="text" style="text-align: center" class="form-control f0" placeholder="How long..." id="minutePicker" name="time" required autocomplete="off">
                                             <div class="input-group-btn">
                                                 <button class="btn btn-success" type="button" id="pBtn">
                                                 <i class="fa fa-plus"></i>
@@ -235,7 +229,7 @@ foreach($rawArrSession as $ras){
                                 </div>
                                 <div class="row mgt15">
                                     <div class="col-xs-6">
-                                        <button class="btn btn-block" type="button" onclick="window.location.href='qt/list'">Back</button>
+                                        <button class="btn btn-default btn-block" type="button" onclick="window.location.href='qt/list'">Back</button>
                                     </div>
                                     <div class="col-xs-6">
                                         <button class="btn btn-success btn-block" type="submit">Submit</button>
@@ -248,20 +242,22 @@ foreach($rawArrSession as $ras){
                 <div id="menu1" class="tab-pane fade">
                     <form action="qt/post" method="post">
                         @csrf
+                        <input type="text" name="type" value="{{Constants::OUT_VACATION}}" style="display: none">
+                        <input type="text" id="OEDate" name="endDate" style="display: none">
                         <div class="flex-pcenter">
                             <div  class="f-w-o1">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="input-group">
                                             <span class="input-group-addon bg-primary"><i class="fa fa-calendar"></i></span>
-                                            <input type="text" class="form-control datepicker dayForOut i-o1 f1" autocomplete="off" required name="dayForOut">
+                                            <input type="text" id="OSDate" class="form-control hasSetDate i-o1 f1" autocomplete="off" required name="startDate">
                                         </div>
                                     </div>
                                     <div class="col-md-6 rmgt-o1">
                                         <div class="input-group">
-                                            <input type="text" class="form-control startTimepicker i-o1 f1" placeholder="start" name="start" required autocomplete="off">
+                                            <input type="text" class="form-control startTimepicker i-o1 f1" placeholder="start" name="startTime" required autocomplete="off">
                                             <span class="input-group-addon bg-primary"><i class="fa fa-arrow-right"></i></span>
-                                            <input type="text" class="form-control endTimepicker i-o1 f1" placeholder="end" name="end" required autocomplete="off">
+                                            <input type="text" class="form-control endTimepicker i-o1 f1" placeholder="end" name="endTime" required autocomplete="off">
                                         </div>
                                         <span id="spent"></span>
                                     </div>
@@ -273,7 +269,7 @@ foreach($rawArrSession as $ras){
                                 </div>  
                                 <div class="row mgt15">
                                     <div class="col-xs-6">
-                                        <button class="btn btn-block" type="button" onclick="window.location.href='qt/list'">Back</button>
+                                        <button class="btn btn-default btn-block" type="button" onclick="window.location.href='qt/list'">Back</button>
                                     </div>
                                     <div class="col-xs-6">
                                         <button class="btn btn-success btn-block" type="submit" id="sBtnf0">Submit</button>
@@ -290,22 +286,22 @@ foreach($rawArrSession as $ras){
                             <div class="f-w-o1">
                                 <div class="row">
                                     <div class="col-xs-6">
-                                        <input type="text" id="dStart" class="form-control i-o1 f2 startDate" placeholder="Start date" name="startD" autocomplete="off" required>
+                                        <input type="text" id="vSDate" class="form-control i-o1 f2 noSetDate" placeholder="Start date" name="startDate" autocomplete="off" required>
                                     </div>
                                     <div class="col-xs-6">
-                                        <input type="text" id="dEnd" class="form-control i-o1 f2 endDate" placeholder="End date" name="endD" autocomplete="off" required>
+                                        <input type="text" id="vEDate" class="form-control i-o1 f2 noSetDate" placeholder="End date" name="endDate" autocomplete="off" required>
                                     </div>
                                 </div>
                                 <div class="row mgt15">
                                     <div class="col-xs-6">
                                         <div class="dropdown">
-                                            <input class="dropdown-toggle form-control vStartTime i-o1 f2" data-toggle="dropdown" placeholder="Start time" autocomplete="off" name="vStartTime" required>
+                                            <input class="dropdown-toggle form-control i-o1 f2" id ="vSTime" data-toggle="dropdown" placeholder="Start time" autocomplete="off" name="startTime" required>
                                             <ul class="dropdown-menu dropdown-menu-o1">
-                                                @for($i = 0; $i < count($arrSession); $i+=3)
+                                                @foreach($shifts as $s)
                                                     <li class="mr-b-5">
-                                                        <a title="{{ substr($arrSession[$i+1],0,5) }}" style="cursor:default"  class="pd-lr-20 optionSTime">Start of {{$arrSession[$i]}}</a>
+                                                        <a title="{{ substr($s->start,0,5) }}" style="cursor:default"  class="pd-lr-20 optionSTime">Start of {{$s->name}}</a>
                                                     </li>
-                                                @endfor
+                                                @endforeach
                                                 <li class="virusInput">
                                                     <input type="text" class="form-control cStartTime  mr-b-8 f2" placeholder="Your custom time" autocomplete="off" name="cStartTime">
                                                 </li>
@@ -314,13 +310,13 @@ foreach($rawArrSession as $ras){
                                     </div>
                                     <div class="col-xs-6">
                                         <div class="dropdown">
-                                            <input class="dropdown-toggle form-control vEndTime i-o1 f2" data-toggle="dropdown" placeholder="End time" autocomplete="off" name="vEndTime" required>
+                                            <input class="dropdown-toggle form-control i-o1 f2" id ="vETime" data-toggle="dropdown" placeholder="End time" autocomplete="off" name="endTime" required>
                                             <ul class="dropdown-menu dropdown-menu-o1">
-                                                @for($i = 0; $i < count($arrSession); $i+=3)
+                                                @foreach($shifts as $s)
                                                     <li class="mr-b-5">
-                                                        <a title="{{substr($arrSession[$i+2],0,5)}}" style="cursor:default" class="pd-lr-20 optionETime">End of {{$arrSession[$i]}}</a>
+                                                        <a title="{{ substr($s->end,0,5) }}" style="cursor:default"  class="pd-lr-20 optionETime">End of {{$s->name}}</a>
                                                     </li>
-                                                @endfor
+                                                @endforeach
                                                 <li class="virusInput">
                                                     <input type="text" class="form-control cEndTime mr-b-8 f2" placeholder="Your custom time" autocomplete="off" name="cEndTime">
                                                 </li>
@@ -332,9 +328,9 @@ foreach($rawArrSession as $ras){
                                 <div class="row">
                                     <div class="col-md-12 mgt15">
                                         <div class="dropdown">
-                                            <select name="rSelect" id="rSelect2" class="form-control" required>
+                                            <select name="type" id="rSelect2" class="form-control" required>
                                                 <option value="" disabled selected style="display: none">Your reason...</option>
-                                                @foreach(DB::table('reason')->where('companyId', Auth::user()->companyId)->select('reason', 'id')->get() as $vr)
+                                                @foreach($dynamicReason as $vr)
                                                     <option value="{{$vr->id}}">{{$vr->reason}}</option>
                                                 @endforeach
                                                 <option  value="{{Constants::OTHER_VACATION}}">Other...</option>
@@ -349,7 +345,7 @@ foreach($rawArrSession as $ras){
                                 </div>  
                                 <div class="row mgt15">
                                     <div class="col-xs-6">
-                                        <button class="btn btn-block" type="button" onclick="window.location.href='qt/list'">Back</button>
+                                        <button class="btn btn-default btn-block" type="button" onclick="window.location.href='qt/list'">Back</button>
                                     </div>
                                     <div class="col-xs-6">
                                         <button class="btn btn-success btn-block" type="submit" id="btnfv">Submit</button>
@@ -373,6 +369,7 @@ foreach($rawArrSession as $ras){
 <script src="plugins/timepicker/bootstrap-timepicker.min.js"></script>
 
 <script>
+    var ymd = <?php echo json_encode(explode('-', date('Y-m-d'))) ?>.join('-');
     $(document).ready(function(){
 
         //bootstrap tab setting
@@ -392,37 +389,45 @@ foreach($rawArrSession as $ras){
             let nextTomorrow = new Date();
             tomorrow.setDate( tomorrow.getDate() + 1);
             nextTomorrow.setDate( nextTomorrow.getDate() + 2);
-            $('.hasSetDate').datepicker({
-                autoclose: true,
-                format: 'yyyy-mm-dd',
-                startDate: tomorrow,
-                orientation: 'bottom',
-            });
-            $('.hasSetDate').datepicker('setDate', tomorrow);
-            $('.LEDate, .dayForOut, .startDate, .endDate').datepicker({
+            $('.hasSetDate, .noSetDate').datepicker({
                 autoclose: true,
                 format: 'yyyy-mm-dd',
                 startDate: new Date(),
                 enableOnReadonly: false ,
                 orientation: 'bottom',
             });
-            $('.LEDate, .dayForOut').datepicker('setDate', new Date());
+            $('.hasSetDate').datepicker('setDate', new Date());
+
+            //hidden input
+            {
+                $('#LEEDate, #OEDate').val( ymd );
+                $('#LESDate').change(function(){
+                    $('#LEEDate').val($(this).val());
+                });
+                $('#LESDate').change(function(){
+                    $('#LEEDate').val($(this).val());
+                });
+                $('#OSDate').change(function(){
+                    $('#OEDate').val($(this).val());
+                });
+            }
+            //end-hidden input
 
             //Date range setting
             {
                 let date = new Date();
-                $('.startDate').change(function(){
+                $('#vSDate').change(function(){
                     if($(this).datepicker('getDate') == null){
-                        $('.endDate').datepicker('setStartDate', date);
+                        $('#vEDate').datepicker('setStartDate', date);
                     }else{
-                        $('.endDate').datepicker('setStartDate', $(this).datepicker('getDate') );
+                        $('#vEDate').datepicker('setStartDate', $(this).datepicker('getDate') );
                     }
                 })
-                $('.endDate').change(function(){
+                $('#vEDate').change(function(){
                     if($(this).datepicker('getDate') == null){
-                        $('.startDate').datepicker('setEndDate', false);
+                        $('#vSDate').datepicker('setEndDate', false);
                     }else{
-                        $('.startDate').datepicker('setEndDate', $(this).datepicker('getDate') );
+                        $('#vSDate').datepicker('setEndDate', $(this).datepicker('getDate') );
                     }
                 })
             }
@@ -450,38 +455,22 @@ foreach($rawArrSession as $ras){
 
             //setting for vacation time
             {
-                $('.vStartTime, .vEndTime, .cStartTime, .cEndTime').keypress(function(e) {
+                $('#vSTime, #vETime, .cStartTime, .cEndTime').keypress(function(e) {
                     e.preventDefault();
                 });
                 $('.optionSTime').click(function(){
-                    $('.vStartTime').val($(this).attr('title')).trigger('change');
+                    $('#vSTime').val($(this).attr('title')).trigger('change');
                 });
                 $('.cStartTime').change(function(){
-                    var val = $(this).val();
-                    if(val.substr(val.length - 1, 1) == ':'){
-                        val = val + '00';
-                    };
-                    $(this).val(val);
-                    if(val.length == 4){
-                        val = '0'+val;
-                    };
-                    $(this).val(val);
-                    $('.vStartTime').val($(this).val()).trigger('change');
+                    $(this).val( formatTime( $(this).val() ) );
+                    $('#vSTime').val($(this).val()).trigger('change');
                 });
                 $('.optionETime').click(function(){
-                    $('.vEndTime').val($(this).attr('title')).trigger('change');
+                    $('#vETime').val($(this).attr('title')).trigger('change');
                 });
                 $('.cEndTime').change(function(){
-                    var val = $(this).val();
-                    if(val.substr(val.length - 1, 1) == ':'){
-                        val = val + '00';
-                    };
-                    $(this).val(val);
-                    if(val.length == 4){
-                        val = '0'+val;
-                    };
-                    $(this).val(val);
-                    $('.vEndTime').val($(this).val()).trigger('change');
+                    $(this).val( formatTime( $(this).val() ) );
+                    $('#vETime').val($(this).val()).trigger('change');
                 });
             }
             //end-setting for vacation time
@@ -501,12 +490,12 @@ foreach($rawArrSession as $ras){
         }
         //end-comment picker
 
-        //time picker
+        //minute picker
         {
-            var step = <?php echo $setting->minTimeForHandling ?>;
-            var maxTime = <?php echo $setting->shortLeave ?>;
+            var step = <?php echo $setting->hour_step?>*60;
+            var maxTime = <?php echo $setting->short_leave ?>*60;
             var value = 0;
-            $('#vI').keypress(function(e) {
+            $('#minutePicker').keypress(function(e) {
                 e.preventDefault();
             });
             $('#pBtn').click(function(){
@@ -514,44 +503,82 @@ foreach($rawArrSession as $ras){
                     return ;
                 }
                 value += step;
-                $('#vI').val(value + ' minutes');
+                $('#minutePicker').val(value + ' minutes').trigger('change');
             });
             $('#mBtn').click(function(){
-                if(value <= 0){
+                if(value <= step){
                     return ;
                 }
                 value -= step;
-                if(value == 0){
-                    $('#vI').val(value + ' minute');
-                }else{
-                    $('#vI').val(value + ' minutes');
+                $('#minutePicker').val(value + ' minutes').trigger('change');
+            });
+            $('#minutePicker, #typePicker, #shiftPicker').change(function(){
+                if(!$('#minutePicker').val()){
+                    return ;
                 }
+                let time = Number($('#minutePicker').val().replace(' minutes', ''));
+                let shifts = <?php echo $shifts ?>;
+                let shiftId = $('select[name="shift"]').val();
+                let reasonId = $('select[name="type"]').val();
+                shifts.forEach((shift)=>{
+                    if(shift.id != shiftId){
+                        return ;
+                    }
+                    if(reasonId == {{Constants::LATE_VACATION}}){
+                        let shiftStartTime = shift.start.substr(0, 5).split(':');
+                        shiftStartTime = Number(shiftStartTime[0])*60 + Number(shiftStartTime[1]);
+                        let endTime = shiftStartTime + time;
+                        endTime = String(Math.floor(endTime/60)).padStart(2, '0') + ':' + String(endTime%60).padStart(2, '0');
+                        $('#LESTime').val(shift.start.substr(0, 5));
+                        $('#LEETime').val(endTime);
+                    }else if(reasonId == {{Constants::EARLY_VACATION}}){
+                        let shiftEndTime = shift.end.substr(0, 5).split(':');
+                        shiftEndTime = Number(shiftEndTime[0])*60 + Number(shiftEndTime[1]);
+                        let startTime = shiftEndTime - time;
+                        startTime = String(Math.floor(startTime/60)).padStart(2, '0') + ':' + String(startTime%60).padStart(2, '0');
+                        $('#LESTime').val(startTime);
+                        $('#LEETime').val(shift.end.substr(0, 5));
+                    }
+                });
             });
         }
-        //end-time picker
+        //end-minute picker
 
         //count spent time
         {
             //go out
             {
                 $('.startTimepicker, .endTimepicker').change(function(){
+                    $('#sBtnf0').attr('disabled', 'disabled');
                     $('.startTimepicker, .endTimepicker').css('color', 'black');
-                    let start = $('.startTimepicker').val();
-                    let end = $('.endTimepicker').val();
+                    $(this).val( formatTime( $(this).val() ) );
+                    let start = $('.startTimepicker').val() + ':00';
+                    let end = $('.endTimepicker').val() + ':00';
                     if( start.length >= 4 && end.length >= 4 ){
+                        let nodes = <?php echo $shifts ?>;
+                        let x = 0;
+                        nodes.forEach((e)=>{
+                            if(start >= e.start && start <= e.end && end >= e.start && end <= e.end){
+                                x++;
+                            }
+                        });
+                        if(!x){
+                            $('#spent').text('You must enter time in shift range!').css('color', 'red');
+                            $('.startTimepicker, .endTimepicker').css('color', 'red');
+                            return ;
+                        }
                         let arrStart = start.split(':');
                         let arrEnd = end.split(':');
-                        let spent = ( arrEnd[0]*60 + Number(arrEnd[1]) )-( arrStart[0]*60 + Number(arrStart[1]) );
-                        if(spent > 0 && spent < 120){
-                            $('#spent').text('Out in '+spent+' minutes').css('color', 'green');
-                            $('#sBtnf0').removeAttr('disabled');
-                        }else{
+                        let spent = ( Number(arrEnd[0]) + Number(arrEnd[1])/60 )-( Number(arrStart[0]) + Number(arrStart[1])/60 );
+                        let shortLeave = <?php echo $setting->short_leave ?>;
+                        let hoursStep = <?php echo $setting->hour_step ?>;
+                        if(spent > shortLeave || spent < hoursStep){
                             $('#spent').text('Invalid time, please try again!').css('color', 'red');
                             $('.startTimepicker, .endTimepicker').css('color', 'red');
-                            $('#sBtnf0').attr('disabled', 'disabled');
+                            return ;
                         }
-                    }else{
-                        $('#sBtnf0').attr('disabled', 'disabled');
+                        $('#spent').text('Out in '+spent+' hours').css('color', 'green');
+                        $('#sBtnf0').removeAttr('disabled');
                     }
                 });
             }
@@ -559,46 +586,63 @@ foreach($rawArrSession as $ras){
             
             //vacation
             {
-                //form validate
-                    $('.startDate, .endDate, .vStartTime, .vEndTime').change(function(){
-                        if(  $('.startDate').val() && $('.endDate').val() && $('.vStartTime').val() && $('.vEndTime').val() ){
-                            if($('.startDate').val() == $('.endDate').val() && $('.vStartTime').val() >= $('.vEndTime').val()){
-                                $('#btnfv').attr('disabled', 'disabled');
-                                $('.vStartTime, .vEndTime').css('color', 'red');
-                                $('#vSpent').text('Invalid data. Please try another!').css('color', 'red');
-                            }else{
-                                $('#btnfv').removeAttr('disabled');
-                                $('.vStartTime, .vEndTime').css('color', '');
-                                $('#vSpent').text('Checking...').css('color', 'blue');
-
-                                //ajax
-                                {
-                                    var start = $('.startDate').val()+' '+$('.vStartTime').val()+':00';
-                                    var end = $('.endDate').val()+' '+$('.vEndTime').val()+':00';
-                                    $.ajax({
-                                        url: 'qt/ajax/handlingVacation',
-                                        method: 'get',
-                                        dataType: 'json',
-                                        data:{
-                                            start: start,
-                                            end: end
-                                        },
-                                        error: function(xhr, ajaxOptions, thrownError){
-                                            console.log(xhr.status);
-                                            console.log(xhr.responseText);
-                                            console.log(thrownError);
-                                        },
-                                        success: function(data){
-                                            let time = data.spent;
-                                            $('#vSpent').text('You will spend '+time+' hours ').css('color', 'green');
-                                        }
-                                    });
-                                }
-                                //end-ajax
+                $('#vSDate, #vEDate, #vSTime, #vETime').change(function(){
+                    $('#btnfv').attr('disabled', 'disabled');
+                    $('#vSTime, #vETime').css('color', 'black');
+                    if(  $('#vSDate').val() && $('#vEDate').val() && $('#vSTime').val() && $('#vETime').val() ){
+                        let startTime = $('#vSTime').val() + ':00';
+                        let endTime = $('#vETime').val() + ':00';
+                        let nodes = <?php echo $shifts ?>;
+                        let x = 0;
+                        nodes.forEach((e)=>{
+                            if(startTime >= e.start && startTime <= e.end && endTime >= e.start && endTime <= e.end){
+                                x += 2;
+                            }else if( 
+                                (startTime >= e.start && startTime <= e.end) 
+                                || (endTime >= e.start && endTime <= e.end) 
+                            ){
+                                x++;
                             }
+                        });
+                        if(x < 2){
+                            $('#vSpent').text('You must enter time in shift range!').css('color', 'red');
+                            $('#vSTime, #vETime').css('color', 'red');
+                            return ;
                         }
-                    });
-                //end-form validate
+                        if($('#vSDate').val() == $('#vEDate').val() && startTime >= endTime){
+                            $('#vSTime, #vETime').css('color', 'red');
+                            $('#vSpent').text('Invalid data. Please try another!').css('color', 'red');
+                            return ;
+                        }
+                        $('#btnfv').removeAttr('disabled');
+                        $('#vSTime, #vETime').css('color', '');
+                        $('#vSpent').text('Checking...').css('color', 'blue');
+                        //ajax
+                        {
+                            let startV = $('#vSDate').val()+' '+$('#vSTime').val()+':00';
+                            let endV = $('#vEDate').val()+' '+$('#vETime').val()+':00';
+                            $.ajax({
+                                url: 'qt/ajax/handlingVacation',
+                                method: 'get',
+                                dataType: 'json',
+                                data:{
+                                    start: startV,
+                                    end: endV
+                                },
+                                error: function(xhr, ajaxOptions, thrownError){
+                                    console.log(xhr.status);
+                                    console.log(xhr.responseText);
+                                    console.log(thrownError);
+                                },
+                                success: function(data){
+                                    let time = data.spent;
+                                    $('#vSpent').text('You will spend '+time+' hours ').css('color', 'green');
+                                }
+                            });
+                        }
+                        //end-ajax
+                    }
+                });
             }
             //end-vacation
         }
@@ -639,6 +683,21 @@ foreach($rawArrSession as $ras){
         //end-test
 
     })
+
+    /**
+        *change string time to format HH:MM:SS
+        *@param String
+        *@return String
+    */
+    function formatTime(rawTime){
+        if(rawTime.substr(rawTime.length - 1, 1) == ':'){
+            rawTime = rawTime + '00';
+        };
+        if(rawTime.length == 4){
+            rawTime = '0'+rawTime;
+        };
+        return rawTime;
+    }
 
     function autosize() {
         var el = this;

@@ -1,5 +1,7 @@
 <?php
-$spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
+use App\Http\Controllers\QTController;
+$qTController = new QTController();
+$spentPercent = number_format(($vacation-$time_remaining)/$vacation*100,0);
 ?>
 
 @extends('layout.index')
@@ -7,8 +9,6 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
 @section('css')
 <!-- bootstrap datepicker -->
 <link rel="stylesheet" href="bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
-<!-- DataTables -->
-<link rel="stylesheet" href="bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
 <style>
   .w-60{
     width: 60px !important;
@@ -105,14 +105,14 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
           <div class="info-box-content">
             <span class="info-box-text">Time remaining</span>
             <span class="info-box-number" id="timeRemaining">
-              <?php $hours_remaining = $time_remaining/60?>
+              <?php $hours_remaining = $time_remaining?>
               {{$hours_remaining.' hours' }}
             </span>
             <div class="progress">
-              <div class="progress-bar" style="width: {{$spent}}%"></div>
+              <div class="progress-bar" style="width: {{$spentPercent}}%"></div>
             </div>
             <span class="progress-description">
-              Spent <span class="spent-percent">{{$spent}}</span>%
+              Spent <span class="spent-percent">{{$spentPercent}}</span>%
             </span>
           </div>
         </div>
@@ -120,7 +120,7 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
           <div class="col-xs-12">
             <div class="box" style="border: none">
               <div class="box-body">
-                <table id="example1" class="table table-bordered table-striped">
+                <table class="table table-bordered table-striped">
                   <thead>
                     <tr>
                       <th>Start</th>
@@ -132,23 +132,22 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
                   <tbody>
                       @foreach ($history as $i)
                         <?php 
-                          $start =  explode(' ',substr($i->start, 0, strlen($i->start)-3));
-                          $startDate =  $start[0];
-                          $startTime =  $start[1];
-                          $end =  explode(' ',substr($i->end, 0, strlen($i->end)-3));
-                          $endDate =  $end[0];
-                          $endTime =  $end[1];
+                          $spentTime = $qTController->VacationSpent((object)[
+                            'start'=>$i->start,
+                            'end'=>$i->end,
+                          ]);
+                          $start =  str_replace(' ', '<br>', substr($i->start, 0, strlen($i->start)-3));
+                          $end =  str_replace(' ', '<br>', substr($i->end, 0, strlen($i->end)-3));
                         ?>
                         <tr>
                           <td>
-                            <span>{{ $startDate }}<br>{{ $startTime }}</span>
+                            <span>{!! $start !!}</span>
                           </td>
                           <td>
-                              <span>{{ $endDate }}<br>{{ $endTime }}</span>
+                              <span>{!! $end !!}</span>
                           </td>
                           <td>
-                            <span class="h-md">{{ $i->spent }} hours</span>
-                            <span class="h-xs">{{ $i->spent }} h</span>
+                            {{ $spentTime }} <span class="h-md">hours</span><span class="h-xs">h</span>
                           </td>
                           @if ($i->is_approved == Constants::APPROVED_VACATION)
                             <td>
@@ -182,15 +181,8 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
 @section('script')
 <!-- bootstrap datepicker -->
 <script src="bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
-<!-- DataTables -->
-<script src="bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
-<script src="bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
 <script>
   $(document).ready(function(){
-
-    $('#example1, #example2').DataTable({
-      "order": []
-    });
 
     //bootstrap tab setting
     {
@@ -211,6 +203,7 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
         todayHighlight: true,
     })
 
+    //not necessary for current template
     $('.searchByDate').change(function(){
       let date = $('.searchByDate').val();
       $.ajax({
@@ -243,6 +236,7 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
         }
       });
     })
+    //end-not necessary for current template
 
     //test
     $('#test').click(function(){
