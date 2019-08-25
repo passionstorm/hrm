@@ -99,20 +99,19 @@ $spentPercent = number_format(($vacation-$time_remaining)/$vacation*100,0);
   </section>
   <section class="content noSidePad">
     <div class="box box-primary">
-      <div style="" class="r-sidePad">
+      <div class="r-sidePad">
         <div class="info-box bg-primary">
           <span class="info-box-icon"><i class="fa fa-clock-o"></i></span>
           <div class="info-box-content">
             <span class="info-box-text">Time remaining</span>
             <span class="info-box-number" id="timeRemaining">
-              <?php $hours_remaining = $time_remaining?>
-              {{$hours_remaining.' hours' }}
+              {{$time_remaining.' hours' }}
             </span>
             <div class="progress">
-              <div class="progress-bar" style="width: {{$spentPercent}}%"></div>
+              <div class="progress-bar" style="width: {{$time_remaining/$vacation*100}}%"></div>
             </div>
             <span class="progress-description">
-              Spent <span class="spent-percent">{{$spentPercent}}</span>%
+              Spent: <span class="spent-percent">{{$vacation-$time_remaining}} h</span>
             </span>
           </div>
         </div>

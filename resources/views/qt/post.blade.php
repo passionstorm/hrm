@@ -1,12 +1,34 @@
-
+<?php $aTRPercent = floor($time_remaining/$vacation*100) ?>
 @extends('layout.index')
-
 @section('css')
     <!-- bootstrap datepicker -->
     <link rel="stylesheet" href="bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
     <!-- Bootstrap time Picker -->
     <link rel="stylesheet" href="plugins/timepicker/bootstrap-timepicker.min.css">
     <style>
+        .sidepad-o1{
+            padding-left: 0 ;
+            padding-right: 0 ;
+        }
+        .mr-b-0{
+            margin-bottom: 0 !important;
+        }
+        .pd-b-0{
+            padding-bottom: 0 !important;
+        }
+        .pd-tb-0{
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        .box-shadow-1{
+            box-shadow: 3px 3px 5px grey;
+        }
+        .pb-s{
+            background-color: #A2F103 !important
+        }
+        .mr-t-10{
+            margin-top: 10px;
+        }
         .mgr-t-o1{
             margin-top: 15px;
         }
@@ -127,6 +149,13 @@
             margin-bottom: 10px
         }
         @media only screen and (min-width: 992px){
+            .f-c{
+                display: flex;
+                justify-content: center;
+            }
+            .sidepad-o1{
+                padding: 10px 20px
+            }
             .f-w-o1{
                 width: 70%;
             }
@@ -162,16 +191,54 @@
         }
     </style>
 @endsection
-
 @section('content')
 <div class="content-wrapper">
   {{-- <button id="test">test</button> --}}
   <section class="content-header">
       <h3 style="margin-left:10px"><span>Vacation</span></h3>
   </section>
-  <section class="content">
+  <section class="content sidepad-o1">
     <div class="box box-primary">
         <div style="padding: 10px 20px">
+            <h4>Time remaining</h4>
+            <div class="row f-c">
+                <div class="col-xs-6 col-md-4">
+                    <div class="box box-success box-shadow-1">
+                        <div class="box-header with-border pd-b-0">
+                            <div class="clearfix">
+                                <span class="pull-left">Actual</span>
+                                <small class="pull-right">{{$aTRPercent}}%</small>
+                            </div>
+                        </div>
+                        <div class="box-body pd-tb-0">
+                            <div class="progress xs mr-b-0">
+                                <div class="progress-bar progress-bar-green" style="width: {{$aTRPercent}}%;"></div>
+                            </div>
+                        </div>
+                        <div class="box-footer pd-tb-0">
+                            <p style="text-align:center">{{$time_remaining}} h</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 col-md-4">
+                    <div class="box box-success box-shadow-1">
+                        <div class="box-header with-border pd-b-0">
+                            <div class="clearfix">
+                                <span class="pull-left">Estimated</span>
+                                <small class="pull-right eTMP">{{$aTRPercent}}%</small>
+                            </div>
+                        </div>
+                        <div class="box-body pd-tb-0">
+                            <div class="progress xs mr-b-0">
+                                <div class="progress-bar progress-bar-green eTMP" style="width: {{$aTRPercent}}%;"></div>
+                            </div>
+                        </div>
+                        <div class="box-footer pd-tb-0">
+                            <p style="text-align:center" id="eTMH">{{$time_remaining}} h</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="flex-o2">
                 <a data-toggle="tab" href="#menu0" class="tab-o1 a-active">Late/Early</a>
                 <a data-toggle="tab" href="#menu1" class="tab-o1">Go out</a>
@@ -187,6 +254,7 @@
                         <input type="text" name="endTime" id="LEETime" style="display: none">
                         <div class="flex-pcenter">
                             <div  class="f-w-o1">
+
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="input-group">
@@ -255,9 +323,9 @@
                                     </div>
                                     <div class="col-md-6 rmgt-o1">
                                         <div class="input-group">
-                                            <input type="text" class="form-control startTimepicker i-o1 f1" placeholder="start" name="startTime" required autocomplete="off">
+                                            <input type="text" id="oVST" class="form-control startTimepicker i-o1 f1" placeholder="start" name="startTime" required autocomplete="off">
                                             <span class="input-group-addon bg-primary"><i class="fa fa-arrow-right"></i></span>
-                                            <input type="text" class="form-control endTimepicker i-o1 f1" placeholder="end" name="endTime" required autocomplete="off">
+                                            <input type="text" id="oVET" class="form-control endTimepicker i-o1 f1" placeholder="end" name="endTime" required autocomplete="off">
                                         </div>
                                         <span id="spent"></span>
                                     </div>
@@ -367,10 +435,22 @@
 <script src="bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
 <!-- bootstrap time picker -->
 <script src="plugins/timepicker/bootstrap-timepicker.min.js"></script>
-
 <script>
     var ymd = <?php echo json_encode(explode('-', date('Y-m-d'))) ?>.join('-');
+    var vacation = <?php echo $vacation ?>;
+    var originTimeRemaining = <?php echo $time_remaining ?>;
+    var originTRPercent = Math.floor(originTimeRemaining/vacation*100);
     $(document).ready(function(){
+        //reset estimated time
+        {
+            $('.tab-o1').click(function(){
+                $('p#eTMH').text(originTimeRemaining +' h');
+                $('small.eTMP').text(originTRPercent +'%');
+                $('div.eTMP').css('width', originTRPercent+'%');
+            });
+
+        }
+        //end-reset estimated time
 
         //bootstrap tab setting
         {
@@ -541,6 +621,17 @@
                     }
                 });
             });
+            //calulate estimated time
+            {
+                $('#minutePicker').change(function(){
+                    let eTimeRemaining = originTimeRemaining - $(this).val().replace(' minutes', '')/60;  
+                    let eTRPercent = Math.floor(eTimeRemaining/vacation*100);
+                    $('p#eTMH').text(eTimeRemaining +' h');
+                    $('small.eTMP').text(eTRPercent +'%');
+                    $('div.eTMP').css('width', eTRPercent+'%');
+                });
+            }
+            //end-calulate estimated time
         }
         //end-minute picker
 
@@ -579,6 +670,15 @@
                         }
                         $('#spent').text('Out in '+spent+' hours').css('color', 'green');
                         $('#sBtnf0').removeAttr('disabled');
+                        //calulate estimated time
+                        {
+                            let eTimeRemaining = originTimeRemaining - spent;  
+                            let eTRPercent = Math.floor(eTimeRemaining/vacation*100);
+                            $('p#eTMH').text(eTimeRemaining +' h');
+                            $('small.eTMP').text(eTRPercent +'%');
+                            $('div.eTMP').css('width', eTRPercent+'%');
+                        }
+                        //end-calulate estimated time
                     }
                 });
             }
@@ -637,6 +737,15 @@
                                 success: function(data){
                                     let time = data.spent;
                                     $('#vSpent').text('You will spend '+time+' hours ').css('color', 'green');
+                                    //calulate estimated time
+                                    {
+                                        let eTimeRemaining = originTimeRemaining - time;  
+                                        let eTRPercent = Math.floor(eTimeRemaining/vacation*100);
+                                        $('p#eTMH').text(eTimeRemaining +' h');
+                                        $('small.eTMP').text(eTRPercent +'%');
+                                        $('div.eTMP').css('width', eTRPercent+'%');
+                                    }
+                                    //end-calulate estimated time
                                 }
                             });
                         }

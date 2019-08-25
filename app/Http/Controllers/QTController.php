@@ -16,32 +16,42 @@ class QTController extends Controller
         $idShiftList = explode('.', DB::table('users')->find($user->id)->shift);
         $shifts = DB::table('shifts')->whereIn('id', $idShiftList)->orderBy('start', 'asc')->get();
         $dynamicReason = DB::table('reasons')->where('company_id', $user->company_id)->select('reason', 'id')->get();
+        $vacation = DB::table('settings')->where('company_id',Auth::user()->company_id)->select('vacation_per_year')->get()[0]->vacation_per_year;
+        $vList = DB::table('vacations')->where([
+            ['is_approved', Constants::APPROVED_VACATION],
+            ['user_id', Auth::user()->id],
+        ])->select('start', 'end')->get();
+        $spent = 0;
+        foreach($vList as $v){
+            $spent += $this->VacationSpent((object)[
+                'start'=>$v->start,
+                'end'=>$v->end
+            ]);
+        }
+        $time_remaining = $vacation - $spent;
         return view('qt.post', [
             'setting'=>$setting,
             'shifts'=>$shifts,
-            'dynamicReason'=>$dynamicReason
+            'dynamicReason'=>$dynamicReason,
+            'time_remaining'=>$time_remaining,
+            'vacation'=>$vacation,
         ]);
     }
 
     public function GetList(){
-        //remove this when create admin confirm request function
-        {
-            $vacation = DB::table('settings')->where('company_id',Auth::user()->company_id)->select('vacation_per_year')->get()[0]->vacation_per_year;
-            $vList = DB::table('vacations')->where([
-                ['is_approved', Constants::APPROVED_VACATION],
-                ['user_id', Auth::user()->id],
-            ])->select('start', 'end')->get();
-            $spent = 0;
-            foreach($vList as $v){
-                $spent += $this->VacationSpent((object)[
-                    'start'=>$v->start,
-                    'end'=>$v->end
-                ]);
-            }
-            $time_remaining = $vacation - $spent;
+        $vacation = DB::table('settings')->where('company_id',Auth::user()->company_id)->select('vacation_per_year')->get()[0]->vacation_per_year;
+        $vList = DB::table('vacations')->where([
+            ['is_approved', Constants::APPROVED_VACATION],
+            ['user_id', Auth::user()->id],
+        ])->select('start', 'end')->get();
+        $spent = 0;
+        foreach($vList as $v){
+            $spent += $this->VacationSpent((object)[
+                'start'=>$v->start,
+                'end'=>$v->end
+            ]);
         }
-        //end remove this when create admin confirm request function
-
+        $time_remaining = $vacation - $spent;
         $history = DB::table('vacations')->where('user_id', Auth::user()->id)->orderBy('updated_at', 'desc')->select('start', 'end', 'is_approved')->get();
         return view('qt.list',[
             'time_remaining'=>$time_remaining,
