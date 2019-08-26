@@ -1,7 +1,8 @@
 <?php
 use App\Http\Controllers\QTController;
 $qTController = new QTController();
-$spentPercent = number_format(($vacation-$time_remaining)/$vacation*100,0);
+$aTRPercent = floor($aTimeRemaining/$vacation*100);
+$eTRPercent = floor($eTimeRemaining/$vacation*100)
 ?>
 
 @extends('layout.index')
@@ -10,12 +11,29 @@ $spentPercent = number_format(($vacation-$time_remaining)/$vacation*100,0);
 <!-- bootstrap datepicker -->
 <link rel="stylesheet" href="bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
 <style>
+  .mr-b-0{
+      margin-bottom: 0 !important;
+  }
+  .pd-b-0{
+    padding-bottom: 0 !important;
+  }
+  .pd-tb-0{
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+  .box-shadow-1{
+    box-shadow: 3px 3px 5px grey;
+  }
+  .p-lr-10{
+    padding-left: 10px;
+    padding-right: 10px;
+  }
   .w-60{
     width: 60px !important;
   }
   .noSidePad{
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+    padding-left: 0 ;
+    padding-right: 0 ;
   }
   .h-xs{
     display: inline;
@@ -72,6 +90,13 @@ $spentPercent = number_format(($vacation-$time_remaining)/$vacation*100,0);
   }
 
   @media only screen and (min-width:992px) {
+    .noSidePad{
+      padding: 10px 20px
+    }
+    .f-c{
+        display: flex;
+        justify-content: center;
+    }
     .r-sidePad{
       padding: 10px 20px
     }
@@ -100,19 +125,45 @@ $spentPercent = number_format(($vacation-$time_remaining)/$vacation*100,0);
   <section class="content noSidePad">
     <div class="box box-primary">
       <div class="r-sidePad">
-        <div class="info-box bg-primary">
-          <span class="info-box-icon"><i class="fa fa-clock-o"></i></span>
-          <div class="info-box-content">
-            <span class="info-box-text">Time remaining</span>
-            <span class="info-box-number" id="timeRemaining">
-              {{$time_remaining.' hours' }}
-            </span>
-            <div class="progress">
-              <div class="progress-bar" style="width: {{$time_remaining/$vacation*100}}%"></div>
+        <div class="p-lr-10">
+          <h4>Time remaining</h4>
+          <div class="row f-c">
+            <div class="col-xs-6 col-md-4">
+                <div class="box box-success box-shadow-1">
+                    <div class="box-header with-border pd-b-0">
+                        <div class="clearfix">
+                            <span class="pull-left">Actual</span>
+                            <small class="pull-right">{{$aTRPercent}}%</small>
+                        </div>
+                    </div>
+                    <div class="box-body pd-tb-0">
+                        <div class="progress xs mr-b-0">
+                            <div class="progress-bar progress-bar-green" style="width: {{$aTRPercent}}%;"></div>
+                        </div>
+                    </div>
+                    <div class="box-footer pd-tb-0">
+                        <p style="text-align:center">{{$aTimeRemaining}} h</p>
+                    </div>
+                </div>
             </div>
-            <span class="progress-description">
-              Spent: <span class="spent-percent">{{$vacation-$time_remaining}} h</span>
-            </span>
+            <div class="col-xs-6 col-md-4">
+                <div class="box box-success box-shadow-1">
+                    <div class="box-header with-border pd-b-0">
+                        <div class="clearfix">
+                            <span class="pull-left">Estimated</span>
+                            <small class="pull-right eTMP">{{$eTRPercent}}%</small>
+                        </div>
+                    </div>
+                    <div class="box-body pd-tb-0">
+                        <div class="progress xs mr-b-0">
+                            <div class="progress-bar progress-bar-green eTMP" style="width: {{$eTRPercent}}%;"></div>
+                        </div>
+                    </div>
+                    <div class="box-footer pd-tb-0">
+                        <p style="text-align:center" id="eTMH">{{$eTimeRemaining}} h</p>
+                    </div>
+                </div>
+            </div>
           </div>
         </div>
         <div class="row">

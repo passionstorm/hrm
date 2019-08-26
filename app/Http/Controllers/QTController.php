@@ -41,20 +41,29 @@ class QTController extends Controller
     public function GetList(){
         $vacation = DB::table('settings')->where('company_id',Auth::user()->company_id)->select('vacation_per_year')->get()[0]->vacation_per_year;
         $vList = DB::table('vacations')->where([
-            ['is_approved', Constants::APPROVED_VACATION],
+            ['is_approved', '!=', Constants::REJECTED_VACATION],
             ['user_id', Auth::user()->id],
-        ])->select('start', 'end')->get();
-        $spent = 0;
+        ])->select('start', 'end', 'is_approved')->get();
+        $aSpent = 0;
+        $eSpent = 0;
         foreach($vList as $v){
-            $spent += $this->VacationSpent((object)[
+            if($v->is_approved == Constants::APPROVED_VACATION){
+                $aSpent += $this->VacationSpent((object)[
+                    'start'=>$v->start,
+                    'end'=>$v->end
+                ]);
+            }
+            $eSpent += $this->VacationSpent((object)[
                 'start'=>$v->start,
                 'end'=>$v->end
             ]);
         }
-        $time_remaining = $vacation - $spent;
+        $aTimeRemaining = $vacation - $aSpent;
+        $eTimeRemaining = $vacation - $eSpent;
         $history = DB::table('vacations')->where('user_id', Auth::user()->id)->orderBy('updated_at', 'desc')->select('start', 'end', 'is_approved')->get();
         return view('qt.list',[
-            'time_remaining'=>$time_remaining,
+            'aTimeRemaining'=>$aTimeRemaining,
+            'eTimeRemaining'=>$eTimeRemaining,
             'vacation'=>$vacation,
             'history'=>$history,
             'today'=>date('Y-m-d'),
