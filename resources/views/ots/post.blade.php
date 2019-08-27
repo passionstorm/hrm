@@ -147,7 +147,10 @@
 
 @section('content')
 <?php
-  $o_select = 'selected';
+
+use App\Constants;
+
+$o_select = 'selected';
   $edit = '';
   $is_approved = '';
   $e_v = '';
@@ -179,7 +182,7 @@
       $edit = 'disabled';
       $is_approved = 'Approved';
       $s_label = 'label-success';
-    }elseif($approved == Constants::PENDDING_OT){
+    }elseif($approved == Constants::PENDING_OT){
       $is_approved = 'Pendding';
       $s_label = 'label-primary';
     }elseif($approved == Constants::REJECT_OT){
@@ -245,7 +248,7 @@
 <!-- bootstrap time picker -->
 <script src="plugins/timepicker/bootstrap-timepicker.min.js"></script>
 <script>
-  var f_approved = <?php echo Constants::PENDDING_OT ?>;
+  var f_approved = <?php echo Constants::PENDING_OT ?>;
   $(document).ready(function(){
 
     //setting to be able to use post ajax

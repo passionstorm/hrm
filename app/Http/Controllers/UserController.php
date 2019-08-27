@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Constants;
-use App\Http\Requests\login;
+use App\Http\Requests\loginRequest;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,39 +20,9 @@ class UserController extends Controller
     /**
      * @return Factory|View
      */
-    public function GetLogin()
-    {
-        return view('login');
-    }
-
-    /**
-     * @param login $request
-     * @return RedirectResponse|Redirector
-     */
-    public function PostLogin(login $request)
-    {
-        if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
-            return redirect('index');
-        } else {
-            return redirect('login')->with('fail', 'Login failed');
-        }
-    }
-
-    /**
-     * @return Factory|View
-     */
     public function GetIndexPage()
     {
         return view('pages.index');
-    }
-
-    /**
-     * @return RedirectResponse|Redirector
-     */
-    public function GetLogout()
-    {
-        Auth::Logout();
-        return redirect('/');
     }
 
     /**
@@ -60,7 +30,7 @@ class UserController extends Controller
      */
     public function GetList()
     {
-        $users = DB::table('users')->where('id', '!=', Auth::user()->id)->get();
+        $users = DB::table('users')->where('id', '!=', Auth::id())->get();
         return view('users.list', ['users' => $users]);
     }
 
@@ -143,25 +113,25 @@ class UserController extends Controller
         //insert to db
         if ($request->hasFile('avatar')) {
             $file = $request->file('avatar');
-            $hinh = md5(time()) . '_' . $file->getClientOriginalName();
-            $file->move(public_path('upload/avatar'), $hinh);
+            $avatar = md5(time()) . '_' . $file->getClientOriginalName();
+            $file->move(public_path('upload/avatar'), $avatar);
         } else {
-            $hinh = 'user_avatar.jpg';
+            $avatar = 'user_avatar.jpg';
         }
-        DB::table('users')->insert(
-            [
-                'role' => $request->role,
-                'name' => $request->name,
-                'username' => $request->username,
-                'email' => $request->email,
-                'password' => bcrypt($request->password),
-                'organization' => $request->organization,
-                'salary' => $request->salary,
-                'avatar' => $hinh,
-                'created_at' => Carbon::now(),
-                'created_by' => Auth::user()->username
-            ]
-        );
+        DB::table('users')->insert([
+            'role' => $request->input('role'),
+            'name' => $request->input('name'),
+            'username' => $request->input('username'),
+            'email' => $request->input('email'),
+            'password' => bcrypt($request->input('password')),
+            'organization' => $request->input('organization'),
+            'salary' => $request->input('salary'),
+            'avatar' => $avatar,
+            'created_at' => Carbon::now(),
+            'created_by' => Auth::user()->username,
+            'updated_at' => Carbon::now(),
+            'updated_by' => Auth::user()->username,
+        ]);
         return redirect('users/edit')->with('success', 'Additional success!');
     }
 
