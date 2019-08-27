@@ -231,41 +231,4 @@ class OtsController extends Controller
       ]);
    }
 
-   public function AjaxList(Request $request)
-   {
-      if ($request->ajax()) {
-         $project = $request->project;
-         $year = $request->year;
-         $month = $request->month;
-         if(date('Y-m') == ($year . '-' . $month)){
-            $daysOfMonth = date('d');
-         }else{
-            $daysOfMonth = date('t', strtotime($year . '-' . $month));
-         }
-         // Create appropriate data as required of request
-         //Advanced query join
-         $ots = DB::table('ot')
-            ->where('user_id', Auth::user()->id)->whereYear('ot_date', $year)->whereMonth('ot_date', $month)
-            ->join('ot_detail', function ($join) use ($project) {
-               if ($project == 0) {
-                  $join->on('ot.id', '=', 'ot_detail.ot_id');
-               } else {
-                  $join->on('ot.id', '=', 'ot_detail.ot_id')->where('ot_detail.project_id', $project);
-               }
-            })
-            ->select('ot.ot_date', 'ot_detail.time_start', 'ot_detail.time_end', 'ot.approved')->get();
-         //end-Advanced query join
-         foreach ($ots as $i) {
-            $i->startToEnd = $i->time_start . '-' . $i->time_end;
-            $i->ot_t = number_format((strtotime($i->time_end) - strtotime($i->time_start)) / 3600, 1);
-            unset($i->time_start, $i->time_end);
-         }
-         //end-Create appropriate data as required of request
-         return response()->json([
-            'daysOfMonth' => $daysOfMonth,
-            'ots' => $ots
-         ]);
-      }
-   }
-
 }

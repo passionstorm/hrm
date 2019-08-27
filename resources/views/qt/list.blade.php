@@ -1,5 +1,8 @@
 <?php
-$spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
+use App\Http\Controllers\QTController;
+$qTController = new QTController();
+$aTRPercent = floor($aTimeRemaining/$vacation*100);
+$eTRPercent = floor($eTimeRemaining/$vacation*100)
 ?>
 
 @extends('layout.index')
@@ -7,9 +10,37 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
 @section('css')
 <!-- bootstrap datepicker -->
 <link rel="stylesheet" href="bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
-<!-- DataTables -->
-<link rel="stylesheet" href="bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
 <style>
+  .mr-b-0{
+      margin-bottom: 0 !important;
+  }
+  .pd-b-0{
+    padding-bottom: 0 !important;
+  }
+  .pd-tb-0{
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+  .box-shadow-1{
+    box-shadow: 3px 3px 5px grey;
+  }
+  .p-lr-10{
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .w-60{
+    width: 60px !important;
+  }
+  .noSidePad{
+    padding-left: 0 ;
+    padding-right: 0 ;
+  }
+  .h-xs{
+    display: inline;
+  }
+  .h-md{
+    display: none;
+  }
   .r-d{
     display: none !important;
   }
@@ -59,6 +90,22 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
   }
 
   @media only screen and (min-width:992px) {
+    .noSidePad{
+      padding: 10px 20px
+    }
+    .f-c{
+        display: flex;
+        justify-content: center;
+    }
+    .r-sidePad{
+      padding: 10px 20px
+    }
+    .h-xs{
+      display: none;
+    }
+    .h-md{
+      display: inline-block;
+    }
     .r-w-o1 {
       width: 25%;
     }
@@ -75,44 +122,99 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
   <section class="content-header">
     <h3><span>Vacation</span><a href="qt/post" style="color: white" class="btn btn-primary">New plan</a></h3>
   </section>
-  <section class="content">
+  <section class="content noSidePad">
     <div class="box box-primary">
-      <div style="padding: 10px 20px">
-        <div class="info-box bg-primary">
-          <span class="info-box-icon"><i class="fa fa-clock-o"></i></span>
-          <div class="info-box-content">
-            <span class="info-box-text">Time remaining</span>
-            <span class="info-box-number" id="timeRemaining">
-              <?php $hours_remaining = $time_remaining/60?>
-              {{$hours_remaining.' hours' }}
-            </span>
-            <div class="progress">
-              <div class="progress-bar" style="width: {{$spent}}%"></div>
+      <div class="r-sidePad">
+        <div class="p-lr-10">
+          <h4>Time remaining</h4>
+          <div class="row f-c">
+            <div class="col-xs-6 col-md-4">
+                <div class="box box-success box-shadow-1">
+                    <div class="box-header with-border pd-b-0">
+                        <div class="clearfix">
+                            <span class="pull-left">Actual</span>
+                            <small class="pull-right">{{$aTRPercent}}%</small>
+                        </div>
+                    </div>
+                    <div class="box-body pd-tb-0">
+                        <div class="progress xs mr-b-0">
+                            <div class="progress-bar progress-bar-green" style="width: {{$aTRPercent}}%;"></div>
+                        </div>
+                    </div>
+                    <div class="box-footer pd-tb-0">
+                        <p style="text-align:center">{{$aTimeRemaining}} h</p>
+                    </div>
+                </div>
             </div>
-            <span class="progress-description">
-              Spent <span class="spent-percent">{{$spent}}</span>%
-            </span>
+            <div class="col-xs-6 col-md-4">
+                <div class="box box-success box-shadow-1">
+                    <div class="box-header with-border pd-b-0">
+                        <div class="clearfix">
+                            <span class="pull-left">Estimated</span>
+                            <small class="pull-right eTMP">{{$eTRPercent}}%</small>
+                        </div>
+                    </div>
+                    <div class="box-body pd-tb-0">
+                        <div class="progress xs mr-b-0">
+                            <div class="progress-bar progress-bar-green eTMP" style="width: {{$eTRPercent}}%;"></div>
+                        </div>
+                    </div>
+                    <div class="box-footer pd-tb-0">
+                        <p style="text-align:center" id="eTMH">{{$eTimeRemaining}} h</p>
+                    </div>
+                </div>
+            </div>
           </div>
         </div>
         <div class="row">
           <div class="col-xs-12">
             <div class="box" style="border: none">
               <div class="box-body">
-                <table id="example1" class="table table-bordered table-striped">
+                <table class="table table-bordered table-striped">
                   <thead>
                     <tr>
                       <th>Start</th>
                       <th>End</th>
                       <th>Spent</th>
+                      <th></th>
                     </tr>
                   </thead>
                   <tbody>
                       @foreach ($history as $i)
-                        <?php $hours_spent = $i->spent/60 ?>
+                        <?php 
+                          $spentTime = $qTController->VacationSpent((object)[
+                            'start'=>$i->start,
+                            'end'=>$i->end,
+                          ]);
+                          $start =  str_replace(' ', '<br>', substr($i->start, 0, strlen($i->start)-3));
+                          $end =  str_replace(' ', '<br>', substr($i->end, 0, strlen($i->end)-3));
+                        ?>
                         <tr>
-                          <td>{{ $i->start }}</td>
-                          <td>{{ $i->end }}</td>
-                          <td>{{ $hours_spent }} hours</td>
+                          <td>
+                            <span>{!! $start !!}</span>
+                          </td>
+                          <td>
+                              <span>{!! $end !!}</span>
+                          </td>
+                          <td>
+                            {{ $spentTime }} <span class="h-md">hours</span><span class="h-xs">h</span>
+                          </td>
+                          @if ($i->is_approved == Constants::APPROVED_VACATION)
+                            <td>
+                                <i class="fa fa-check h-xs" style="color:green"></i>
+                                <span class="label label-success h-md w-60">Approved</span>
+                            </td>
+                          @elseif ($i->is_approved == Constants::PENDDING_VACATION)
+                            <td>
+                                <i class="fa fa-hourglass-start h-xs"></i>
+                                <span class="label label-default h-md w-60">Pendding</span>
+                            </td>
+                          @elseif ($i->is_approved == Constants::REJECTED_VACATION)
+                            <td>
+                                <i class="fa fa-ban h-xs" style="color:red"></i>
+                                <span class="label label-danger h-md w-60">Reject</span>
+                            </td>
+                          @endif
                         </tr>
                       @endforeach
                   </tbody>
@@ -129,15 +231,8 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
 @section('script')
 <!-- bootstrap datepicker -->
 <script src="bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
-<!-- DataTables -->
-<script src="bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
-<script src="bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
 <script>
   $(document).ready(function(){
-
-    $('#example1, #example2').DataTable({
-      "order": []
-    });
 
     //bootstrap tab setting
     {
@@ -158,6 +253,7 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
         todayHighlight: true,
     })
 
+    //not necessary for current template
     $('.searchByDate').change(function(){
       let date = $('.searchByDate').val();
       $.ajax({
@@ -190,6 +286,7 @@ $spent = number_format(($vacation-$time_remaining)/$vacation*100,0);
         }
       });
     })
+    //end-not necessary for current template
 
     //test
     $('#test').click(function(){

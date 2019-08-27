@@ -122,46 +122,4 @@ class ProjectsController extends Controller
         return view('projects.participants', ['users' => $users, 'project_name' => $project_name, 'project_id' => $project_id, 'project_participants' => $project_participants]);
     }
 
-    public function AddParticipantsAjax(Request $request)
-    {
-        if ($request->ajax()) {
-            $p_id = $request->p_id;
-            $p = DB::table('projects')->find($p_id)->participants;
-            if (!$p) {
-                $p = array();
-            } else {
-                $p = explode(',',$p);
-            }
-            array_push($p, $request->addValue);
-            $p = implode(',',$p);
-            DB::table('projects')->where('id', $p_id)->update([
-                'participants' => $p
-            ]);
-            return response()->json([
-                'added_id' => $request->addValue
-            ]);
-        }
-    }
-
-    public function RemoveParticipantsAjax(Request $request)
-    {
-        if ($request->ajax()) {
-            $p_id = $request->p_id;
-            $p = DB::table('projects')->find($p_id)->participants;
-            $p = explode(',',$p);
-
-            for($i = 0; $i<count($p); $i++){
-                if( $p[$i] == $request->removeValue ){
-                    unset($p[$i]);
-                } 
-            }
-            $p = implode(',',$p);
-            DB::table('projects')->where('id', $p_id)->update([
-                'participants' => $p
-            ]);
-            return response()->json([
-                'removed_id' => $request->removeValue
-            ]);
-        }
-    }
 }
