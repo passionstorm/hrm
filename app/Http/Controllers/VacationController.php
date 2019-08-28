@@ -3,13 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Constants;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 
-class QTController extends Controller
+class VacationController extends Controller
 {
-    public function GetQT()
+    /**
+     * @return View
+     */
+    public function getVacation()
     {
         $user = Auth::user();
         $setting = DB::table('settings')->where('company_id', $user->company_id)->first(['vacation_per_year', 'short_leave', 'hour_step']);
@@ -38,13 +43,21 @@ class QTController extends Controller
         ]);
     }
 
-    public function GetList()
+    /**
+     * @return View
+     */
+    public function getList()
     {
-        $vacation = DB::table('settings')->where('company_id', Auth::user()->company_id)->select('vacation_per_year')->get()[0]->vacation_per_year;
-        $vList = DB::table('vacations')->where([
-            ['is_approved', '!=', Constants::REJECTED_VACATION],
-            ['user_id', Auth::id()],
-        ])->select('start', 'end', 'is_approved')->get();
+        $vacation = DB::table('settings')->where('company_id', Auth::user()->company_id)->first('vacation_per_year');
+        $vacationPerYear = $vacation ? $vacation->vacation_per_year : 12;
+
+        $vList = DB::table('vacations')
+            ->where([
+                ['is_approved', '!=', Constants::REJECTED_VACATION],
+                ['user_id', Auth::id()],
+            ])
+            ->get(['start', 'end', 'is_approved']);
+
         $aSpent = 0;
         $eSpent = 0;
         foreach ($vList as $v) {
@@ -59,30 +72,41 @@ class QTController extends Controller
                 'end' => $v->end
             ]);
         }
-        $aTimeRemaining = $vacation - $aSpent;
-        $eTimeRemaining = $vacation - $eSpent;
-        $history = DB::table('vacations')->where('user_id', Auth::id())->orderBy('updated_at', 'desc')->select('start', 'end', 'is_approved')->get();
+        $aTimeRemaining = $vacationPerYear - $aSpent;
+        $eTimeRemaining = $vacationPerYear - $eSpent;
+        $history = DB::table('vacations')
+            ->where('user_id', Auth::id())
+            ->orderBy('updated_at', 'desc')
+            ->get(['start', 'end', 'is_approved']);
+
         return view('qt.list', [
             'aTimeRemaining' => $aTimeRemaining,
             'eTimeRemaining' => $eTimeRemaining,
-            'vacation' => $vacation,
+            'vacation' => $vacationPerYear,
             'history' => $history,
             'today' => date('Y-m-d'),
         ]);
     }
 
-    public function PostQT(Request $request)
+
+    /**
+     * @param Request $request
+     * @return RedirectResponse
+     */
+    public function postVacation(Request $request)
     {
         $userId = Auth::id();
-        $sDate = $request->startDate;
-        $eDate = $request->endDate;
-        $sTime = $request->startTime . ':00';
-        $eTime = $request->endTime . ':00';
-        $type = $request->type;
-        $comment = $request->comment;
+        $sDate = $request->input('startDate');
+        $eDate = $request->input('endDate');
+        $sTime = $request->input('startTime') . ':00';
+        $eTime = $request->input('endTime') . ':00';
+        $type = $request->input('type');
+        $comment = $request->input('comment');
+
         $start = $sDate . ' ' . $sTime;
         $end = $eDate . ' ' . $eTime;
         $now = date("Y-m-d H:i:s");
+
         DB::table('vacations')->insert([
             'user_id' => $userId,
             'start' => $start,
@@ -94,7 +118,8 @@ class QTController extends Controller
             'updated_at' => $now,
             'created_by' => $userId,
         ]);
-        return redirect('qt/list');
+
+        return redirect('vacation/list');
     }
 
     /**
@@ -102,86 +127,83 @@ class QTController extends Controller
      * @param object
      * @return number
      */
-    function VacationSpent($vacationDays){
+    function VacationSpent($vacationDays)
+    {
         $arrStart = explode(' ', $vacationDays->start);
         $arrEnd = explode(' ', $vacationDays->end);
         $startDate = strtotime($arrStart[0]);
         $startTime = strtotime($arrStart[1]);
         $endDate = strtotime($arrEnd[0]);
         $endTime = strtotime($arrEnd[1]);
-        $middleDays = max(0, ($endDate - $startDate)/3600/24 - 1);
-        $dayWorkTime = $this->getDayWorkTime();
-        $spent = $middleDays*$dayWorkTime;
-        $shifts = $this->getTimeShifts();
-        if($startDate == $endDate){
+        $middleDays = max(0, ($endDate - $startDate) / 3600 / 24 - 1);
+        $dayWorkTime = 0;
+        $shifts = $this->getTimeShifts($dayWorkTime);
+        $spent = $middleDays * $dayWorkTime;
+        if ($startDate == $endDate) {
             $spent += $this->_getSpentTimeSameDate($shifts, $startTime, $endTime);
-        }else{
-            $spent += $this->_getSpentTimeDiffDate($shifts, $startTime, $endTime, $dayWorkTime*3600);
+        } else {
+            $spent += $this->_getSpentTimeDiffDate($shifts, $startTime, $endTime, $dayWorkTime * 3600);
         }
+
         return $spent;
     }
 
-    function _getSpentTimeSameDate($shifts, $startTime, $endTime){
+    function _getSpentTimeSameDate($shifts, $startTime, $endTime)
+    {
         $spentTime = 0;
         $spentShift = 0;
-        foreach($shifts as $shift){
+        foreach ($shifts as $shift) {
             $startShift = strtotime($shift['start']);
             $endShift = strtotime($shift['end']);
-            if($startShift <= $endTime && $endTime <= $endShift){
+            if ($startShift <= $endTime && $endTime <= $endShift) {
                 $spentTime += $endTime - $startShift + $spentShift;
             }
-            if($startShift <= $startTime && $startTime <= $endShift){
+            if ($startShift <= $startTime && $startTime <= $endShift) {
                 $spentTime -= $startTime - $startShift + $spentShift;
             }
-            $spentShift += $shift['spent']*3600;
+            $spentShift += $shift['spent'] * 3600;
         }
-        return $spentTime/3600;//hours unit
+        return $spentTime / 3600;//hours unit
     }
 
-    function _getSpentTimeDiffDate($shifts, $startTime, $endTime, $dayWorkTime){
+    function _getSpentTimeDiffDate($shifts, $startTime, $endTime, $dayWorkTime)
+    {
         $spentTime = 0;
         $spentShift = 0;
-        foreach($shifts as $shift){
+        foreach ($shifts as $shift) {
             $startShift = strtotime($shift['start']);
             $endShift = strtotime($shift['end']);
-            if($startShift <= $startTime && $startTime <= $endShift){
+            if ($startShift <= $startTime && $startTime <= $endShift) {
                 $spentTime += $dayWorkTime - ($startTime - $startShift) - $spentShift;
             }
-            if($startShift <= $endTime && $endTime <= $endShift){
+            if ($startShift <= $endTime && $endTime <= $endShift) {
                 $spentTime += $endTime - $startShift + $spentShift;
             }
-            $spentShift += $shift['spent']*3600;
+            $spentShift += $shift['spent'] * 3600;
         }
-        return $spentTime/3600;//hours unit
+        return $spentTime / 3600;//hours unit
     }
+
 
     /**
      * create list shift inlude start, end, spent(hour) for current user
+     * @param $dayOfWork
      * @return array
      */
-    function getTimeShifts()
+    function getTimeShifts(&$dayOfWork)
     {
         $idShiftList = explode('.', Auth::user()->shift);
         $shifts = DB::table('shifts')->whereIn('id', $idShiftList)->get()->all();
-        return array_map(function ($shift) {
+
+        return array_map(function ($shift) use (&$dayOfWork) {
+            $spent = (strtotime($shift->end) - strtotime($shift->start)) / 3600;
+            $dayOfWork += $spent;
             return [
                 'start' => $shift->start,
                 'end' => $shift->end,
-                'spent' => (strtotime($shift->end) - strtotime($shift->start))/3600,
+                'spent' => $spent,
             ];
         }, $shifts);
-    }
-
-    /**
-     * calculate dayWorkTime(hour) for current user
-     * @return float 
-     */    
-    function getDayWorkTime(){
-        $dayWorkTime = 0;
-        foreach( $this->getTimeShifts() as $s ){
-            $dayWorkTime += $s['spent'];
-        }
-        return $dayWorkTime;
     }
 
 }

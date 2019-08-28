@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\QTController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use stdClass;
-use DB;
 use Illuminate\Support\Facades\Auth;
+use stdClass;
 
 class ApiController extends Controller
 {
     public function HandlingVacation(Request $request){
-        $QTController = new QTController();
+        $QTController = new VacationController();
         $vacationDays = new stdClass();
         $vacationDays->start = $request->start;
         $vacationDays->end = $request->end;

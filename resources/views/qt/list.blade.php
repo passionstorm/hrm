@@ -1,6 +1,6 @@
 <?php
-use App\Http\Controllers\QTController;
-$qTController = new QTController();
+use App\Http\Controllers\VacationController;
+$qTController = new VacationController();
 $aTRPercent = floor($aTimeRemaining/$vacation*100);
 $eTRPercent = floor($eTimeRemaining/$vacation*100)
 ?>
@@ -120,7 +120,7 @@ $eTRPercent = floor($eTimeRemaining/$vacation*100)
 <div class="content-wrapper">
   {{-- <button id="test">test</button> --}}
   <section class="content-header">
-    <h3><span>Vacation</span><a href="qt/post" style="color: white" class="btn btn-primary">New plan</a></h3>
+    <h3><span>Vacation</span><a href="vacation/post" style="color: white" class="btn btn-primary">New plan</a></h3>
   </section>
   <section class="content noSidePad">
     <div class="box box-primary">

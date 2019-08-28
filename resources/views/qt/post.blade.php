@@ -247,7 +247,7 @@
             </div>
             <div class="tab-content">
                 <div id="menu0" class="tab-pane fade in active">
-                    <form action="qt/post" method="post">
+                    <form action="vacation/post" method="post">
                         @csrf
                         <input type="text" id="LEEDate" name="endDate" style="display: none">
                         <input type="text" name="startTime" id="LESTime" style="display: none">

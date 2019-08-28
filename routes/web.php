@@ -32,10 +32,9 @@ Route::get('ot/post/{date}', 'OtsController@GetOTs')->middleware(Constants::AUTH
 Route::post('ot/post', 'OtsController@PostOT')->middleware(Constants::AUTHORIZE_AUTH);
 
 //quit time
-Route::get('qt/post', 'QTController@GetQT')->middleware(Constants::AUTHORIZE_AUTH);
-Route::post('qt/post', 'QTController@PostQT')->middleware(Constants::AUTHORIZE_AUTH);
-Route::get('qt/list', 'QTController@GetList')->middleware(Constants::AUTHORIZE_AUTH);
-Route::get('qt/list/pending', 'QTController@GetListPending')->middleware(Constants::AUTHORIZE_AUTH);
+Route::get('vacation/post', 'VacationController@getVacation')->middleware(Constants::AUTHORIZE_AUTH);
+Route::post('vacation/post', 'VacationController@postVacation')->middleware(Constants::AUTHORIZE_AUTH);
+Route::get('vacation/list', 'VacationController@getList')->middleware(Constants::AUTHORIZE_AUTH);
 
 //api
 Route::get('projects/participants/add/ajax', 'ApiController@AddParticipantsAjax')->middleware(Constants::AUTHORIZE_AJAX_REQUEST);
