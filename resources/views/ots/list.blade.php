@@ -109,8 +109,11 @@
 @endsection
 
 @section('content')
-<?php 
- $totalTimeOT = 0;
+<?php
+
+use App\Constants;
+
+$totalTimeOT = 0;
  foreach($ots as $i){
      if($i->approved == 1){
         $totalTimeOT += $i->ot_t;
@@ -172,7 +175,7 @@
                                                     $edit = 'disabled';
                                                     $is_approved = 'Approved';
                                                     $s_label = 'label-success';
-                                                }elseif($approved == Constants::PENDDING_OT){
+                                                }elseif($approved == Constants::PENDING_OT){
                                                     $is_approved = 'Pendding';
                                                     $s_label = 'label-primary';
                                                 }elseif($approved == Constants::REJECT_OT){

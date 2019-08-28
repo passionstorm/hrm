@@ -48,7 +48,7 @@
                 </a>
             </li>
             <li>
-                <a href="qt/list">
+                <a href="vacation/list">
                     <span>Vacation</span>
                 </a>
             </li>

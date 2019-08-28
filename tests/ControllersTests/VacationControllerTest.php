@@ -1,16 +1,15 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Controllers;
 
-use App\Http\Controllers\QTController;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Http\Controllers\VacationController;
 use Illuminate\Support\Facades\Auth;
+use Tests\TestCase;
 
-class VCSTest extends TestCase
+class VacationControllerTest extends TestCase
 {
     /**
+     *  Todo: Test is fail. need to fix logic and change test case
      * A basic unit test example.
      *
      * @return void
@@ -18,9 +17,10 @@ class VCSTest extends TestCase
     public function testVacationSpent()
     {
         Auth::shouldReceive('user')->andreturn((object)[
-            'id' => 1
+            'id' => 1,
+            'shift' => '1,2',
         ]);
-        $controller = new QTController();
+        $controller = new VacationController();
         $i = 1;
         
         //1
@@ -28,18 +28,18 @@ class VCSTest extends TestCase
             'start'=>'2019-08-18 08:00:00',
             'end'=>'2019-08-18 10:00:00',
         ]);
-        $this->assertEquals(floatval(2), floatval($case), "case" . $i++);
+        $this->assertEquals(floatval(1.5), floatval($case), "case" . $i++);
         
         //2
         $case = $controller->VacationSpent((object)[
             'start'=>'2019-08-18 08:00:00',
             'end'=>'2019-08-18 12:00:00',
         ]);
-        $this->assertEquals(floatval(4), floatval($case), "case" . $i++);
+        $this->assertEquals(floatval(3.5), floatval($case), "case" . $i++);
         
         //3
         $case = $controller->VacationSpent((object)[
-            'start'=>'2019-08-18 08:00:00',
+            'start'=>'2019-08-18 08:30:00',
             'end'=>'2019-08-18 16:00:00',
         ]);
         $this->assertEquals(floatval(7), floatval($case), "case" . $i++);

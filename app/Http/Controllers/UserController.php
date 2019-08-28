@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Constants;
-use App\Http\Requests\login;
+use App\Http\Requests\loginRequest;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -67,28 +67,27 @@ class UserController extends Controller
     }
 
     /**
-     * @return RedirectResponse|Redirector
-     */
-    public function GetLogout()
-    {
-        Auth::Logout();
-        return redirect('/');
-    }
-
-    /**
      * @return Factory|View
      */
-    public function GetList()
+    public function getList()
     {
-        $users = DB::table('users')->where('id', '!=', Auth::user()->id)->get();
-        return view('users.list', ['users' => $users]);
+        $users = DB::table('users')->where('id', '!=', Auth::id())->get();
+        $statis[Constants::ROLE_ADMIN] = 0;
+        $statis[Constants::ROLE_STAFF] = 0;
+        $statis[Constants::ROLE_MEMBER] = 0;
+        foreach ($users as $user){
+            $statis[$user->role] += 1;
+        }
+        $statis[Auth::user()->role] += 1;
+
+        return view('users.list', ['users' => $users, 'statis' => $statis]);
     }
 
     /**
      * @param $id
      * @return RedirectResponse|Redirector
      */
-    public function DeleteUser($id)
+    public function deleteUser($id)
     {
         DB::table('users')->where('id', $id)->update(['is_deleted' => Constants::IS_DELETED]);
         return redirect('users/list')->with('success', 'Delete user successfully!');
@@ -98,7 +97,7 @@ class UserController extends Controller
      * @param null $id
      * @return Factory|View
      */
-    public function EditUser($id = null)
+    public function editUser($id = null)
     {
         if ($id) {
             $user = DB::table('users')->find($id);
@@ -114,7 +113,7 @@ class UserController extends Controller
      * @return RedirectResponse|Redirector
      * @throws ValidationException
      */
-    public function PostUser(Request $request, $id = null)
+    public function postUser(Request $request, $id = null)
     {
         $rule = [
             'email' => 'required',
@@ -163,25 +162,26 @@ class UserController extends Controller
         //insert to db
         if ($request->hasFile('avatar')) {
             $file = $request->file('avatar');
-            $hinh = md5(time()) . '_' . $file->getClientOriginalName();
-            $file->move(public_path('upload/avatar'), $hinh);
+            $avatar = md5(time()) . '_' . $file->getClientOriginalName();
+            $file->move(public_path('upload/avatar'), $avatar);
         } else {
-            $hinh = 'user_avatar.jpg';
+            $avatar = 'user_avatar.jpg';
         }
-        DB::table('users')->insert(
-            [
-                'role' => $request->role,
-                'name' => $request->name,
-                'username' => $request->username,
-                'email' => $request->email,
-                'password' => bcrypt($request->password),
-                'organization' => $request->organization,
-                'salary' => $request->salary,
-                'avatar' => $hinh,
-                'created_at' => Carbon::now(),
-                'created_by' => Auth::user()->username
-            ]
-        );
+        DB::table('users')->insert([
+            'role' => $request->input('role'),
+            'name' => $request->input('name'),
+            'username' => $request->input('username'),
+            'email' => $request->input('email'),
+            'password' => bcrypt($request->input('password')),
+            'organization' => $request->input('organization'),
+            'salary' => $request->input('salary'),
+            'avatar' => $avatar,
+            'created_at' => Carbon::now(),
+            'created_by' => Auth::user()->username,
+            'updated_at' => Carbon::now(),
+            'updated_by' => Auth::user()->username,
+        ]);
+
         return redirect('users/edit')->with('success', 'Additional success!');
     }
 
