@@ -20,9 +20,16 @@ class UserController extends Controller
     /**
      * @return Factory|View
      */
-    public function GetLogin()
+    public function GetLogin(Request $request)
     {
-        return view('login');
+        $username  = $request->cookie('username');
+        $password = $request->cookie('password');
+        $rm = $request->cookie('rm');
+        return view('login', [
+            'username'=>$username,
+            'password'=>$password,
+            'rm'=>$rm,
+        ]);
     }
 
     /**
@@ -32,6 +39,19 @@ class UserController extends Controller
     public function PostLogin(login $request)
     {
         if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
+            if($request->rMe){
+
+                //create cookie
+                $username_cookie = cookie('username', $request->username, 525600);
+                $password_cookie = cookie('password', $request->password, 525600);
+                $rm_cookie = cookie('rm', $request->rMe, 525600);
+                return response()
+                ->redirectTo('index')
+                ->withCookie($username_cookie)
+                ->withCookie($password_cookie)
+                ->withCookie($rm_cookie);
+
+            }
             return redirect('index');
         } else {
             return redirect('login')->with('fail', 'Login failed');
