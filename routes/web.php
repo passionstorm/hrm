@@ -11,13 +11,13 @@ Route::get('login', 'Auth\LoginController@login');
 Route::post('login', 'Auth\LoginController@postLogin');
 Route::get('logout', 'Auth\LoginController@logout');
 
-Route::get('index', 'UserController@GetIndexPage')->name('dashboard')->middleware(Constants::AUTHORIZE_AUTH);
+Route::get('index', 'UserController@getIndexPage')->name('dashboard')->middleware(Constants::AUTHORIZE_AUTH);
 
 //users
-Route::get('users/list', 'UserController@GetList')->middleware(Constants::AUTHORIZE_AUTH);
-Route::get('users/delete/{id}', 'UserController@DeleteUser')->middleware(Constants::ROLE_ADMIN);
-Route::get('users/edit/{id?}', 'UserController@EditUser')->middleware(Constants::ROLE_ADMIN);
-Route::post('users/edit/{id?}', 'UserController@PostUser')->middleware(Constants::ROLE_ADMIN);
+Route::get('users/list', 'UserController@getList')->middleware(Constants::AUTHORIZE_AUTH);
+Route::get('users/delete/{id}', 'UserController@deleteUser')->middleware(Constants::AUTHORIZE_ADMIN);
+Route::get('users/edit/{id?}', 'UserController@editUser')->middleware(Constants::AUTHORIZE_ADMIN);
+Route::post('users/edit/{id?}', 'UserController@postUser')->middleware(Constants::AUTHORIZE_ADMIN);
 
 //project
 Route::get('projects/{id}/participants/add/', 'ProjectsController@AddParticipants')->middleware(Constants::AUTHORIZE_MANAGER);

@@ -20,7 +20,7 @@ class UserController extends Controller
     /**
      * @return Factory|View
      */
-    public function GetIndexPage()
+    public function getIndexPage()
     {
         return view('pages.index');
     }
@@ -28,17 +28,25 @@ class UserController extends Controller
     /**
      * @return Factory|View
      */
-    public function GetList()
+    public function getList()
     {
         $users = DB::table('users')->where('id', '!=', Auth::id())->get();
-        return view('users.list', ['users' => $users]);
+        $statis[Constants::ROLE_ADMIN] = 0;
+        $statis[Constants::ROLE_STAFF] = 0;
+        $statis[Constants::ROLE_MEMBER] = 0;
+        foreach ($users as $user){
+            $statis[$user->role] += 1;
+        }
+        $statis[Auth::user()->role] += 1;
+
+        return view('users.list', ['users' => $users, 'statis' => $statis]);
     }
 
     /**
      * @param $id
      * @return RedirectResponse|Redirector
      */
-    public function DeleteUser($id)
+    public function deleteUser($id)
     {
         DB::table('users')->where('id', $id)->update(['is_deleted' => Constants::IS_DELETED]);
         return redirect('users/list')->with('success', 'Delete user successfully!');
@@ -48,7 +56,7 @@ class UserController extends Controller
      * @param null $id
      * @return Factory|View
      */
-    public function EditUser($id = null)
+    public function editUser($id = null)
     {
         if ($id) {
             $user = DB::table('users')->find($id);
@@ -64,7 +72,7 @@ class UserController extends Controller
      * @return RedirectResponse|Redirector
      * @throws ValidationException
      */
-    public function PostUser(Request $request, $id = null)
+    public function postUser(Request $request, $id = null)
     {
         $rule = [
             'email' => 'required',
@@ -132,6 +140,7 @@ class UserController extends Controller
             'updated_at' => Carbon::now(),
             'updated_by' => Auth::user()->username,
         ]);
+
         return redirect('users/edit')->with('success', 'Additional success!');
     }
 

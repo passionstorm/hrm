@@ -1,0 +1,178 @@
+/*Small devices (landscape phones, 576px and up)*/
+@media (max-width: 576px) {
+    section.content {
+        padding: 0;
+    }
+}
+
+/*Medium devices (tablets, 768px and up)*/
+@media (max-width: 768px) {
+
+}
+
+html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary, time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+    background: transparent;
+}
+
+ul, ol, dl {
+    list-style: none;
+}
+
+ul.table-body li {
+    position: relative;
+    border-bottom: 1px solid #d7d7d7;
+    border-left: 1px solid #d7d7d7;
+    border-right: 1px solid #d7d7d7;
+    background: #fff url('/img/bg_link_arrow01.png') no-repeat 99% 50%;
+}
+
+ul.table-body li div {
+    display: inline-block;
+    vertical-align: middle;
+    word-break: break-all;
+}
+
+
+ul.table-body li a {
+    display: block;
+    padding: 10px;
+}
+
+.type_search input {
+    width: calc(100% - 46px);
+    box-sizing: border-box;
+    float: left;
+    margin: 0;
+    padding: 0 15px;
+    height: 42px;
+    font-size: 14px;
+    border: 1px solid #d7d7da;
+    border-right: 0;
+    border-radius: 5px 0 0 5px;
+}
+
+.content-header{
+    text-align: center;
+}
+
+.type_search button {
+    float: left;
+    display: block;
+    margin: 0 auto;
+    padding: 13px 0;
+    width: 46px;
+    height: 42px;
+    font-weight: bold;
+    color: #444444;
+    font-size: 14px;
+    border: 1px solid #d7d7da;
+    -moz-border-radius: 0 5px 5px 0;
+    -webkit-border-radius: 0 5px 5px 0;
+    -o-border-radius: 0 5px 5px 0;
+    -ms-border-radius: 0 5px 5px 0;
+    border-radius: 0 5px 5px 0;
+    background: #fdfdfd;
+    background: url('/img/icon_search.png'), -moz-linear-gradient(top, #fdfdfd 0%, #f0f0ec 100%);
+    background: url('/img/icon_search.png'), -webkit-linear-gradient(top, #fdfdfd 0%, #f0f0ec 100%);
+    background: url('/img/icon_search.png'), linear-gradient(to bottom, #fdfdfd 0%, #f0f0ec 100%);
+    background-position: 50%;
+    background-repeat: no-repeat, no-repeat;
+    outline: 0;
+}
+
+.card {
+    box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+    position: relative;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 0 solid rgba(0,0,0,.125);
+    border-radius: .25rem;
+}
+
+.card-header {
+    background-color: transparent;
+    border-bottom: 1px solid rgba(0,0,0,.125);
+    position: relative;
+    padding: .5rem 1.25rem;
+    border-top-left-radius: .25rem;
+    border-top-right-radius: .25rem;
+}
+
+.card-body {
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    padding: 0.8rem;
+}
+
+.callout, .card, .info-box, .mb-3, .my-3, .small-box {
+    margin-bottom: 0.5rem;
+}
+
+
+.row{
+     margin-right: 0;
+     margin-left: 0;
+}
+
+li div.pic {
+    display: block;
+    margin: 0;
+    padding: 0;
+    width: 60px;
+    height: 60px;
+    overflow: hidden;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    -o-border-radius: 50%;
+    -ms-border-radius: 50%;
+    border-radius: 50%;
+}
+
+.pic img {
+    width: 60px;
+    height: 60px;
+}
+
+input[type="checkbox"] {
+    display: none;
+}
+
+input[type="checkbox"] + label > span.checkbox {
+    display: inline-block;
+    margin-right: 8px;
+    padding: 3px 0 3px 26px;
+    background: url('/img/check_off.png') left top no-repeat;
+    vertical-align: -2px;
+}
+
+input[type="checkbox"]:checked + label span.checkbox {
+    background: url('/img/check_on.png') left top no-repeat;
+}
+
+ul.headers {
+    margin-top: 3px;
+    border-top: 1px solid #d7d7d7;
+    background: #eee;
+    border-left: 1px solid #d7d7d7;
+    border-right: 1px solid #d7d7d7;
+}
+
+div.box ul.headers li {
+    display: inline-block;
+    padding: 4px 0;
+    font-size: 10px;
+    text-align: center;
+    font-weight: bold;
+}
