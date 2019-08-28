@@ -101,7 +101,6 @@ class QTController extends Controller
      * @return number
      */
     function VacationSpent($vacationDays){
-        $spent = 0;
         $arrStart = explode(' ', $vacationDays->start);
         $arrEnd = explode(' ', $vacationDays->end);
         $startDate = strtotime($arrStart[0]);
@@ -109,39 +108,49 @@ class QTController extends Controller
         $endDate = strtotime($arrEnd[0]);
         $endTime = strtotime($arrEnd[1]);
         $middleDays = max(0, ($endDate - $startDate)/3600/24 - 1);
+        $dayWorkTime = $this->getDayWorkTime();
+        $spent = $middleDays*$dayWorkTime;
         $shifts = $this->getTimeShifts();
-        $workTimesPerDay = 0;
+        if($startDate == $endDate){
+            $spent += $this->_getSpentTimeSameDate($shifts, $startTime, $endTime);
+        }else{
+            $spent += $this->_getSpentTimeDiffDate($shifts, $startTime, $endTime, $dayWorkTime*3600);
+        }
+        return $spent;
+    }
+
+    function _getSpentTimeSameDate($shifts, $startTime, $endTime){
+        $spentTime = 0;
+        $spentShift = 0;
         foreach($shifts as $shift){
             $startShift = strtotime($shift['start']);
             $endShift = strtotime($shift['end']);
-            $workTimesPerDay += $shift['spent'];
-            if($startDate == $endDate){
-                if($endTime <= $startShift){
-                    break;
-                }elseif($endTime > $startShift && $endTime <= $endShift){
-                    if($startTime <= $startShift){
-                        $spent += ($endTime - $startShift)/3600;
-                    }elseif($startTime > $startShift){
-                        $spent += ($endTime - $startTime)/3600;
-                    }
-                    break;
-                }
+            if($startShift <= $endTime && $endTime <= $endShift){
+                $spentTime += $endTime - $startShift + $spentShift;
             }
-            if($startTime <= $startShift){
-                $spent += $shift['spent'];
-            }elseif($startTime > $startShift && $startTime < $endShift){
-                $spent += ($endShift - $startTime)/3600;
+            if($startShift <= $startTime && $startTime <= $endShift){
+                $spentTime -= $startTime - $startShift + $spentShift;
             }
-            if($startDate == $endDate || $endTime <= $startShift){
-                continue;
-            }elseif($endTime > $startShift && $endTime < $endShift){
-                $spent += ($endTime - $startShift)/3600;
-            }elseif($endTime >= $endShift){
-                $spent += $shift['spent'];
-            }
+            $spentShift += $shift['spent']*3600;
         }
-        $spent += $middleDays*$workTimesPerDay;
-        return $spent;
+        return $spentTime/3600;//hours unit
+    }
+
+    function _getSpentTimeDiffDate($shifts, $startTime, $endTime, $dayWorkTime){
+        $spentTime = 0;
+        $spentShift = 0;
+        foreach($shifts as $shift){
+            $startShift = strtotime($shift['start']);
+            $endShift = strtotime($shift['end']);
+            if($startShift <= $startTime && $startTime <= $endShift){
+                $spentTime += $dayWorkTime - ($startTime - $startShift) - $spentShift;
+            }
+            if($startShift <= $endTime && $endTime <= $endShift){
+                $spentTime += $endTime - $startShift + $spentShift;
+            }
+            $spentShift += $shift['spent']*3600;
+        }
+        return $spentTime/3600;//hours unit
     }
 
     /**
@@ -155,9 +164,21 @@ class QTController extends Controller
             return [
                 'start' => $shift->start,
                 'end' => $shift->end,
-                'spent' => (strtotime($shift->end) - strtotime($shift->start))/60/60,
+                'spent' => (strtotime($shift->end) - strtotime($shift->start))/3600,
             ];
         }, $shifts);
+    }
+
+    /**
+     * calculate dayWorkTime(hour) for current user
+     * @return float 
+     */    
+    function getDayWorkTime(){
+        $dayWorkTime = 0;
+        foreach( $this->getTimeShifts() as $s ){
+            $dayWorkTime += $s['spent'];
+        }
+        return $dayWorkTime;
     }
 
 }
