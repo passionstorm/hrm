@@ -204,7 +204,7 @@ $eTRPercent = floor($eTimeRemaining/$vacation*100)
                                 <i class="fa fa-check h-xs" style="color:green"></i>
                                 <span class="label label-success h-md w-60">Approved</span>
                             </td>
-                          @elseif ($i->is_approved == Constants::PENDDING_VACATION)
+                          @elseif ($i->is_approved == Constants::PENDING_VACATION)
                             <td>
                                 <i class="fa fa-hourglass-start h-xs"></i>
                                 <span class="label label-default h-md w-60">Pendding</span>
