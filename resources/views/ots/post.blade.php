@@ -68,6 +68,8 @@
     }
 
     .ot-date {
+        padding: 10px;
+        font-size: 24px;
         display: inline-block;
         text-align: center;
     }
@@ -139,13 +141,13 @@ if (isset($approved)) {
         <a href="ot/list" style="text-decoration: underline; padding-bottom: 15px; display:block"><i
                     class="fa fa-mail-reply"></i>Back to list</a>
         <div id="displayAlert"></div>
-        <div class="box">
-            <div class="form-header">
-                <h3 class="ot-date">{{$date}} </h3>
+        <div class="card">
+
+            <div class="card-body">
+                <h1 class="ot-date">{{$date}} </h1>
                 <h4 class="status label {{$s_label}}">{{$is_approved}}</h4>
-            </div>
-            <div class="box-body no-padding">
-                <table class="table table-hover">
+
+                <table class="table table-hover" style="text-align: left">
                     <tr>
                         <th>Time</th>
                         <th id="th2">Project</th>
@@ -166,7 +168,6 @@ if (isset($approved)) {
                     </tr>
                     @else
                     <tr>
-                        <td>Empty</td>
                     </tr>
                     @endif
                     @endforeach

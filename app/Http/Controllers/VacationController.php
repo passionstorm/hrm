@@ -119,7 +119,7 @@ class VacationController extends Controller
             'created_by' => $userId,
         ]);
 
-        return redirect('vacation/list');
+        return redirect()->route('vacation.list');
     }
 
     /**

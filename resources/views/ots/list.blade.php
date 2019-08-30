@@ -126,20 +126,20 @@ $totalTimeOT = 0;
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-            List of your OTs
+            {{ _('Overtime Management') }}
         </h1>
     </section>
     <!-- Main content -->
     <section class="content">
         <div class="row">
             <div class="col-xs-12">
-                <div class="box">
-                    <div class="box-body">
+                <div class="card">
+                    <div class="card-body">
                         <form id="ot_search">
                             <div class="row">
                                 <div class="mgt col-md-3">
                                     <select name="project" id="" class="form-control" required>
-                                        <option value="0" selected>All projects</option>
+                                        <option value="0" selected>{{ _('All projects') }}</option>
                                         @foreach ($projects as $p)
                                             <option value="{{$p->id}}">{{$p->name}}</option>
                                         @endforeach
