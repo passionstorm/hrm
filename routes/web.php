@@ -37,7 +37,3 @@ Route::post('vacation/post', 'VacationController@postVacation')->name('vacation.
 Route::get('vacation/list', 'VacationController@getList')->name('vacation.list')->middleware(Constants::AUTHORIZE_AUTH);
 
 //api
-Route::get('projects/participants/add/ajax', 'ApiController@AddParticipantsAjax')->middleware(Constants::AUTHORIZE_AJAX_REQUEST);
-Route::get('projects/participants/remove/ajax', 'ApiController@RemoveParticipantsAjax')->middleware(Constants::AUTHORIZE_AJAX_REQUEST);
-Route::get('ot/list/ajax', 'ApiController@AjaxList')->middleware(Constants::AUTHORIZE_AJAX_REQUEST);
-Route::get('qt/ajax/handlingVacation', 'ApiController@HandlingVacation')->middleware(Constants::AUTHORIZE_AJAX_REQUEST);
