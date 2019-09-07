@@ -12,11 +12,11 @@ class QTController extends Controller
 {
     public function GetQT(){
         $user = Auth::user();
-        $setting = DB::table('settings')->where('company_id', $user->company_id)->select('vacation_per_year', 'short_leave', 'hour_step')->get()[0];
+        $setting = DB::table('companies')->find($user->company_id);
         $idShiftList = explode('.', DB::table('users')->find($user->id)->shift);
         $shifts = DB::table('shifts')->whereIn('id', $idShiftList)->orderBy('start', 'asc')->get();
         $dynamicReason = DB::table('reasons')->where('company_id', $user->company_id)->select('reason', 'id')->get();
-        $vacation = DB::table('settings')->where('company_id',Auth::user()->company_id)->select('vacation_per_year')->get()[0]->vacation_per_year;
+        $vacation = $setting->vacation_per_year;
         $vList = DB::table('vacations')->where([
             ['is_approved', Constants::APPROVED_VACATION],
             ['user_id', Auth::user()->id],
@@ -39,7 +39,8 @@ class QTController extends Controller
     }
 
     public function GetList(){
-        $vacation = DB::table('settings')->where('company_id',Auth::user()->company_id)->select('vacation_per_year')->get()[0]->vacation_per_year;
+        $user = Auth::user();
+        $vacation = DB::table('companies')->find($user->company_id)->vacation_per_year;
         $vList = DB::table('vacations')->where([
             ['is_approved', '!=', Constants::REJECTED_VACATION],
             ['user_id', Auth::user()->id],

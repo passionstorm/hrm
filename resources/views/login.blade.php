@@ -15,8 +15,6 @@
   <link rel="stylesheet" href="bower_components/Ionicons/css/ionicons.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="dist/css/AdminLTE.min.css">
-  <!-- iCheck -->
-  <link rel="stylesheet" href="plugins/iCheck/square/blue.css">
 
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -30,29 +28,30 @@
 </head>
 <body class="hold-transition login-page">
 <div class="login-box">
-  <div class="login-logo">
-    <a href="../../index2.html"><b>Human Resource Manager</b></a>
-  </div>
+  <div class="login-logo"><b>Login</b></div>
   <!-- /.login-logo -->
   <div class="login-box-body">
-    <p class="login-box-msg">Sign in to start your session</p>
-    
     @include('messages.errors')
     @include('messages.fail')
     <form action="login" method="post">
         @csrf
       <div class="form-group has-feedback">
-        <label>Username</label>
         <input type="text" class="form-control" placeholder="Username" name="username">
         <span class="glyphicon glyphicon-user form-control-feedback"></span>
       </div>
       <div class="form-group has-feedback">
-        <label>Password</label>
         <input type="password" class="form-control" placeholder="Password" name="password">
         <span class="glyphicon glyphicon-lock form-control-feedback"></span>
       </div>
-      <div class="text-center">
-          <button type="submit" class="btn btn-primary">Sign In</button>
+      <div class="row">
+        <div class="col-xs-8">
+          <label>
+            <input type="checkbox" name="remember_me"> Remember Me
+          </label>
+        </div>
+        <div class="col-xs-4">
+          <button type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
+        </div>
       </div>
     </form>
   </div>
@@ -64,16 +63,5 @@
 <script src="bower_components/jquery/dist/jquery.min.js"></script>
 <!-- Bootstrap 3.3.7 -->
 <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-<!-- iCheck -->
-<script src="plugins/iCheck/icheck.min.js"></script>
-<script>
-  $(function () {
-    $('input').iCheck({
-      checkboxClass: 'icheckbox_square-blue',
-      radioClass: 'iradio_square-blue',
-      increaseArea: '20%' /* optional */
-    });
-  });
-</script>
 </body>
 </html>

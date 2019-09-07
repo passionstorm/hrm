@@ -21,7 +21,8 @@ class ProjectsController extends Controller
      */
     public function GetList()
     {
-        $data = DB::table('projects')->get();
+        $user = Auth::user();
+        $data = DB::table('projects')->where('company_id', $user->company_id)->get();
         return view('projects.list', ['projects' => $data]);
     }
 
@@ -73,7 +74,7 @@ class ProjectsController extends Controller
 
         $this->validate($request, $rules, $errorMessages);
         $c_country = isset(Constants::COUNTRIES[$request->c_country]) ? Constants::COUNTRIES[$request->c_country] : '';
-
+        $user = Auth::user();
         if ($id) {
             $project = DB::table('projects')->find($id);
             //validate name if it's changed
@@ -83,6 +84,7 @@ class ProjectsController extends Controller
 
             DB::table('projects')->where('id', $id)->update(
                 [
+                    'company_id'=> $user->company_id,
                     'c_country' => $c_country,
                     'c_name' => $request->c_name,
                     'name' => $request->name,
@@ -95,9 +97,9 @@ class ProjectsController extends Controller
             );
             return redirect('projects/edit/' . $id)->with('success', 'Successful project editing!');
         } else {
-
             DB::table('projects')->insert(
                 [
+                    'company_id'=> $user->company_id,
                     'c_country' => $c_country,
                     'c_name' => $request->c_name,
                     'name' => $request->name,
@@ -114,11 +116,15 @@ class ProjectsController extends Controller
 
     public function AddParticipants($id)
     {
+        $user = Auth::user();
         $project = DB::table('projects')->find($id);
         $project_name = $project->name;
         $project_id = $project->id;
         $project_participants = explode(',',$project->participants);
-        $users = DB::table('users')->where('is_deleted', 0)->select('id', 'name')->get();
+        $users = DB::table('users')->where([
+            ['is_deleted', 0],
+            ['company_id',$user->company_id],
+        ])->select('id', 'name')->get();
         return view('projects.participants', ['users' => $users, 'project_name' => $project_name, 'project_id' => $project_id, 'project_participants' => $project_participants]);
     }
 

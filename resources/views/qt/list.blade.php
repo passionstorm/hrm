@@ -290,6 +290,8 @@ $eTRPercent = floor($eTimeRemaining/$vacation*100)
 
     //test
     $('#test').click(function(){
+      // console.log(typeof document.cookie)
+      document.cookie = "username=; expires=Thu, 18 Dec 2000 12:00:00 UTC; path=/";
     });
     //end-test
   });

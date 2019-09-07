@@ -7,15 +7,20 @@ $roleMember = 'role:' . Constants::ROLE_MEMBER;
 $roleManager = 'role:' . Constants::ROLE_ADMIN . ',' . Constants::ROLE_STAFF;
 
 Route::get('test', function () {
-    for($i = 0, $c = 7 ; $i < $c; $i++ ){
-        echo $i;echo '<hr>';
-    }
+    $user = Auth::user();
+$companyName = DB::table('companies')->find($user->id);
+    echo $companyName;echo '<hr>';
+    
     // echo var_dump( $history );echo '<hr>';
     // echo json_encode($shifts);echo '<hr>';
 });
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::get('register', function () {
+    return view('register');
 });
 
 Route::get('login', 'UserController@GetLogin');
@@ -28,7 +33,7 @@ Route::get('index', 'UserController@GetIndexPage')->name('dashboard')->middlewar
 Route::get('users/list', 'UserController@GetList')->middleware($roleManager);
 Route::get('users/delete/{id}', 'UserController@DeleteUser')->middleware($roleAdmin);
 Route::get('users/edit/{id?}', 'UserController@EditUser')->middleware($roleAdmin);
-Route::post('users/edit/{id?}', 'UserController@PostUser')->middleware($roleAdmin);
+Route::post('users/edit/{id?}', 'UserController@PostUser');
 
 //project
 Route::get('projects/{id}/participants/add/', 'ProjectsController@AddParticipants')->middleware($roleManager);

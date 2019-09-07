@@ -15,6 +15,9 @@
   .d-n {
     display: none !important;
   }
+  .mg-t-10{
+    margin-top: 10px
+  }
 </style>
 @endsection
 

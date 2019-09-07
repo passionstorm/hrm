@@ -47,7 +47,8 @@ class OtsController extends Controller
 
    public function GetOTs($date)
    {
-      $projects = DB::table('projects')->select('id', 'name')->get();
+      $user = Auth::user();
+      $projects = DB::table('projects')->where('company_id', $user->company_id)->select('id', 'name')->get();
 
       $ot = DB::table('ot')->where([
          ['ot_date', $date],

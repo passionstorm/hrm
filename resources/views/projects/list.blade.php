@@ -130,7 +130,7 @@
                                 </div>
                             </div>
                             <p>Deadline: <span class="deadline">{{$p->deadline}}</span></p>
-                            <p>Budget: <b>$</b><span class="budget">{{number_format($p->budget, "2")}}</span></p>
+                            <p>Budget: <b>$</b><span class="budget">{{$p->budget}}</span></p>
                             <p>Participants: <span class="participants">{{$participants_c}}</span></p>
                         </div>
                     @endforeach
