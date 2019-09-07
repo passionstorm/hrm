@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Constants;
-use App\Http\Requests\login;
+use App\Http\Requests\loginRequest;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,9 +21,16 @@ class UserController extends Controller
     /**
      * @return Factory|View
      */
-    public function GetLogin()
+    public function GetLogin(Request $request)
     {
-        return view('login');
+        $username  = $request->cookie('username');
+        $password = $request->cookie('password');
+        $rm = $request->cookie('rm');
+        return view('login', [
+            'username'=>$username,
+            'password'=>$password,
+            'rm'=>$rm,
+        ]);
     }
 
     /**
@@ -55,18 +62,9 @@ class UserController extends Controller
     }
 
     /**
-     * @return RedirectResponse|Redirector
-     */
-    public function GetLogout()
-    {
-        Auth::Logout();
-        return redirect('/');
-    }
-
-    /**
      * @return Factory|View
      */
-    public function GetList()
+    public function getList()
     {
         $user = Auth::user();
         $users = DB::table('users')->where([
@@ -80,7 +78,7 @@ class UserController extends Controller
      * @param $id
      * @return RedirectResponse|Redirector
      */
-    public function DeleteUser($id)
+    public function deleteUser($id)
     {
         DB::table('users')->where('id', $id)->update(['is_deleted' => Constants::IS_DELETED]);
         return redirect('users/list')->with('success', 'Delete user successfully!');
@@ -90,7 +88,7 @@ class UserController extends Controller
      * @param null $id
      * @return Factory|View
      */
-    public function EditUser($id = null)
+    public function editUser($id = null)
     {
         if ($id) {
             $user = DB::table('users')->find($id);
@@ -105,7 +103,7 @@ class UserController extends Controller
      * @return RedirectResponse|Redirector
      * @throws ValidationException
      */
-    public function PostUser(Request $request, $id = null)
+    public function postUser(Request $request, $id = null)
     {
         $rule = [
             'retype_password' => 'same:password',
@@ -159,10 +157,10 @@ class UserController extends Controller
         $this->validate($request, ['company_name' => 'unique:companies,company_name']);
         if ($request->hasFile('avatar')) {
             $file = $request->file('avatar');
-            $hinh = md5(time()) . '_' . $file->getClientOriginalName();
-            $file->move(public_path('upload/avatar'), $hinh);
+            $avatar = md5(time()) . '_' . $file->getClientOriginalName();
+            $file->move(public_path('upload/avatar'), $avatar);
         } else {
-            $hinh = 'user_avatar.jpg';
+            $avatar = 'user_avatar.jpg';
         }
         if($request->firstRegister){
             DB::table('companies')->insert([

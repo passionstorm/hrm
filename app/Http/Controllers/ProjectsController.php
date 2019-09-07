@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Constants;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use App\Constants;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -32,7 +32,10 @@ class ProjectsController extends Controller
      */
     public function DeleteProject($id)
     {
-        DB::table('projects')->where('id', $id)->update(['is_deleted' => Constants::IS_DELETED]);
+        DB::table('projects')
+            ->where('id', $id)
+            ->update(['is_deleted' => Constants::IS_DELETED]);
+
         return redirect('projects/list')->with('success', 'close the project successfully!');
     }
 
@@ -45,8 +48,10 @@ class ProjectsController extends Controller
     {
         if ($id) {
             $data = DB::table('projects')->find($id);
+
             return view('projects.edit', ['project' => $data]);
         }
+
         return view('projects.edit');
     }
 
@@ -112,6 +117,21 @@ class ProjectsController extends Controller
             );
             return redirect('projects/edit')->with('success', 'Additional project successfully');
         }
+
+        DB::table('projects')->insert(
+            [
+                'c_country' => $c_country,
+                'c_name' => $request->c_name,
+                'name' => $request->name,
+                'budget' => $request->budget,
+                'deadline' => $request->deadline,
+                'describe' => $request->describe,
+                'created_at' => Carbon::now(),
+                'created_by' => Auth::user()->username,
+            ]
+        );
+
+        return redirect('projects/edit')->with('success', 'Additional project successfully');
     }
 
     public function AddParticipants($id)

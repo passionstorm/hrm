@@ -27,6 +27,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 </head>
 <body class="hold-transition login-page">
+  {{-- <button id="test">test</button> --}}
 <div class="login-box">
   <div class="login-logo"><b>Login</b></div>
   <!-- /.login-logo -->

@@ -5,11 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class OtsController extends Controller
 {
-
    function isWeekend($date)
    {
       return (date('N', strtotime($date)) >= 6);
@@ -66,170 +65,170 @@ class OtsController extends Controller
             'date' => $date,
             'approved' => $ot[0]->approved
             ]);
-      }
+        }
 
-      return view('ots.post', ['projects' => $projects, 'date' => $date]);
-   }
+        return view('ots.post', ['projects' => $projects, 'date' => $date]);
+    }
 
-   public function PostOT(Request $request)
-   {
-      if ($request->ajax()) {
-         //validate
-         $data = $request->data;
-         $date = $request->date;
-         $approved = $request->approved;
-         $amount = count($data);
-         $user_id = Auth::user()->id;
+    public function PostOT(Request $request)
+    {
+        if ($request->ajax()) {
+            //validate
+            $data = $request->data;
+            $date = $request->date;
+            $approved = $request->approved;
+            $amount = count($data);
+            $user_id = Auth::user()->id;
 
-         //check user enter same post value
-         if ($amount >= 2) {
-            for ($i = 0; $i < $amount - 1; $i++) {
-               for ($y = $i + 1; $y < $amount; $y++) {
-                  if( substr($data[$i]['id'], 0, 4) == substr($data[$y]['id'], 0, 4) && $data[$i]['start'] == $data[$y]['start'] && $data[$i]['end'] == $data[$y]['end'] ){
-                     return response()->json([
-                        'samePosts' => [ $data[$i]['id'], $data[$y]['id'] ]
-                     ]);
-                  }
-               }
+            //check user enter same post value
+            if ($amount >= 2) {
+                for ($i = 0; $i < $amount - 1; $i++) {
+                    for ($y = $i + 1; $y < $amount; $y++) {
+                        if (substr($data[$i]['id'], 0, 4) == substr($data[$y]['id'], 0, 4) && $data[$i]['start'] == $data[$y]['start'] && $data[$i]['end'] == $data[$y]['end']) {
+                            return response()->json([
+                                'samePosts' => [$data[$i]['id'], $data[$y]['id']]
+                            ]);
+                        }
+                    }
+                }
             }
-         }
-         //end-check user enter same post value
+            //end-check user enter same post value
 
-         //check error time
-         for ($i = 0; $i < $amount; $i++) {
-            if (strtotime($data[$i]['start']) >= strtotime($data[$i]['end'])) {
-               return response()->json([
-                  'errorTimes' => [ $data[$i]['id'] ],
-               ]);
+            //check error time
+            for ($i = 0; $i < $amount; $i++) {
+                if (strtotime($data[$i]['start']) >= strtotime($data[$i]['end'])) {
+                    return response()->json([
+                        'errorTimes' => [$data[$i]['id']],
+                    ]);
+                }
             }
-         }
-         //end-check error time
+            //end-check error time
 
-         //check conflict ot post
-         if ($amount > 1) {
+            //check conflict ot post
+            if ($amount > 1) {
+                for ($i = 0; $i < $amount - 1; $i++) {
+                    for ($y = $i + 1; $y < $amount; $y++) {
+                        if (substr($data[$i]['id'], 0, 4) == substr($data[$y]['id'], 0, 4)) {
+                            $time1 = (object)[
+                                'start' => $data[$i]['start'], 'end' => $data[$i]['end']
+                            ];
+                            $time2 = (object)[
+                                'start' => $data[$y]['start'], 'end' => $data[$y]['end']
+                            ];
+                            if ($this->checkConflictTime($time1, $time2)) {
+                                return response()->json([
+                                    'existOT' => [$data[$i]['id'], $data[$y]['id']]
+                                ]);
+                            }
+                        }
+                    }
+                }
+            }
+            //end-check conflict ot post
+
+            //check conflict in ot_detail table
             for ($i = 0; $i < $amount - 1; $i++) {
-               for ($y = $i + 1; $y < $amount; $y++) {
-                  if( substr($data[$i]['id'], 0, 4) == substr($data[$y]['id'], 0, 4) ){
-                     $time1 = (object) [
-                        'start' => $data[$i]['start'], 'end' => $data[$i]['end']
-                     ];
-                     $time2 = (object) [
-                        'start' => $data[$y]['start'], 'end' => $data[$y]['end']
-                     ];
-                     if ($this->checkConflictTime($time1, $time2)) {
+                for ($y = $i + 1; $y < $amount; $y++) {
+                    $time1 = (object)['start' => $data[$i]['start'], 'end' => $data[$i]['end']];
+                    $time2 = (object)['start' => $data[$y]['start'], 'end' => $data[$y]['end']];
+                    if ($this->checkConflictTime($time1, $time2)) {
                         return response()->json([
-                           'existOT' => [$data[$i]['id'], $data[$y]['id']]
+                            'existOT' => [$data[$i]['id'], $data[$y]['id']]
                         ]);
-                     }
-                  }
-               }
+                    }
+                }
             }
-         }
-         //end-check conflict ot post
+            //end-check conflict in ot_detail table
 
-         //check conflict in ot_detail table
-         for ($i = 0; $i < $amount-1; $i++) {
-            for($y = $i + 1; $y < $amount; $y++){
-               $time1 = (object) ['start' => $data[$i]['start'], 'end' => $data[$i]['end']];
-               $time2 = (object) ['start' => $data[$y]['start'], 'end' => $data[$y]['end']];
-               if ($this->checkConflictTime($time1, $time2)) {
-                  return response()->json([
-                     'existOT' => [ $data[$i]['id'], $data[$y]['id'] ]
-                  ]);
-               }
+            //end-validate
+
+            //save to 'ot' table
+            //check exitst ot date of current user
+            $existOT = $this->findOtId($date, $user_id);
+            //end-check exitst ot date of current user
+            if (count($existOT) == 0) {//case of add
+                DB::table('ot')->insert(
+                    [
+                        'user_id' => $user_id,
+                        'ot_date' => $date,
+                        'weekend_flag' => (date('N', strtotime($date)) >= 6),
+                        'approved' => $approved,
+                        'created_at' => Carbon::now(),
+                        'created_by' => Auth::user()->username
+                    ]
+                );
+            }//end-case of add
+            else {//case of update
+                $eoID = $existOT[0]->id;
+                DB::table('ot')->where('id', $eoID)->update(
+                    [
+                        'approved' => $approved,
+                        'updated_at' => Carbon::now(),
+                        'updated_by' => Auth::user()->username
+                    ]
+                );
+            }//end-case of update
+            //end-save to 'ot' table
+
+            //save to 'ot_detail' table
+            $ot_id = $this->findOtId($date, $user_id);
+            DB::table('ot_detail')->where('ot_id', $ot_id[0]->id)->delete();
+            for ($i = 0; $i < $amount; $i++) {
+                DB::table('ot_detail')->insert(
+                    [
+                        'ot_id' => $ot_id[0]->id,
+                        'time_start' => $data[$i]['start'],
+                        'time_end' => $data[$i]['end'],
+                        'project_id' => $data[$i]['project_id'],
+                        'comment' => $data[$i]['comment'],
+                        'created_at' => Carbon::now(),
+                        'created_by' => Auth::user()->username,
+                    ]
+                );
             }
-         }
-         //end-check conflict in ot_detail table
+            //end-save to 'ot_detail' table
 
-         //end-validate
+            //response success
+            return response()->json([
+                'success' => 'success',
+            ]);
+            //end-response success
+        }
+    }
 
-         //save to 'ot' table
-         //check exitst ot date of current user
-         $existOT = $this->findOtId($date, $user_id);
-         //end-check exitst ot date of current user
-         if (count($existOT) == 0) {//case of add
-            DB::table('ot')->insert(
-               [
-                  'user_id' => $user_id,  
-                  'ot_date' => $date,
-                  'weekend_flag' => $this->isWeekend($date),
-                  'approved' => $approved,
-                  'created_at' => Carbon::now(),
-                  'created_by' => Auth::user()->username
-               ]
-            );
-         }//end-case of add
-         else {//case of update
-            $eoID = $existOT[0]->id;
-            DB::table('ot')->where('id', $eoID)->update(
-               [
-                  'approved' => $approved,
-                  'updated_at' => Carbon::now(),
-                  'updated_by' => Auth::user()->username
-               ]
-            );
-         }//end-case of update
-         //end-save to 'ot' table
+    public function GetList()
+    {
+        $projects = DB::table('ot')
+            ->where('user_id', Auth::user()->id)
+            ->join('ot_detail', function ($join) {
+                $join->on('ot.id', 'ot_detail.ot_id');
+            })
+            ->join('projects', function ($join) {
+                $join->on('ot_detail.project_id', 'projects.id');
+            })
+            ->select('projects.name', 'projects.id')->distinct()->get();
 
-         //save to 'ot_detail' table
-         $ot_id = $this->findOtId($date, $user_id);
-         DB::table('ot_detail')->where('ot_id', $ot_id[0]->id)->delete();
-         for ($i = 0; $i < $amount; $i++) {
-               DB::table('ot_detail')->insert(
-                  [
-                     'ot_id' => $ot_id[0]->id,
-                     'time_start' => $data[$i]['start'],
-                     'time_end' => $data[$i]['end'],
-                     'project_id' => $data[$i]['project_id'],
-                     'comment' => $data[$i]['comment'],
-                     'created_at' => Carbon::now(),
-                     'created_by' => Auth::user()->username,
-                  ]
-               );
-         }
-         //end-save to 'ot_detail' table
+        $month = date('m');
+        $yearMonth = date('Y-m');
+        $today = date('d');
+        $ots = DB::table('ot')
+            ->where('user_id', Auth::id())
+            ->whereMonth('ot_date', $month)
+            ->join('ot_detail', 'ot.id', 'ot_detail.ot_id')
+            ->get(['ot.ot_date', 'ot_detail.time_start', 'ot_detail.time_end', 'ot.approved']);
 
-         //response success
-         return response()->json([
-            'success' => 'success',
-         ]);
-         //end-response success
-      }
-   }
+        foreach ($ots as $i) {
+            $i->startToEnd = $i->time_start . '-' . $i->time_end;
+            $i->ot_t = number_format((strtotime($i->time_end) - strtotime($i->time_start)) / 3600, 1);
+            unset($i->time_start, $i->time_end);
+        }
 
-   public function GetList()
-   {
-      //Advanced query join
-      $projects = DB::table('ot')
-         ->where('user_id', Auth::user()->id)
-         ->join('ot_detail', function ($join) {
-            $join->on('ot.id', 'ot_detail.ot_id');
-         })
-         ->join('projects', function ($join) {
-            $join->on('ot_detail.project_id', 'projects.id');
-         })
-         ->select('projects.name', 'projects.id')->distinct()->get();
-      //end-Advanced query join
-
-      $month = date('m');
-      $yearMonth = date('Y-m');
-      $today = date('d');
-      $ots = DB::table('ot')
-         ->where('user_id', Auth::user()->id)->whereMonth('ot_date', $month)
-         ->join('ot_detail', 'ot.id', 'ot_detail.ot_id')
-         ->select('ot.ot_date', 'ot_detail.time_start', 'ot_detail.time_end', 'ot.approved')->get();
-      foreach ($ots as $i) {
-         $i->startToEnd = $i->time_start . '-' . $i->time_end;
-         $i->ot_t = number_format((strtotime($i->time_end) - strtotime($i->time_start)) / 3600,1);
-         unset($i->time_start, $i->time_end);
-      }
-
-      return view('ots.list', [
-         'yearMonth' => $yearMonth,
-         'projects' => $projects,
-         'today' => $today,
-         'ots' => $ots
-      ]);
-   }
+        return view('ots.list', [
+            'yearMonth' => $yearMonth,
+            'projects' => $projects,
+            'today' => $today,
+            'ots' => $ots
+        ]);
+    }
 
 }
