@@ -13,7 +13,10 @@
 <div class="highlight highlight-source-shell">
     <pre>
         npm install
+        
         composer install
+        
+        
     </pre>
 </div>
 
