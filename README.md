@@ -9,5 +9,12 @@
 <div>Chạy lệnh "php artisan key:generate"</div>
 <div>Chạy lệnh "php artisan config:cache"</div>
 
+<h3>How to start</h3>
+<div class="highlight highlight-source-shell">
+    <pre>
+        npm install -g parcel-bundler
+    </pre>
+</div>
+
 
 <a href="https://github.com/passionstorm/hrm/wiki/Rule-code"><h3>Rule code khi tham gia dự án</h3></a>
