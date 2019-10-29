@@ -12,7 +12,8 @@
 <h3>How to start</h3>
 <div class="highlight highlight-source-shell">
     <pre>
-        npm install -g parcel-bundler
+        npm install
+        composer install
     </pre>
 </div>
 
