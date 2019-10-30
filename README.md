@@ -7,37 +7,16 @@
 <h3>How to start</h3>
 <div class="highlight highlight-source-shell">
     <pre>
-        
-        npm install
-        
-        
-        
-        composer install
-        
-        
-        
-        php artisan key:generate
-        
-        
-        
-        Change name .env.example to .env and edit it to suit you
-        
-        
-        
-        php artisan config:cache
-        
-     </pre>
-     
-     <pre><code>- Login / Logout
+        <code>- Login / Logout
 
-- Permission Authentication
-  - Page permission
-  - Directive permission
-  - Permission configuration page
-  - Two-step login
+    - Permission Authentication
+      - Page permission
+      - Directive permission
+      - Permission configuration page
+      - Two-step login
 
-- Multi-environment build
-  - dev sit stage prod
+    - Multi-environment build
+      - dev sit stage prod
 
 - Global Features
   - I18n
