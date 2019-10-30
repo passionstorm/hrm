@@ -8,18 +8,13 @@
 <div class="highlight highlight-source-shell">
     <pre>
         npm install
-    </pre>
-    <pre>
+        
         composer install
-    </pre>
-    <pre>
+        
         php artisan key:generate
-    </pre>    
-    <pre>
+        
         Change name .env.example to .env and edit it to suit you
         php artisan config:cache
-    </pre>   
 </div>
-
 
 <a href="https://github.com/passionstorm/hrm/wiki/Rule-code"><h3>Rule code khi tham gia dự án</h3></a>
