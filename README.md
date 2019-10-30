@@ -7,14 +7,14 @@
 <h3>How to start</h3>
 <div class="highlight highlight-source-shell">
     <pre>
-        npm install
+        "npm install"
         
-        composer install
+        "composer install"
         
-        php artisan key:generate
+        "php artisan key:generate"
         
-        Change name .env.example to .env and edit it to suit you
-        php artisan config:cache
+        "Change name .env.example to .env and edit it to suit you"
+        "php artisan config:cache"
 </div>
 
 <a href="https://github.com/passionstorm/hrm/wiki/Rule-code"><h3>Rule code khi tham gia dự án</h3></a>
