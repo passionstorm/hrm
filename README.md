@@ -13,11 +13,13 @@
 <div class="highlight highlight-source-shell">
     <pre>
         npm install
-        
-        composer install
-        
-        
     </pre>
+    <pre>
+        composer install
+    </pre>
+    <pre>
+        php artisan key:generate
+    </pre>    
 </div>
 
 
