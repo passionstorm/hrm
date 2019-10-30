@@ -7,6 +7,7 @@
 <h3>How to start</h3>
 <pre>
     <span>npm install</span>
+    
     <span>composer install</span>
 </pre>
 
