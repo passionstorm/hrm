@@ -4,11 +4,6 @@
 <div>Account staff: username: staff, password: staff</div>
 <div>Account member: username: member1, password: member1</div>
 
-<h3>Cách cấu hình env</h3>
-<div>Đổi tên file .env.example thành .env </div>
-<div>Chạy lệnh "php artisan key:generate"</div>
-<div>Chạy lệnh "php artisan config:cache"</div>
-
 <h3>How to start</h3>
 <div class="highlight highlight-source-shell">
     <pre>
@@ -20,6 +15,10 @@
     <pre>
         php artisan key:generate
     </pre>    
+    <pre>
+        Change name .env.example to .env and edit it to suit you
+        php artisan config:cache
+    </pre>   
 </div>
 
 
