@@ -13,4 +13,4 @@
     <span>php artisan config:cache</span>
 </pre>
 
-<a href="https://github.com/passionstorm/hrm/wiki/Rule-code"><h3>Rule code khi tham gia dự án</h3></a>
+<a href="https://github.com/passionstorm/hrm/wiki/Rule-code"><h3>Rules when participating in a project</h3></a>
