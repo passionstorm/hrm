@@ -56,7 +56,7 @@ class Kernel extends HttpKernel
             EncryptCookies::class,
             AddQueuedCookiesToResponse::class,
             StartSession::class,
-            // \Illuminate\Session\Middleware\AuthenticateSession::class,
+            AuthenticateSession::class,
             ShareErrorsFromSession::class,
             VerifyCsrfToken::class,
             SubstituteBindings::class,
@@ -85,8 +85,6 @@ class Kernel extends HttpKernel
         'signed' => ValidateSignature::class,
         'throttle' => ThrottleRequests::class,
         'verified' => EnsureEmailIsVerified::class,
-        'login' => login::class,
-        'role' => Role::class,
         'AllowOnlyAjaxRequests' => AllowOnlyAjaxRequests::class,
     ];
 

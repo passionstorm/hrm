@@ -28,27 +28,27 @@
                     $PreventMember = 'none';
                 }
                 ?>
-                <a href="index">
+                <a href="{{ route('home')}}">
                     <span>Dashboard</span>
                 </a>
             </li>
             <li style="display: {{$PreventMember}}">
-                <a href="users/list">
+                <a href="{{route('users.list')}}">
                     <span>Users</span>
                 </a>
             </li>
-            <li  style="display: {{$PreventMember}}">
-                <a href="projects/list">
+            <li style="display: {{$PreventMember}}">
+                <a href="{{route('projects.list')}}">
                     <span>Projects</span>
                 </a>
             </li>
             <li>
-                <a href="ot/list">
+                <a href="{{route('ot.list')}}">
                     <span>OT</span>
                 </a>
             </li>
             <li>
-                <a href="qt/list">
+                <a href="{{route('vacation.list')}}">
                     <span>Vacation</span>
                 </a>
             </li>
