@@ -3,6 +3,7 @@
 <div>Account admin: username: admin, password: admin</div>
 <div>Account staff: username: staff, password: staff</div>
 <div>Account member: username: member1, password: member1</div>
+<div>Source front end: <a href="https://github.com/passionstorm/hrm_fe">https://github.com/passionstorm/hrm_fe</a></div>
 
 <h3>How to start</h3>
 <pre>
