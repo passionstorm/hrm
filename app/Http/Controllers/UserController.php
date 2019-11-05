@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -22,7 +23,13 @@ class UserController extends Controller
      */
     public function getIndexPage()
     {
-        return view('pages.index');
+        $user = Auth::user();
+        $numberOfEmployees = DB::table('users')->where('company_id', $user->company_id)->count();
+        $numberOfProjects = DB::table('projects')->where('company_id', $user->company_id)->count();
+        return view('pages.index',[
+            'numberOfEmployees'=>$numberOfEmployees,
+            'numberOfProjects'=>$numberOfProjects,
+        ]);
     }
 
     /**
@@ -62,7 +69,6 @@ class UserController extends Controller
             $user = DB::table('users')->find($id);
             return view('users.post', ['user' => $user]);
         }
-
         return view('users.post');
     }
 
@@ -75,12 +81,16 @@ class UserController extends Controller
     public function postUser(Request $request, $id = null)
     {
         $rule = [
-            'email' => 'required',
             'retype_password' => 'same:password',
-            'name' => 'required',
             'avatar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ];
         $this->validate($request, $rule);
+        if(Auth::check()){
+            $currentUser = Auth::user();
+            $createdBy = $currentUser->username;
+        }else{
+            $createdBy = $request->username;
+        }
         if ($id) {//post Edit user section
             $user = DB::table('users')->find($id);
             //validate email if email is changed
@@ -99,7 +109,6 @@ class UserController extends Controller
             //only admin case. because attr of select input must be disabled, must save the changes of role and salary
             if (Auth::user()->role == Constants::ROLE_ADMIN) {
                 $user->role = $request->role;
-                $user->organization = $request->organization;
                 $user->salary = $request->salary;
             }
 
@@ -108,7 +117,6 @@ class UserController extends Controller
                     'role' => $user->role,
                     'name' => $request->name,
                     'email' => $request->email,
-                    'organization' => $user->organization,
                     'salary' => $user->salary,
                     'avatar' => $user->avatar,
                     'updated_at' => Carbon::now(),
@@ -118,7 +126,10 @@ class UserController extends Controller
             return redirect('users/edit/' . $id)->with('success', 'successful editing!');
         }
 
-        //insert to db
+        //Add user 
+        $this->validate($request, ['username' => 'unique:users,username']);
+        $this->validate($request, ['email' => 'unique:users,email']);
+        $this->validate($request, ['company_name' => 'unique:companies,company_name']);
         if ($request->hasFile('avatar')) {
             $file = $request->file('avatar');
             $avatar = md5(time()) . '_' . $file->getClientOriginalName();
@@ -140,7 +151,6 @@ class UserController extends Controller
             'updated_at' => Carbon::now(),
             'updated_by' => Auth::user()->username,
         ]);
-
         return redirect('users/edit')->with('success', 'Additional success!');
     }
 

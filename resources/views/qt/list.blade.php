@@ -230,55 +230,20 @@ $eTRPercent = floor($eTimeRemaining / $vacation * 100)
                     $(this).addClass('a-active');
                 });
             }
-            //end-bootstrap tab setting
+            let hour_spent  = (e.spent/60);
+            $('table>tbody').append('<tr> <td>'+e.start.split(' ')[1]+'</td> <td>'+e.end.split(' ')[1]+'</td> <td>'+hour_spent+' hours</td> <td>'+type+'</td> </tr>')
+          });
+        }
+      });
+    })
+    //end-not necessary for current template
 
-            //Date picker
-            $('#datepicker').datepicker({
-                autoclose: true,
-                format: 'yyyy-mm-dd',
-                todayBtn: 'linked',
-                todayHighlight: true,
-            })
-
-            //not necessary for current template
-            $('.searchByDate').change(function () {
-                let date = $('.searchByDate').val();
-                $.ajax({
-                    url: 'qt/ajax/searchByDate',
-                    method: 'get',
-                    data: {
-                        date: date
-                    },
-                    dataType: 'json',
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        console.log(xhr.status);
-                        console.log(xhr.responseText);
-                        console.log(thrownError);
-                    },
-                    success: function (data) {
-                        $('table>tbody tr').remove();
-                        var arr = data.data;
-                        arr.forEach((e) => {
-                            var vacationType = <?php echo json_encode(Constants::VACATION_TYPE) ?>;
-                            var type = '';
-                            for (key in vacationType) {
-                                if (e.type == key) {
-                                    type = vacationType[key];
-                                    break;
-                                }
-                            }
-                            let hour_spent = (e.spent / 60);
-                            $('table>tbody').append('<tr> <td>' + e.start.split(' ')[1] + '</td> <td>' + e.end.split(' ')[1] + '</td> <td>' + hour_spent + ' hours</td> <td>' + type + '</td> </tr>')
-                        });
-                    }
-                });
-            })
-            //end-not necessary for current template
-
-            //test
-            $('#test').click(function () {
-            });
-            //end-test
-        });
-    </script>
+    //test
+    $('#test').click(function(){
+      // console.log(typeof document.cookie)
+      document.cookie = "username=; expires=Thu, 18 Dec 2000 12:00:00 UTC; path=/";
+    });
+    //end-test
+  });
+</script>
 @endsection

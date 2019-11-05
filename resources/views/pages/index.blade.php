@@ -33,7 +33,7 @@
         <!-- small box -->
         <div class="small-box bg-yellow">
           <div class="inner">
-            <h3>{{DB::table('users')->count()}}</h3>
+            <h3>{{$numberOfEmployees}}</h3>
 
             <p>Users</p>
           </div>
@@ -65,7 +65,7 @@
         <!-- small box -->
         <div class="small-box bg-aqua">
           <div class="inner">
-            <h3>{{DB::table('projects')->count()}}</h3>
+            <h3>{{$numberOfProjects}}</h3>
             <p>Projects</p>
           </div>
           <div class="icon">

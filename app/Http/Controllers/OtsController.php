@@ -10,57 +10,61 @@ use Illuminate\Support\Facades\DB;
 class OtsController extends Controller
 {
 
-    function findOtId($ot_date, $user_id)
-    {
-        return DB::table('ot')->where([
-            ['ot_date', $ot_date],
-            ['user_id', $user_id],
-        ])->select('id')->get();
-    }
+   function isWeekend($date)
+   {
+      return (date('N', strtotime($date)) >= 6);
+   }
 
-    function checkConflictTime($obj_time_1, $obj_time_2)
-    {
-        $start1 = strtotime($obj_time_1->start);
-        $end1 = strtotime($obj_time_1->end);
-        $start2 = strtotime($obj_time_2->start);
-        $end2 = strtotime($obj_time_2->end);
-        if (($start2 >= $start1 && $start2 < $end1) || ($start2 < $start1 && $end2 > $start1)) {
-            return true;
-        }
-        return false;
-    }
+   function findOtId($ot_date, $user_id)
+   {
+      return DB::table('ot')->where([
+         ['ot_date', $ot_date],
+         ['user_id', $user_id],
+      ])->select('id')->get();
+   }
 
-    function sortByStartTime($array)
-    {
-        for ($i = 0; $i < count($array) - 1; $i++) {
-            for ($y = $i + 1; $y < count($array); $y++) {
-                if (strtotime($array[$i]->start) > strtotime($array[$y]->start)) {
-                    $v = $array[$i];
-                    $array[$i] = $array[$y];
-                    $array[$y] = $v;
-                }
-            }
-        }
-    }
+   function checkConflictTime($obj_time_1, $obj_time_2)
+   {
+      $start1 = strtotime($obj_time_1->start);
+      $end1 = strtotime($obj_time_1->end);
+      $start2 = strtotime($obj_time_2->start);
+      $end2 = strtotime($obj_time_2->end);
+      if (($start2 >= $start1 && $start2 < $end1) || ($start2 < $start1 && $end2 > $start1)) {
+         return true;
+      }
+      return false;
+   }
 
-    public function GetOTs($date)
-    {
-        $projects = DB::table('projects')->select('id', 'name')->get();
-        $ot = DB::table('ot')->where([
-            ['ot_date', $date],
-            ['user_id', Auth::user()->id],
-        ])->get();
+   function sortByStartTime($array){
+      for($i = 0; $i<count($array)-1; $i++){
+         for($y = $i+1; $y<count($array); $y++){
+             if( strtotime($array[$i]->start) > strtotime($array[$y]->start) ){
+                 $v = $array[$i];$array[$i] = $array[$y];$array[$y] = $v;
+             }
+         }
+     }
+   }
 
-        if (count($ot) > 0) {
-            $ot_ds = DB::table('ot_detail')->where('ot_id', $ot[0]->id)
-                ->join('projects', 'projects.id', 'ot_detail.project_id')
-                ->select('ot_detail.id', 'comment', 'time_start as start', 'time_end as end', 'project_id', 'projects.name')->get();
-            $this->sortByStartTime($ot_ds);
-            return view('ots.post', [
-                'projects' => $projects,
-                'item' => $ot_ds,
-                'date' => $date,
-                'approved' => $ot[0]->approved
+   public function GetOTs($date)
+   {
+      $user = Auth::user();
+      $projects = DB::table('projects')->where('company_id', $user->company_id)->select('id', 'name')->get();
+
+      $ot = DB::table('ot')->where([
+         ['ot_date', $date],
+         ['user_id', Auth::user()->id],
+      ])->get();
+
+      if ( count($ot) > 0) {
+         $ot_ds = DB::table('ot_detail')->where('ot_id', $ot[0]->id)
+         ->join('projects', 'projects.id', 'ot_detail.project_id')
+         ->select('ot_detail.id','comment', 'time_start as start', 'time_end as end', 'project_id', 'projects.name')->get();
+         $this->sortByStartTime($ot_ds);
+         return view('ots.post', [
+            'projects' => $projects, 
+            'item' => $ot_ds, 
+            'date' => $date,
+            'approved' => $ot[0]->approved
             ]);
         }
 

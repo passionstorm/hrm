@@ -17,7 +17,7 @@ class VacationController extends Controller
     public function getVacation()
     {
         $user = Auth::user();
-        $setting = DB::table('settings')->where('company_id', $user->company_id)->first(['vacation_per_year', 'short_leave', 'hour_step']);
+        $setting = DB::table('companies')->where('company_id', $user->company_id)->first(['vacation_per_year', 'short_leave', 'hour_step']);
         $idShiftList = explode('.', DB::table('users')->find($user->id)->shift);
         $shifts = DB::table('shifts')->whereIn('id', $idShiftList)->orderBy('start', 'asc')->get();
         $dynamicReason = DB::table('reasons')->where('company_id', $user->company_id)->get(['reason', 'id']);
@@ -48,7 +48,7 @@ class VacationController extends Controller
      */
     public function getList()
     {
-        $vacation = DB::table('settings')->where('company_id', Auth::user()->company_id)->first('vacation_per_year');
+        $vacation = DB::table('companies')->where('company_id', Auth::user()->company_id)->first('vacation_per_year');
         $vacationPerYear = $vacation ? $vacation->vacation_per_year : 12;
 
         $vList = DB::table('vacations')
